@@ -1,1 +1,0 @@
-<html><head><link rel="stylesheet" href="style.css" type="text/css" /></head><body bgcolor="#000000" class="serverName"><span class="color7">WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW</span></body></html>

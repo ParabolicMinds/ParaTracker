@@ -245,7 +245,6 @@ $buf3 .= '<img src="ui/param.gif" class="hiddenPic" /><img src="ui/param_c.gif" 
 		fadels();
 		//--></script>' . $buf3;
 		file_put_contents('tracker_page.php', $buf2);
-
 	} else {
 		$buf =  '<html><head><link rel="stylesheet" href="style.css" type="text/css" />
 		<script type="text/javascript"><!--
@@ -290,8 +289,9 @@ $buf .= '</td><td width="9" background="ui/blinker2.gif"></td></tr></table></td>
 
 </body></html>';
 
-		file_put_contents('tracker_page.php', $buf);
-		file_put_contents('param.php', "");
+
+	file_put_contents('tracker_page.php', $buf);
+	file_put_contents('param.php', "");
 	}
 
 file_put_contents("time.txt", time());
