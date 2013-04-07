@@ -134,19 +134,33 @@ function do_update()
 		$buf='';
 		
 		$i = 1;
-		if(file_exists('images/levelshots/' . str_replace('/','_',$cvars_hash["mapname"]) . '_' . $i . '.jpg'))
-		{
-			for($i=1;file_exists('images/levelshots/' . str_replace('/','_',$cvars_hash["mapname"]) . '_' . $i . '.jpg');$i++)
-			{
-				$buf .= '.ls' . $i . '{background: url("images/levelshots/' . str_replace('/',"_",$cvars_hash["mapname"]) . '_' . $i . '.jpg");}' . chr(0x0A);
-				$buf3 .= '<img src="images/levelshots/' . str_replace('/','_',$cvars_hash["mapname"]) . '_' . $i . '.jpg" class="hiddenPic">';
+		$type = "";
+		
+		function checklevelshot($lsi, $name) {
+			if (file_exists('levelshots/' . $name . "_" . $lsi . ".gif")){
+				return ".gif";
+			} else if (file_exists('levelshots/' . $name . "_" . $lsi . ".png")){
+				return ".png";
+			} else if (file_exists('levelshots/' . $name . "_" . $lsi . ".jpg")){
+				return ".jpg";
+			} else {
+				return "False";
 			}
 		}
-		else
-		{
-			$buf .= '.ls1{background: url("images/missing.gif");}' . chr(0x0A);
+		
+		if (checklevelshot(1,$cvars_hash["mapname"])!="False"){
+			for ($i=1;$type=checklevelshot($i,$cvars_hash["mapname"]);$i++) {
+				if ($type == "False") {
+					break;
+				}
+				$buf .= '.ls' . $i . '{background: url("levelshots/' . $cvars_hash["mapname"] . "_" . $i . $type .'");}' . chr(0x0A);
+				$buf3 .= '<img src="levelshots/' . $cvars_hash["mapname"] . "_" . $i . $type .'" class="hiddenPic">';
+			}
+		} else {
+			$buf .= '.ls1{background: url("ui/missing.gif");}' . chr(0x0A);
 		}
-$buf3 .= '<img src="images/tracker/param.gif" class="hiddenPic" /><img src="images/tracker/param_c.gif" class="hiddenPic" /><img src="images/tracker/param_l.gif" class="hiddenPic" /><img src="images/tracker/rcon.gif" class="hiddenPic" /><img src="images/tracker/rcon_c.gif" class="hiddenPic" /><img src="images/tracker/rcon_l.gif" class="hiddenPic" />';
+		
+$buf3 .= '<img src="ui/param.gif" class="hiddenPic" /><img src="ui/param_c.gif" class="hiddenPic" /><img src="ui/param_l.gif" class="hiddenPic" /><img src="ui/rcon.gif" class="hiddenPic" /><img src="ui/rcon_c.gif" class="hiddenPic" /><img src="ui/rcon_l.gif" class="hiddenPic" />';
 			$buf2 = '<html><head><link rel="stylesheet" href="style.css" type="text/css" /><title>lame!</title></head><body bgcolor="#DDDDDD">
 			<script language="javascript" type="text/javascript"><!--
 		var shot = 1;
@@ -192,7 +206,7 @@ $buf3 .= '<img src="images/tracker/param.gif" class="hiddenPic" /><img src="imag
 			mywindow.moveTo(0, 0);
 		}
 		//--></script>
-		<table border="0" cellspacing="0" cellpadding="0" width="450" height="200" bgcolor="#000000" background="images/tracker/full.jpg" class="text">
+		<table border="0" cellspacing="0" cellpadding="0" width="450" height="200" bgcolor="#000000" background="ui/full.jpg" class="text">
 		<tr height="200"><td valign="top" width="244"><div class="urcorner"></div>
 		<table border="0" cellspacing="0" cellpadding="0" class="text"><tr height="164"><td><table cellspacing="0" cellpadding="0" class="text" border="0">
 		<tr height="22"><td width="30"></td>
@@ -210,22 +224,22 @@ $buf3 .= '<img src="images/tracker/param.gif" class="hiddenPic" /><img src="imag
 		<tr height="36"><td></td><td colspan="3"><table border="0" cellspacing="0" cellpadding="0"><tr>
 		<td width="116"><table cellspacing="0" cellpadding="0" class="players" border="0"><tr height="5"><td></td></tr><tr><td>Players: ' . $player_count . '/' . $cvars_hash["sv_maxclients"] . '</td></tr></table></td>
 		<td><table border="0" cellspacing="0" cellpadding="0" class="players"><tr height="4"><td colspan="3"></td></tr>
-		<tr height="33"><td width="2"><img src="images/tracker/leftborderline.gif" border="0" height="33" width="2" /></td><td width="51" valign="top"><a href="javascript:rcon_window()" onmouseover="rcon.src=\'images/tracker/rcon_l.gif\';" onmousemove="rcon.src=\'images/tracker/rcon_l.gif\';" onmouseout="rcon.src=\'images/tracker/rcon.gif\';" onmousedown="rcon.src=\'images/tracker/rcon_c.gif\';"><img name="rcon" src="images/tracker/rcon.gif" border="0" /></a></td>
-		<td width="51" valign="top"><a href="javascript:param_window()" onmouseover="param.src=\'images/tracker/param_l.gif\';" onmousemove="param.src=\'images/tracker/param_l.gif\';" onmouseout="param.src=\'images/tracker/param.gif\';" onmousedown="param.src=\'images/tracker/param_c.gif\';"><img name="param" src="images/tracker/param.gif" border="0" /></a></td></tr>
+		<tr height="33"><td width="2"><img src="ui/leftborderline.gif" border="0" height="33" width="2" /></td><td width="51" valign="top"><a href="javascript:rcon_window()" onmouseover="rcon.src=\'ui/rcon_l.gif\';" onmousemove="rcon.src=\'ui/rcon_l.gif\';" onmouseout="rcon.src=\'ui/rcon.gif\';" onmousedown="rcon.src=\'ui/rcon_c.gif\';"><img name="rcon" src="ui/rcon.gif" border="0" /></a></td>
+		<td width="51" valign="top"><a href="javascript:param_window()" onmouseover="param.src=\'ui/param_l.gif\';" onmousemove="param.src=\'ui/param_l.gif\';" onmouseout="param.src=\'ui/param.gif\';" onmousedown="param.src=\'ui/param_c.gif\';"><img name="param" src="ui/param.gif" border="0" /></a></td></tr>
 		</table></td></tr></table></td></tr></table></td></tr></table></td><td valign="top" width="6"></td>
 		<td valign="top" width="200">
 		<style>' . $buf . '
 		.corner{height:150px;absolute;top:0;right:0;}
-		.urcorner{background:url("images/tracker/corner-tr.gif");height:150px;position:absolute;top:0;right:0;}
+		.urcorner{background:url("ui/corner-tr.gif");height:150px;position:absolute;top:0;right:0;}
 		</style>
 		<table border="0" cellspacing="0" cellpadding="0" class="text"><tr height="150">
-		<td valign="top" id="ls" class="ls1"><table border="0" cellspacing="0" cellpadding="0"><tr height="150"><td width="200"><table border="0" cellspacing="0" cellpadding="0" background="images/tracker/corner-tr.gif"><tr height="150"><td width="200" id="hs" class="ls1"><img src="images/tracker/corner-tr.gif" height="150" width="200" /></td></tr></table></td></tr></table></td>
+		<td valign="top" id="ls" class="ls1"><table border="0" cellspacing="0" cellpadding="0"><tr height="150"><td width="200"><table border="0" cellspacing="0" cellpadding="0" background="ui/corner-tr.gif"><tr height="150"><td width="200" id="hs" class="ls1"><img src="ui/corner-tr.gif" height="150" width="200" /></td></tr></table></td></tr></table></td>
 		</tr><tr height="50"><td valign="top">
 		<table height="50" border="0" cellspacing="0" cellpadding="0" class="info"><tr height="3"><td valign="top" colspan="2"></td></tr>
 		<tr height="15"><td width="88">Gametype: ' . $gametypes[$cvars_hash["g_gametype"]] . '</td>
 		<td width="106">Map: ' . colorize($cvars_hash["mapname"]) . '</td></tr>
 		<tr height="15"><td colspan="2">Mod Name: ' . $cvars_hash["gamename"] . '</td></tr>
-		<tr height="15"><td colspan="2"><table class="info" cellpadding="0" cellspacing="0" border="0"><tr><td>Server IP: ' . $server_addr . ':' . $server_port . '</td><td width="6" background="images/tracker/blinker.gif"></td></tr></table></td></tr>
+		<tr height="15"><td colspan="2"><table class="info" cellpadding="0" cellspacing="0" border="0"><tr><td>Server IP: ' . $server_addr . ':' . $server_port . '</td><td width="6" background="ui/blinker.gif"></td></tr></table></td></tr>
 </table></td></tr></table></td></tr></table></body></html>
 		<script language="javascript" type="text/javascript"><!-- 
 		fadels();
@@ -245,22 +259,22 @@ $buf3 .= '<img src="images/tracker/param.gif" class="hiddenPic" /><img src="imag
 		setTimeout("makeReconnectButtonVisible()", 5100);
 		}
 		--></script>
-		</head><body onload="startTimer()"><table cellspacing="0" cellpadding="0" border="0" width="450" height="200" background="images/tracker/blank.jpg">
+		</head><body onload="startTimer()"><table cellspacing="0" cellpadding="0" border="0" width="450" height="200" background="ui/blank.jpg">
 		<tr>
 		<td valign="top">
 <table class="noConnection" cellspacing="0" cellpadding="0" border="0" height="199" width="245">
 <tr><td width="21"></td><td valign="top" width="237" align="center"><br><br><br>Could not connect<br />to server!<br /><br /><table class="noConnection" cellspacing="0" cellpadding="0" border="0"><tr><td>' . $server_addr . ':' . $server_port;
 
 
-$buf .= '</td><td width="9" background="images/tracker/blinker2.gif"></td></tr></table></td></tr>
+$buf .= '</td><td width="9" background="ui/blinker2.gif"></td></tr></table></td></tr>
 
 		<tr height="35"><td colspan="2" valign="top"><table cellspacing="0" cellpadding="0" border="0" valign="top"><tr><td width="140" valign="top"></td><td width="2" align="right" valign="top">
-<img src="images/tracker/leftborderline.gif" border="0" height="33" width="2" /></td><td width="102" valign="top">
+<img src="ui/leftborderline.gif" border="0" height="33" width="2" /></td><td width="102" valign="top">
 
-<table height="31" wodth="102" cellspacing="0" cellpadding="0"><tr height="31"><td width="102" background="images/tracker/reconnect_empty.gif">
+<table height="31" wodth="102" cellspacing="0" cellpadding="0"><tr height="31"><td width="102" background="ui/reconnect_empty.gif">
 
-<a href="' . substr($$_SERVER['PHP_SELF'], 0, strpos($$_SERVER['PHP_SELF'], ".php" ) + 4) . '" onmouseover="reconnect.src=\'images/tracker/reconnect_l.gif\';" onmousemove="reconnect.src=\'images/tracker/reconnect_l.gif\';" onmouseout="reconnect.src=\'images/tracker/reconnect.gif\';" onmousedown="reconnect.src=\'images/tracker/reconnect_c.gif\';">
-<img id="reconnectButton" onclick="makeReconnectButtonInvisible()" class="hiddenPic" name="reconnect" src="images/tracker/reconnect.gif" height="31" width="102" border="0" />
+<a href="' . substr($$_SERVER['PHP_SELF'], 0, strpos($$_SERVER['PHP_SELF'], ".php" ) + 4) . '" onmouseover="reconnect.src=\'ui/reconnect_l.gif\';" onmousemove="reconnect.src=\'ui/reconnect_l.gif\';" onmouseout="reconnect.src=\'ui/reconnect.gif\';" onmousedown="reconnect.src=\'ui/reconnect_c.gif\';">
+<img id="reconnectButton" onclick="makeReconnectButtonInvisible()" class="hiddenPic" name="reconnect" src="ui/reconnect.gif" height="31" width="102" border="0" />
 
 </a></td></tr></table>
 
@@ -270,9 +284,9 @@ $buf .= '</td><td width="9" background="images/tracker/blinker2.gif"></td></tr><
 </table></td></tr></table>
 
 
-<img src="images/tracker/reconnect.gif" class="hiddenPic" />
-<img src="images/tracker/reconnect_c.gif" class="hiddenPic" />
-<img src="images/tracker/reconnect_l.gif" class="hiddenPic" />
+<img src="ui/reconnect.gif" class="hiddenPic" />
+<img src="ui/reconnect_c.gif" class="hiddenPic" />
+<img src="ui/reconnect_l.gif" class="hiddenPic" />
 
 </body></html>';
 
