@@ -1,0 +1,70 @@
+{
+    "cvars": {
+        "sv_maxclients": "10",
+        "g_siegeTeam2": "none",
+        "g_siegeTeam1": "none",
+        "g_siegeRespawn": "20",
+        "g_maxGameClients": "0",
+        "g_jediVmerc": "0",
+        "jp_highlander": "0",
+        "g_debugMelee": "1",
+        "jp_DuelAlpha": "100",
+        "g_stepSlideFix": "1",
+        "g_siegeTeamSwitch": "1",
+        "g_forceRegenTime": "130",
+        "g_forcePowerDisable": "0",
+        "g_weaponDisable": "524279",
+        "bot_minplayers": "4",
+        "sv_allowDownload": "0",
+        "sv_floodProtect": "1",
+        "sv_maxPing": "0",
+        "sv_minPing": "0",
+        "sv_maxRate": "10000",
+        "sv_hostname": "^1Jedi Knight 3 ^0server Bei ^7 clan-overrated.de By ^1CoCo",
+        "g_gametype": "0",
+        "g_duelWeaponDisable": "1",
+        "g_forceBasedTeams": "0",
+        "duel_fraglimit": "1",
+        "g_maxForceRank": "7",
+        "g_saberLocking": "1",
+        "g_privateDuel": "0",
+        "capturelimit": "20",
+        "timelimit": "20",
+        "fraglimit": "00",
+        "dmflags": "128",
+        "version": "JAmp: v1.0.1.0 win-x86 Oct 24 2003",
+        "g_maxHolocronCarry": "3",
+        "g_needpass": "0",
+        "protocol": "26",
+        "mapname": "mp\/ffa2",
+        "sv_privateClients": "0",
+        "jp_cinfo": "232659",
+        "V": "2.3",
+        "gamename": "JA+ Mod v2.3",
+        "g_saberWallDamageScale": "0.4",
+        "g_showDuelHealths": "0"
+    },
+    "players": [
+        {
+            "score": "8",
+            "ping": "0",
+            "name": "Reborn Twin"
+        },
+        {
+            "score": "5",
+            "ping": "0",
+            "name": "Imperial Officer"
+        },
+        {
+            "score": "9",
+            "ping": "0",
+            "name": "Rodian"
+        },
+        {
+            "score": "23",
+            "ping": "0",
+            "name": "Chewbacca"
+        }
+    ],
+    "updated": 1365431800
+}
