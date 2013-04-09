@@ -36,7 +36,7 @@
         "g_maxHolocronCarry": "3",
         "g_needpass": "0",
         "protocol": "26",
-        "mapname": "mp\/ffa2",
+        "mapname": "mp\/ffa3",
         "sv_privateClients": "0",
         "jp_cinfo": "232659",
         "V": "2.3",
@@ -46,25 +46,25 @@
     },
     "players": [
         {
-            "score": "8",
+            "score": "3",
             "ping": "0",
-            "name": "Reborn Twin"
+            "name": "Desann"
         },
         {
-            "score": "5",
+            "score": "3",
             "ping": "0",
-            "name": "Imperial Officer"
+            "name": "Rax Joris"
         },
         {
-            "score": "9",
+            "score": "2",
             "ping": "0",
             "name": "Rodian"
         },
         {
-            "score": "23",
+            "score": "7",
             "ping": "0",
             "name": "Chewbacca"
         }
     ],
-    "updated": 1365431800
+    "updated": 1365467084
 }
