@@ -1,0 +1,10 @@
+body { font-size:14px }
+
+#levelshot { z-index:1;position:absolute;width:192px;height:146px;top:4px;left:250px; }
+
+.border_graphic { z-index:2;position:absolute;top:0px;left:0px; }
+
+#header { z-index:3;position:absolute;top:7px;left:28px;width:200px;height:20px;font-size:12px;color:white }
+
+#players { z-index:3;position:absolute;top:35px;left:28px;width:215px;height:159px;margin:0px;padding:0px;list-style: none;border:0px;background:green;overflow:hidden }
+#players li { background:blue;margin:0px;padding:1px;width:205px }

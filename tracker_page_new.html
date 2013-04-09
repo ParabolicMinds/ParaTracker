@@ -2,55 +2,26 @@
 <html>
 	<head>
 		<title>tracker</title>
+		<link rel="stylesheet" href="style2.css" type="text/css" />
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<script type="text/javascript">
-		$(document).ready(function() {
-				
-	/*$.getJSON('serverstatus.php', function(data) {
-		var items = [];
-		$.each(data, function(key, val) {
-			items.push('<li id="' + key + '">' + val + '</li>');
-		});
-		$('<ul/>', {
-			'class': 'my-new-list',
-			html: items.join('')
-		}).appendTo('body');
-		});*/
-		});
-		
-		function do_update() {
-			$.getJSON('serverstatus.php', function(data) {
-				console.log(data);
-			})
-		}
-		
-		function next_page() {
-			
-		}
-		
-		function previous_page() {
-			
-		}
-		</script>
+		<script src="server_status.js"></script>
 	</head>
 	<body>
-		<img id="levelshot" src="levelshots/atlantica_2.jpg" style="z-index:1;position:absolute;width:192px;height:146px;top:4px;left:250px" />
-		<img src="ui/border_graphic.png" style="z-index:2;position:absolute;top:0px;left:0px" />
-		<div style="z-index:3;position:absolute;top:8px;left:30px;color:white;font-size:13px">Player</div>
-		<div style="z-index:3;position:absolute;top:8px;left:175px;color:white;font-size:13px">Score</div>
-		<div style="z-index:3;position:absolute;top:8px;left:210px;color:white;font-size:13px">Ping</div>
-		<ul id="players" style="z-index:3;position:absolute;top:25px;left:28px;width:210px;height:110px;margin:0px;padding:0px;list-style: none;border:2px solid;background:green;overflow:hidden">
-			<li style="background:blue;margin:0px;padding:1px;font-size:14px;width:205px">hi1</li>
-			<li style="background:blue;margin:0px;padding:1px;font-size:14px;width:205px">hi2</li>
-			<li style="background:blue;margin:0px;padding:1px;font-size:14px;width:205px">hi3</li>
-			<li style="background:blue;margin:0px;padding:1px;font-size:14px;width:205px">hi4</li>
-			<li style="background:blue;margin:0px;padding:1px;font-size:14px;width:205px">hi5</li>
-			<li style="background:blue;margin:0px;padding:1px;font-size:14px;width:205px">hi6</li>
-			<li style="background:blue;margin:0px;padding:1px;font-size:14px;width:205px">hi7</li>
+		<img id="levelshot" src="levelshots/atlantica_2.jpg" />
+		<img src="ui/border_graphic.png" class="border_graphic" />
+		<div id="header">Jedi Knight 3 server Bei clan-overrated.de By CoCo (127.0.0.1:29070)</div>
+		<ul id="players">
+			<li>hi1</li>
+			<li>hi2</li>
+			<li>hi1</li>
+			<li>hi2</li>
+			<li>hi1</li>
+			<li>hi2</li>
+			<li>hi1</li>
+			<li>hi2</li>
+			<li>hi1</li>
+			<li>hi2</li>
 		</ul>
-		<div style="z-index:3;position:absolute;top:140px;left:30px;color:white;font-size:14px">Page 1/1</div>
-		<div style="z-index:3;position:absolute;top:139px;left:100px;font-size:14px"><a onclick="previous_page()" href="javascript:void(0)" id="previous">previous</a></div>
-		<div style="z-index:3;position:absolute;top:139px;left:160px;font-size:14px"><a onclick="next_page()" href="javascript:void(0)" id="next">next</a></div>
 		<div id="loading" style="z-index:4;position:absolute;width:100px;height:50px;top:50px;left:50px;background:red;visibility:hidden">Loading...</div>
 	</body>
 </html>
