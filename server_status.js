@@ -1,4 +1,9 @@
 $(document).ready(function() {
+	$('#loading').hide()
+	$('#scrollable').slimScroll({	
+    	color: "goldenrod",
+        height: '147px'
+    });
 	do_update();
 	
 	/*$.getJSON('serverstatus.php', function(data) {
@@ -14,8 +19,10 @@ $(document).ready(function() {
 });
 
 function do_update() {
+	$('#loading').show()
 	$.getJSON('serverstatus.php', function(data) {
 		console.log(data);
+		$('#loading').hide();
 	})
 }
 
