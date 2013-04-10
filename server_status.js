@@ -5,23 +5,19 @@ $(document).ready(function() {
         height: '147px'
     });
 	do_update();
-	
-	/*$.getJSON('serverstatus.php', function(data) {
-		var items = [];
-		$.each(data, function(key, val) {
-			items.push('<li id="' + key + '">' + val + '</li>');
-		});
-		$('<ul/>', {
-			'class': 'my-new-list',
-			html: items.join('')
-		}).appendTo('body');
-		});*/
 });
 
 function do_update() {
 	$('#loading').show()
 	$.getJSON('serverstatus.php', function(data) {
-		console.log(data);
+		$("#addr").text("(" + data["addr"] + ")");
+		$("#hostname").text(data["cvars"]["sv_hostname"]);
+		$("#map").text(data["cvars"]["mapname"]);
+		$("#gamename span").text(data["cvars"]["gamename"]);
+		$("#gamemode span").text((new Array("FFA", "", "", "Duel", "Power Duel", "", "Team FFA", "Siege", "CTF"))[data["cvars"]["g_gametype"]]);
+		$.each(data["players"], function(index, value) {
+			$("#scrollable ul").append("<li>" + value["name"] + "</li>");
+		});
 		$('#loading').hide();
 	})
 }
@@ -30,6 +26,6 @@ function rcon() {
 	console.log("rcon");
 }
 
-function param() {
-	console.log("param");
+function cvars() {
+	console.log("cvars");
 }

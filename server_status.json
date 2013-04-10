@@ -36,7 +36,7 @@
         "g_maxHolocronCarry": "3",
         "g_needpass": "0",
         "protocol": "26",
-        "mapname": "mp\/ffa3",
+        "mapname": "mp\/ffa4",
         "sv_privateClients": "0",
         "jp_cinfo": "232659",
         "V": "2.3",
@@ -46,25 +46,26 @@
     },
     "players": [
         {
-            "score": "4",
+            "score": "3",
             "ping": "0",
-            "name": "Imperial Saboteur"
-        },
-        {
-            "score": "4",
-            "ping": "0",
-            "name": "Rax Joris"
+            "name": "Jan Ors"
         },
         {
             "score": "1",
             "ping": "0",
+            "name": "Rax Joris"
+        },
+        {
+            "score": "2",
+            "ping": "0",
             "name": "Rodian"
         },
         {
-            "score": "9",
+            "score": "16",
             "ping": "0",
             "name": "Chewbacca"
         }
     ],
-    "updated": 1365581618
+    "addr": "62.75.204.42:29070",
+    "updated": 1365584859
 }

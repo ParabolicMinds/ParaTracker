@@ -34,6 +34,7 @@ function do_update() {
 		}
 
 		// Add the timestamp for this new data.
+		$result["addr"] = $server_data[0] . ":" . $server_data[1];
 		$result["updated"] = time();
 
 		// Write out to the json file
