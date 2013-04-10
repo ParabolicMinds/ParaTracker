@@ -1,5 +1,6 @@
 $(document).ready(function() {
-				
+	do_update();
+	
 	/*$.getJSON('serverstatus.php', function(data) {
 		var items = [];
 		$.each(data, function(key, val) {
@@ -11,19 +12,11 @@ $(document).ready(function() {
 		}).appendTo('body');
 		});*/
 });
-		
+
 function do_update() {
 	$.getJSON('serverstatus.php', function(data) {
 		console.log(data);
 	})
-}
-
-function next_page() {
-	console.log("next");
-}
-
-function previous_page() {
-	console.log("prev");
 }
 
 function rcon() {

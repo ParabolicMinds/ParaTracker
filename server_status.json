@@ -46,25 +46,25 @@
     },
     "players": [
         {
-            "score": "3",
+            "score": "4",
             "ping": "0",
-            "name": "Desann"
+            "name": "Imperial Saboteur"
         },
         {
-            "score": "3",
+            "score": "4",
             "ping": "0",
             "name": "Rax Joris"
         },
         {
-            "score": "2",
+            "score": "1",
             "ping": "0",
             "name": "Rodian"
         },
         {
-            "score": "7",
+            "score": "9",
             "ping": "0",
             "name": "Chewbacca"
         }
     ],
-    "updated": 1365467084
+    "updated": 1365576757
 }

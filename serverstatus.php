@@ -1,5 +1,5 @@
 <?php
-
+sleep(2);
 // Load the existing server snapshot, update it if it is too old.
 $server_status = file_get_contents("server_status.json");
 $parsed = json_decode($server_status, true);

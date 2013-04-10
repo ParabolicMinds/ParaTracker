@@ -1,10 +1,21 @@
-body { font-size:14px }
+body { font-size:13px;font-family:"Times New Roman", Times, serif;color:white }
 
-#levelshot { z-index:1;position:absolute;width:192px;height:146px;top:4px;left:250px; }
+#levelshot { z-index:1;position:absolute;width:192px;height:146px;top:4px;left:250px }
 
-.border_graphic { z-index:2;position:absolute;top:0px;left:0px; }
+.border_graphic { z-index:2;position:absolute;top:0px;left:0px }
 
-#header { z-index:3;position:absolute;top:7px;left:28px;width:200px;height:20px;font-size:12px;color:white }
+#header { z-index:3;position:absolute;top:6px;left:12px;width:229px;height:32px;overflow:hidden }
 
-#players { z-index:3;position:absolute;top:35px;left:28px;width:215px;height:159px;margin:0px;padding:0px;list-style: none;border:0px;background:green;overflow:hidden }
-#players li { background:blue;margin:0px;padding:1px;width:205px }
+#players { z-index:3;position:absolute;top:44px;left:31px;width:211px;height:150px;margin:0px;padding:0px;list-style:none;border:1px solid;border-color:#333333;overflow:hidden }
+
+#loading { z-index:4;width:100px;height:50px;top:50px;left:50px;background:red }
+
+#map { z-index:3;position:absolute;top:120px;left:254px;background-color:black;opacity:0.8;filter:alpha(opacity=40);padding:4px;font-size:16px }
+#gametype { z-index:3;position:absolute;top:90px;left:254px;background-color:black;opacity:0.8;filter:alpha(opacity=40);padding:4px;font-size:16px }
+
+#rcon { z-index:3;position:absolute;top:174px;left:254px }
+#cvars { z-index:3;position:absolute;top:174px;left:358px }
+
+#info { z-index:3;position:absolute;top:157px;left:254px }
+
+

@@ -4,24 +4,33 @@
 		<title>tracker</title>
 		<link rel="stylesheet" href="style2.css" type="text/css" />
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
+		<script src="jquery.slimscroll.min.js"></script>
 		<script src="server_status.js"></script>
 	</head>
 	<body>
 		<img id="levelshot" src="levelshots/atlantica_2.jpg" />
 		<img src="ui/border_graphic.png" class="border_graphic" />
-		<div id="header">Jedi Knight 3 server Bei clan-overrated.de By CoCo (127.0.0.1:29070)</div>
+		<div id="header"><span style="color:goldenrod">127.0.0.1</span> - Jedi Knight 3 server Bei clan-overrated.de By CoCo</div>
 		<ul id="players">
 			<li>hi1</li>
-			<li>hi2</li>
 			<li>hi1</li>
-			<li>hi2</li>
 			<li>hi1</li>
-			<li>hi2</li>
 			<li>hi1</li>
-			<li>hi2</li>
 			<li>hi1</li>
-			<li>hi2</li>
+			<li>hi1</li>
+			<li>hi1</li>
+			<li>hi1</li>
+			<li>hi1</li>
+			<li>hi1</li>
+			<li>hi1</li>
 		</ul>
-		<div id="loading" style="z-index:4;position:absolute;width:100px;height:50px;top:50px;left:50px;background:red;visibility:hidden">Loading...</div>
+		<div id="map">mp/ffa5</div>
+		<div id="info">Mode:"FFA" Mod:"JA+ 2.3"</div>
+		
+		<a href="javascript:void(0)" onclick="rcon()" id="rcon">rcon web console</a>
+		<a href="javascript:void(0)" onclick="cvars()" id="cvars">server cvars</a>
+		
+		<div id="loading">Loading...</div>
 	</body>
 </html>
