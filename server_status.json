@@ -1,42 +1,42 @@
 {
     "cvars": {
         "sv_maxclients": "10",
-        "g_siegeTeam2": "none",
-        "g_siegeTeam1": "none",
-        "g_siegeRespawn": "20",
-        "g_maxGameClients": "0",
-        "g_jediVmerc": "0",
-        "jp_highlander": "0",
-        "g_debugMelee": "1",
-        "jp_DuelAlpha": "100",
-        "g_stepSlideFix": "1",
-        "g_siegeTeamSwitch": "1",
-        "g_forceRegenTime": "130",
-        "g_forcePowerDisable": "0",
-        "g_weaponDisable": "524279",
-        "bot_minplayers": "4",
-        "sv_allowDownload": "0",
-        "sv_floodProtect": "1",
-        "sv_maxPing": "0",
-        "sv_minPing": "0",
-        "sv_maxRate": "10000",
-        "sv_hostname": "^1Jedi Knight 3 ^0server Bei ^7 clan-overrated.de By ^1CoCo",
-        "g_gametype": "0",
-        "g_duelWeaponDisable": "1",
-        "g_forceBasedTeams": "0",
-        "duel_fraglimit": "1",
-        "g_maxForceRank": "7",
-        "g_saberLocking": "1",
-        "g_privateDuel": "0",
-        "capturelimit": "20",
-        "timelimit": "20",
-        "fraglimit": "00",
         "dmflags": "128",
+        "fraglimit": "00",
+        "timelimit": "20",
+        "capturelimit": "20",
+        "g_privateDuel": "0",
+        "g_saberLocking": "1",
+        "g_maxForceRank": "7",
+        "duel_fraglimit": "1",
+        "g_forceBasedTeams": "0",
+        "g_duelWeaponDisable": "1",
+        "g_gametype": "0",
+        "sv_hostname": "^1Jedi Knight 3 ^0server Bei ^7 clan-overrated.de By ^1CoCo",
+        "sv_maxRate": "10000",
+        "sv_minPing": "0",
+        "sv_maxPing": "0",
+        "sv_floodProtect": "1",
+        "sv_allowDownload": "0",
+        "bot_minplayers": "4",
+        "g_weaponDisable": "524279",
+        "g_forcePowerDisable": "0",
+        "g_forceRegenTime": "130",
+        "g_siegeTeamSwitch": "1",
+        "g_stepSlideFix": "1",
+        "jp_DuelAlpha": "100",
+        "g_debugMelee": "1",
+        "jp_highlander": "0",
+        "g_jediVmerc": "0",
+        "g_maxGameClients": "0",
+        "g_siegeRespawn": "20",
+        "g_siegeTeam1": "none",
+        "g_siegeTeam2": "none",
         "version": "JAmp: v1.0.1.0 win-x86 Oct 24 2003",
         "g_maxHolocronCarry": "3",
         "g_needpass": "0",
         "protocol": "26",
-        "mapname": "mp\/ffa4",
+        "mapname": "mp\/ffa5",
         "sv_privateClients": "0",
         "jp_cinfo": "232659",
         "V": "2.3",
@@ -46,26 +46,26 @@
     },
     "players": [
         {
-            "score": "3",
+            "score": "0",
             "ping": "0",
-            "name": "Jan Ors"
+            "name": "Reelo"
         },
         {
-            "score": "1",
+            "score": "0",
             "ping": "0",
-            "name": "Rax Joris"
+            "name": "Alora"
         },
         {
             "score": "2",
             "ping": "0",
-            "name": "Rodian"
+            "name": "Shadowtrooper"
         },
         {
-            "score": "16",
+            "score": "0",
             "ping": "0",
-            "name": "Chewbacca"
+            "name": "TIE Pilot ^7(^56^7)"
         }
     ],
     "addr": "62.75.204.42:29070",
-    "updated": 1365584859
+    "updated": 1365641973
 }
