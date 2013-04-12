@@ -5,11 +5,12 @@
 		<link rel="stylesheet" href="style2.css" type="text/css" />
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
-		<script src="jquery.slimscroll.min.js"></script>
-		<script src="server_status.js"></script>
+		<script src="js/jquery.cycle.lite.js"></script>
+		<script src="js/jquery.slimscroll.min.js"></script>
+		<script src="js/server_status.js"></script>
 	</head>
 	<body>
-		<img id="levelshot" src="levelshots/atlantica_2.jpg" />
+		<div class="slideshow"></div>
 		<img src="ui/border_graphic.png" class="border_graphic" />
 		<div id="header"><span id="hostname"></span> <span id="addr" style="color:goldenrod" /></div>
 		<div id="players">
@@ -20,7 +21,17 @@
 		<div id="map"></div>
 		<div id="gamemode">Gamemode: <span></span></div>
 		<div id="gamename">Mod: <span></span></div>
-		<a href="javascript:void(0)" onclick="rcon()" id="rcon">rcon web console</a>
-		<a href="javascript:void(0)" onclick="cvars()" id="cvars">server cvars</a>
+		<a href="javascript:void(0)" onclick="rcon()" id="rcon_link">rcon web console</a>
+		<a href="javascript:void(0)" onclick="cvars()" id="cvars_link">server cvars</a>
+		<div id="rcon_popup">
+			<a href="javascript:void(0)" onclick="rcon_close()">close</a>
+			<p>Dark Eldar Rcons are the best unit in the game.</p>
+		</div>
+		<div id="cvars_popup">
+			<a href="javascript:void(0)" onclick="cvars_close()">close</a>
+			<p>See vars? I don't see any vars.</p>
+			<table>
+			</table>
+		</div>
 	</body>
 </html>

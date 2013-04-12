@@ -36,7 +36,7 @@
         "g_maxHolocronCarry": "3",
         "g_needpass": "0",
         "protocol": "26",
-        "mapname": "mp\/ffa5",
+        "mapname": "mp\/ffa3",
         "sv_privateClients": "0",
         "jp_cinfo": "232659",
         "V": "2.3",
@@ -46,26 +46,31 @@
     },
     "players": [
         {
-            "score": "0",
+            "score": "3",
             "ping": "0",
-            "name": "Reelo"
+            "name": "Rodian"
         },
         {
-            "score": "0",
+            "score": "8",
             "ping": "0",
             "name": "Alora"
         },
         {
-            "score": "2",
+            "score": "3",
             "ping": "0",
             "name": "Shadowtrooper"
         },
         {
-            "score": "0",
+            "score": "7",
             "ping": "0",
             "name": "TIE Pilot ^7(^56^7)"
         }
     ],
     "addr": "62.75.204.42:29070",
-    "updated": 1365641973
+    "updated": 1365740568,
+    "levelshots": [
+        "levelshots\/mp\/ffa31.jpg",
+        "levelshots\/mp\/ffa32.jpg",
+        "levelshots\/mp\/ffa33.jpg"
+    ]
 }
