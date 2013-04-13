@@ -2,7 +2,7 @@
 // Load the existing server snapshot, update it if it is too old.
 $server_status = file_get_contents("server_status.json");
 $parsed_server_status = json_decode($server_status, true);
-if (($parsed_server_status["updated"] + 1) < time()) do_update($parsed_server_status);
+if (($parsed_server_status["updated"] + 5) < time()) do_update($parsed_server_status);
 
 // Send the snapshot to the browser.
 header('Content-Type: application/json');

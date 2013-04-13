@@ -1,7 +1,7 @@
 body { font-size:10px;font-family:"Courier New", Courier, monospace;color:white }
 
-.slideshow { position:absolute;width:192px;height:146px;top:4px;left:250px;padding: 0px;margin: 0px;border: 0px }
-.slideshow img { position:absolute;width:192px;height:146px;top:0px;left:0px;padding: 0px;margin: 0px;border: 0px }
+.slideshow { position:absolute;width:192px;height:146px;top:4px;left:250px;padding:0px;margin:0px;border:0px;background-color:black }
+.slideshow img { position:absolute;width:192px;height:146px;top:0px;left:0px;padding:0px;margin:0px;border:0px }
 
 .border_graphic { z-index:2000;position:absolute;top:0px;left:0px }
 
@@ -19,9 +19,12 @@ body { font-size:10px;font-family:"Courier New", Courier, monospace;color:white 
 #cvars_link { z-index:3000;position:absolute;top:182px;left:358px }
 
 #rcon_popup { z-index:4000; position:absolute;top:25px;left:75px;width:300px;height:150px;background-color:#DAA520;border:2px solid;padding:2px;display:none }
-#cvars_popup { z-index:4000; position:absolute;top:25px;left:75px;width:300px;height:150px;background-color:#DAA520;border: 2px solid;padding:2px;display:none;overflow:auto }
-#cvars_popup table { border: 1px solid }
-#cvars_popup table tr td { border: 1px solid }
+#cvars_popup { z-index:4000; position:absolute;top:25px;left:25px;width:400px;height:150px;background-color:#DAA520;border:2px solid;padding:2px;display:none }
+#cvars_popup div { height:135px;margin:2px;overflow:auto;border:1px solid }
+#cvars_popup div table tr td { border: 1px solid }
+
+#offline { z-index:4000; position:absolute;top:25px;left:75px;width:300px;height:150px;background-color:#DAA520;border:2px solid;padding:2px;display:none }
+
 
 #gamemode { z-index:3000;position:absolute;top:157px;left:254px;width:100px;height:10px;overflow:hidden }
 #gamename { z-index:3000;position:absolute;top:169px;left:254px;width:100px;height:10px;overflow:hidden }
