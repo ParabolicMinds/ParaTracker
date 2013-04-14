@@ -36,7 +36,7 @@
         "g_maxHolocronCarry": "3",
         "g_needpass": "0",
         "protocol": "26",
-        "mapname": "mp\/ffa5",
+        "mapname": "mp\/ffa2",
         "sv_privateClients": "0",
         "jp_cinfo": "232659",
         "V": "2.3",
@@ -46,31 +46,31 @@
     },
     "players": [
         {
-            "score": "1",
+            "score": "3",
             "ping": "0",
-            "name": "Reborn Twin"
+            "name": "Mon Mothma"
         },
         {
-            "score": "1",
+            "score": "15",
             "ping": "0",
             "name": "Alora"
         },
         {
-            "score": "0",
+            "score": "18",
             "ping": "0",
             "name": "Shadowtrooper"
         },
         {
-            "score": "0",
+            "score": "15",
             "ping": "0",
             "name": "TIE Pilot ^7(^56^7)"
         }
     ],
     "addr": "62.75.204.42:29070",
-    "updated": 1365852412,
+    "updated": 1365912021,
     "levelshots": [
-        "levelshots\/mp\/ffa51.jpg",
-        "levelshots\/mp\/ffa52.jpg",
-        "levelshots\/mp\/ffa53.jpg"
+        "levelshots\/mp\/ffa21.jpg",
+        "levelshots\/mp\/ffa22.jpg",
+        "levelshots\/mp\/ffa23.jpg"
     ]
 }
