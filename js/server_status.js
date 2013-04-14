@@ -4,14 +4,14 @@ var slideshow_started = false;
 $(document).ready(function() {
 	$('#scrollable').slimScroll({ color: "#DAA520", height: '147px' });
 	do_update();
-	setInterval(do_update, 5000); // Get an update every 5 seconds
+	setInterval(do_update, 30000); // Get an update every 30 seconds
 });
 
 function do_update() {
 	$.getJSON('serverstatus.php', function(data) {
 		
-		// If the server snapshot is too old, the server is offline.
-		if ((new Date().getTime() / 1000 - data["updated"]) > 30) {
+		// If the server snapshot is older then 5 minutes, show the server offline message.
+		if ((new Date().getTime() / 1000 - data["updated"]) > 300) {
 			$("#offline").show();
 		} else {
 			$("#offline").hide();
