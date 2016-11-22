@@ -21,8 +21,10 @@ __________________________________________
 INSTALLATION INSTRUCTIONS:
 
 You must have PHP on your web server to use ParaTracker.
-Copy ParaTracker's files onto your website, and then add a DIV or a frame somewhere that
-references the file "ParaTracker-A.php".
+To use this version of ParaTracker, you need to open "ParaTracker-A.php".
+
+To insert it onto a web page, add a frame somewhere on your website that
+references the file.
 
 Then, open ParaConfig.php in a text editor. Set the IP address and port of your server, as well
 as any other parameters that you feel like changing. RCon is available, but is disabled by default
