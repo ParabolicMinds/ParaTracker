@@ -60,13 +60,18 @@ else
 if ($lastRefreshTime + $floodProtectTimeout < time())
 {
   	file_put_contents("info/time.txt", "wait");
-  	do_update();
+  	doUpdate();
    	file_put_contents("info/time.txt", time());
 }
 
 
 echo "-->";
-include 'info/tracker_page.html';
+
+//Remove this when all is done
+include 'info/trackerPageA.txt';
+
+
+
 }
 
 ?>

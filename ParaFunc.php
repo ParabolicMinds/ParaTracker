@@ -1,15 +1,16 @@
 ﻿<?php
 
-if (!file_exists("info/"))
+function versionNumber()
 {
-    mkdir("info/");
+    //Return a string of the version number
+    return("1.0 RC");
 }
 
-function do_update()
+function doUpdate()
 {
 
     include 'ParaConfig.php';
-    
+
     //First and firemost, let's see if the user put any invalid stuff in the config file.
     //After all, garbage in, garbage out.
 
@@ -22,8 +23,9 @@ function do_update()
     $serverIPAddress = ipAddressValidator($serverIPAddress);
     $serverPort = numericValidator($serverPort, 1, 65535, 29070);
 
-    $floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 10);
     $floodProtectTimeout = numericValidator($floodProtectTimeout, $connectionTimeout, 1200, 10);
+    //Have to validate this one twice to make sure it isn't lower than the connection timeout limit
+    $floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 10);
     $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
 
     $disableFrameBorder = booleanValidator($disableFrameBorder, 0);
@@ -53,8 +55,6 @@ function do_update()
 		$s .= $char;
 	}
 	fclose($fp);
-
-//	file_put_contents('info/serverdump.txt', $s); //Debug line
 
 	if(strlen($s))
 	{
@@ -87,316 +87,26 @@ function do_update()
 			$playerParseCount++;
 		}
 
-		//This buffer holds the CVAR HTML code
-		$buf='<!DOCTYPE html><html lang="en"><head>
-		<meta charset="utf-8"/>
-		<link rel="stylesheet" href="../ParaStyle.css" type="text/css" />
-		<link rel="stylesheet" href="../Config-DoNotEdit.css" type="text/css" />
-		<title>Server Cvars</title>
-		<script src="../ParaScript.js"></script>
-		</head>
-		<body class="cvars_page">
-		<span class="CVarHeading">Server Cvars</span><br />
-		<span class="CVarServerAddress">' . $serverIPAddress . ":" . $serverPort . '</span><br /><br />
-		<table class="FullSizeCenter"><tr><td><table><tr class="cvars_titleRow cvars_titleRowSize"><td class="Width270">Name</td><td class="Width270">Value</td></tr>' . "\n";
-		$c = 1;
-		
-		
+		cvarList($serverIPAddress, $serverPort, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags);
 
-		foreach($cvar_array_single as $cvar)
-		{
-			$buf .= '<tr class="cvars_row' . $c . '"><td>' . $cvar['name'] . '</td><td>';
-			if ((($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
-			{
-				$buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
-			}
-		    //Check for flags, and if they are present let's sort them into something useful...
-			elseif ($cvar['name'] == 'dmflags')
-			{
-			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $dmflags);
-			}
-			elseif ($cvar['name'] == 'g_weaponDisable')
-			{
-			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $weaponFlags);
-			}
-			elseif ($cvar['name'] == 'g_forcePowerDisable')
-			{
-			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $forcePowerFlags);
-			}
-			else
-			{
-			$buf .= $cvar['value'];
-			}
-			$buf .= '</td></tr>' . "\n";
-			$c++;
-			if($c > 2) $c = 1;
-		}
-		$buf .= '</table></td></tr></table><h6 class="center">ParaTracker version 1.0 RC - Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited. Your mileage may vary. Please drink and drive responsibly.</h6></body></html>';
-		file_put_contents('info/param.html', $buf);
+		$player_count = playerList($player_array, $playerParseCount, $noPlayersOnlineMessage);
+
+		//The following function detects how many levelshots exist on the server, and passes a buffer of information back, and the final count of levelshots
+		$levelshotBufferArray = levelshotfinder($cvars_hash["mapname"], $maximumLevelshots, $fadeLevelshots);
+		$levelshotBuffer = $levelshotBufferArray[0];
+		$levelshotCount = $levelshotBufferArray[1];
+
+		$buf2 = htmlDeclarations("ParaTracker");
+
+		javascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime);
+
+		paramRConJavascript($RConEnable, $newWindowSnapToCorner);
+
+		$buf2 .= file_get_contents("info/javascriptAndCSS.txt");
+		$buf2 .= file_get_contents("info/rconParamScript.txt");
 
 
-		//This buffer holds the player list
-		$playerListbuffer = '<table class="playerTable">';
-		$player_count = 0;
-		
-		//FIXME: Doesn't work
-		$playerNameCharacterLimit = 40;
-		
-		if($playerParseCount > 0)
-		{
-			$player_array = array_sort($player_array, "score", true);
-			$c = 1;
-			foreach($player_array as &$player)
-			{
-				$player_name = str_replace(array("\n", "\r"), '', $player["name"]);
-				if (strlen($player_name) > $playerNameCharacterLimit)
-				{
-					$l = 0;
-					for($k = 0; ($l < $playerNameCharacterLimit) && ($k < strlen($player_name)); $k++)
-					{
-						if(($player_name[$k] == '^') && (strpos("0123456789", $player_name[$k+1]) != FALSE))
-						{
-							$k++;
-						}
-						else
-						{
-							$l++;
-						}
-					}
-				}
-				else
-				{
-					$k = $playerNameCharacterLimit;
-				}
-				$player_count++;
-				$playerListbuffer .= "\n" . '<tr class="playerRow' . $c . '"><td class="playerName">'. colorize(substr($player_name,0,$k));
-				$playerListbuffer .= '</td>' . "\n" . '<td class="playerScore">' . $player["score"] . '</td><td class="playerPing">' . $player["ping"] . '</td></tr>';
-				$c++;
-				if($c > 2) $c = 1;
-			}
-			$playerListbuffer .= "\n";
-		} else {
-			$playerListbuffer .= '<tr><td class="noPlayersOnline">&nbsp;' . $noPlayersOnlineMessage . '</td></tr>';
-		}
-		$playerListbuffer .= '</table>';
-		$buf3='';
-		file_put_contents('info/playerlist2.html', $playerListbuffer);
-
-
-		//The following chunk of code detects how many levelshots exist on the server, and passes them on to the stylesheet and JavaScript for fading.
-		$levelshotBuffer = '';
-
-		$levelshotCount = 0;
-		$levelshotIndex = 1;
-	    $foundLevelshot = 0;
-		do
-		{
-
-		    //Reset this value every iteration so we can check to see if levelshots are being found
-		    $foundLevelshot = 0;
-
-		    //Check for a PNG first
-		    if(file_exists('images/levelshots/' . $cvars_hash["mapname"] . '_' . $levelshotIndex . '.png'))
-		    {
-		        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $cvars_hash["mapname"] . '_' . $levelshotIndex . '.png");background-size: 300px 225px;background-repeat: no-repeat;}';
-        		$foundLevelshot = 1;
-		    }
-		    else
-		    {
-		    //Failed to find a PNG, so let's check for a JPG
-		        if(file_exists('images/levelshots/' . $cvars_hash["mapname"] . '_' . $levelshotIndex . '.jpg'))
-		        {
-		            $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $cvars_hash["mapname"] . '_' . $levelshotIndex . '.jpg");background-size: 300px 225px;background-repeat: no-repeat;}';
-		            $foundLevelshot = 1;
-		        }
-		        else
-		        {
-		            //Also failed to find a JPG, so let's check for a GIF
-		            if(file_exists('images/levelshots/' . $cvars_hash["mapname"] . '_' . $levelshotIndex . '.gif'))
-		            {
-		                $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $cvars_hash["mapname"] . '_' . $levelshotIndex . '.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
-		                $foundLevelshot = 1;
-		            }
-		            else
-		            {
-		            //Could not find any images. One last check - is this the first iteration of the loop?
-		            //If so, we need to try and find a levelshot no matter what. Let's see if the user was
-		            //silly and forgot to add an underscore and number to the file name, and if so, we'll
-		            //just use that one. If not, we'll have to default to a placeholder for missing images.
-		                if ($levelshotCount == 0)
-		                {
-		                //Checking for a PNG again:
-		                	if(file_exists('images/levelshots/' . $cvars_hash["mapname"] . $levelshotIndex . '.png'))
-		            		{
-		                        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $cvars_hash["mapname"] . '.png");background-size: 300px 225px;background-repeat: no-repeat;}';
-        				    }
-        				    else
-        				    {
-        				        //And checking for a JPG again:
-		                	    if(file_exists('images/levelshots/' . $cvars_hash["mapname"] . $levelshotIndex . '.jpg'))
-		                	    {
-		                	        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $cvars_hash["mapname"] . '.jpg");background-size: 300px 225px;background-repeat: no-repeat;}';
-		                	    }
-		                	    else
-		                	    {
-		                	        //Lastly...checking for a GIF.
-		                	        if(file_exists('images/levelshots/' . $cvars_hash["mapname"] . $levelshotIndex . '.gif'))
-		                	        {
-		                                $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $cvars_hash["mapname"] . '.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
-		                	        }
-		                	        else
-		                	        {
-		                	            //Could not find a levelshot! Use the default 'missing picture' image and close out
-		                	            $levelshotBuffer .= '.levelshot1{background: url("images/missing.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
-		                	            $levelshotBuffer .= '.levelshot2{background: url("images/missing.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
-		                	        }
-		                	    }
-        				    }
-		                }
-		            }
-		        }
-		    }
-
-   		$levelshotBuffer .= "\n";
-
-	        if ($foundLevelshot == 1)
-	        {
-	            $levelshotCount++;
-	            $levelshotIndex++;
-	        }
-
-		} While ($foundLevelshot == 1 && $levelshotCount < $maximumLevelshots && $fadeLevelshots == 1);
-
-//This code prevents the Javascript below from seeing a value of 0 levelshots when none are found.
-//There will always be a minimum of one levelshot. A placeholder is used if none is found.
-if ($levelshotCount == 0)
-{
-    $levelshotCount = 1;
-}
-
-       		//This buffer holds the main tracker page HTML and Javascript code
-			$buf2 = '
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
-<link rel="stylesheet" href="ParaStyle.css" type="text/css" />
-<title>ParaTracker</title>
-<script src="ParaScript.js"></script>';
-
-if($enableAutoRefresh == "1")
-{
-    $buf2 .= '<script type="text/javascript">
-    pageReloadTimer = setTimeout("pageReload()", ' . ($autoRefreshTimer * 1000) . ');
-    </script>';
-}
-
-
-$buf2 .= '<script type="text/javascript"><!--
-		var timer = 0;  //Used for setting re-execution timeout
-		var allowFading = ' . $fadeLevelshots . ';   //Used to test whether fading levelshots is disabled
-		var opac = 1;   //Opacity level for the top layer.
-		var shot = 1;   //Levelshot number
-		var mode = 1;   //0 means we are delaying between fades. 1 means a fade is in progress.
-		var maxLevelshots = ' . $levelshotCount . ';   //The maximum number of levelshots detected by the PHP code goes here.
-		var count = -1; //Counter used for checking the number of executions.
-
-		function fadelevelshot()
-		{
-
-			count++;
-			if (mode == 0 && maxLevelshots > 1 && allowFading == 1)
-			{
-				if (count >= ' . $levelshotFPS * $levelshotTransitionTime . ' || opac < 0)
-				{
-					document.getElementById("topLayerFade").className = document.getElementById("bottomLayerFade").className;
-					document.getElementById("bottomLayerFade").className = document.getElementById("levelshotPreload").className;
-	                document.getElementById("levelshotPreload").className = "levelshotFrame levelshot" + shot;
-					document.getElementById("topLayerFade").style.opacity = 1;
-					opac = 1;
-					count=0;
-					mode=1;
-					timer = setTimeout("fadelevelshot()", ' . 1000 * $levelshotDisplayTime . ');
-				}
-				else
-				{
-					opac -= 1 / (' . $levelshotTransitionTime * $levelshotFPS . ');
-					document.getElementById("topLayerFade").style.opacity = opac;
-					timer = setTimeout("fadelevelshot()", ' . $levelshotTransitionTime * 1000 / ($levelshotFPS * $levelshotTransitionTime) . ');
-				}
-			}
-			else
-			{
-			//A levelshot has finished its transition, so reset everything
-				count=0;
-				mode=0;
-				shot++;
-				if(shot > maxLevelshots) shot = 1;
-				//Now, re-execute the script to start fading a new levelshot!
-				timer = setTimeout("fadelevelshot()", 10);
-			}
-		}
-
-		    //This little bit of code pre-loads the second and third levelshots, and terminates the script if only one levelshot is available.
-	    function firstexecution()
-	    {
-	        if (maxLevelshots > 1 && allowFading == 1);
-	            {
-	                shot++;
-	                document.getElementById("topLayerFade").className = "levelshotFrame levelshot1";
-	                document.getElementById("bottomLayerFade").className = "levelshotFrame levelshot" + shot;
-
-	                //lets set up a pre-loader in case there are more than 2 levelshots
-	                shot++;
-	                //In case there are only two levelshots, then we will just go back to shot 1
-	                if(shot > maxLevelshots) shot = 1;
-	                document.getElementById("levelshotPreload").className = "levelshotFrame levelshot" + shot;
-	                document.getElementById("topLayerFade").style.opacity = 1;
-
-	                opac = 1;
-	                count=0;
-	                mode=1;
-	                timer = setTimeout("fadelevelshot()", ' . 1000 * $levelshotDisplayTime . ');
-	            }
-	    }
-
-timer = setTimeout("firstexecution()", 100);
-
-		function param_window()
-		{
-			mywindow = window.open("info/param.html", "mywindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=600,height=700");';
-
-			if ($newWindowSnapToCorner == "1")
-			{
-			$buf2 .= 'mywindow.moveTo(0, 0);';
-			}
-
-		$buf2 .= '}';
-		
-		if ($RConEnable == 1)
-		{
-		$buf2 .= 'function rcon_window()
-		{
-			myotherwindow = window.open("RCon.php", "myotherwindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=780,height=375");
-			';
-
-			if ($newWindowSnapToCorner == "1")
-			{
-			$buf2 .= 'myotherwindow.moveTo(0, 0);';
-			}
-			
-		$buf2 .= '}';
-		}
-		
-		$buf2 .= '//-->
-</script>
-		
-
-<style>
-' . $levelshotBuffer . '
-</style>
-</head>
+$buf2 .= '</head>
 
 <div class="TrackerFrameNoBG BackgroundColorImage">
 <div class="TrackerFrame';
@@ -431,7 +141,7 @@ $buf2 .= '">
 <table><tr><td class="playerName">Name</td><td class="playerScore">&nbsp;Score</td><td class="playerPing">&nbsp;Ping</td><td></td></tr></table>
 </div>
 
-<div class="playerList">' . $playerListbuffer . '
+<div class="playerList">' . file_get_contents("info/playerlist.txt") . '
 
 </div>
 
@@ -512,17 +222,28 @@ $buf2 .= '</div>
 
 </body>
 </html>';
-		file_put_contents('info/tracker_page.html', $buf2);
+file_put_contents('info/trackerPageA.txt', $buf2);
 
 	}
 	else
+	//Could not connect to the server! Display error page.
 	{
 		$buf =  '<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"/>
 <link rel="stylesheet" href="ParaStyle.css" type="text/css" />
 <link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
 <script src="ParaScript.js"></script>
-</head><body>
+';
+
+if($enableAutoRefresh == "1")
+{
+    $buf .= '<script type="text/javascript">
+    pageReloadTimer = setTimeout("pageReload()", ' . ($autoRefreshTimer * 1000) . ');
+    </script>';
+}
+
+
+$buf .= '</head><body>
 
 <div class="TrackerFrameNoBG BackgroundColorImage">
 <div class="TrackerFrame';
@@ -566,10 +287,327 @@ reconnectTimer = setTimeout("makeReconnectButtonVisible()", ' . ($floodProtectTi
 $buf .= '
 </body></html>';
 
-		file_put_contents('info/tracker_page.html', $buf);
+		file_put_contents('info/trackerPageA.txt', $buf);
 		file_put_contents('info/param.html', "");
 	}
 
+}
+
+function cvarList($serverIPAddress, $serverPort, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags)
+{
+		$buf='<!DOCTYPE html><html lang="en"><head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="../ParaStyle.css" type="text/css" />
+		<link rel="stylesheet" href="../Config-DoNotEdit.css" type="text/css" />
+		<title>Server Cvars</title>
+		<script src="../ParaScript.js"></script>
+		</head>
+		<body class="cvars_page">
+		<span class="CVarHeading">Server Cvars</span><br />
+		<span class="CVarServerAddress">' . $serverIPAddress . ":" . $serverPort . '</span><br /><br />
+		<table class="FullSizeCenter"><tr><td><table><tr class="cvars_titleRow cvars_titleRowSize"><td class="Width270">Name</td><td class="Width270">Value</td></tr>' . "\n";
+		$c = 1;
+		
+		
+
+		foreach($cvar_array_single as $cvar)
+		{
+			$buf .= '<tr class="cvars_row' . $c . '"><td>' . $cvar['name'] . '</td><td>';
+			if ((($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
+			{
+				$buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
+			}
+		    //Check for flags, and if they are present let's sort them into something useful...
+			elseif ($cvar['name'] == 'dmflags')
+			{
+			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $dmflags);
+			}
+			elseif ($cvar['name'] == 'g_weaponDisable')
+			{
+			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $weaponFlags);
+			}
+			elseif ($cvar['name'] == 'g_forcePowerDisable')
+			{
+			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $forcePowerFlags);
+			}
+			else
+			{
+			$buf .= $cvar['value'];
+			}
+			$buf .= '</td></tr>' . "\n";
+			$c++;
+			if($c > 2) $c = 1;
+		}
+		$buf .= '</table></td></tr></table><h6 class="center">ParaTracker version ' . versionNumber() . ' - Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited. Your mileage may vary. Please drink and drive responsibly.</h6></body></html>';
+		file_put_contents('info/param.html', $buf);
+
+}
+
+function playerList($player_array, $playerParseCount, $noPlayersOnlineMessage)
+{
+		$playerListbuffer = '<table class="playerTable">';
+		$player_count = 0;
+		
+		//FIXME: Doesn't work
+		$playerNameCharacterLimit = 40;
+		
+		if($playerParseCount > 0)
+		{
+			$player_array = array_sort($player_array, "score", true);
+			$c = 1;
+			foreach($player_array as &$player)
+			{
+				$player_name = str_replace(array("\n", "\r"), '', $player["name"]);
+				if (strlen($player_name) > $playerNameCharacterLimit)
+				{
+					$l = 0;
+					for($k = 0; ($l < $playerNameCharacterLimit) && ($k < strlen($player_name)); $k++)
+					{
+						if(($player_name[$k] == '^') && (strpos("0123456789", $player_name[$k+1]) != FALSE))
+						{
+							$k++;
+						}
+						else
+						{
+							$l++;
+						}
+					}
+				}
+				else
+				{
+					$k = $playerNameCharacterLimit;
+				}
+				$player_count++;
+				$playerListbuffer .= "\n" . '<tr class="playerRow' . $c . '"><td class="playerName">'. colorize(substr($player_name,0,$k));
+				$playerListbuffer .= '</td>' . "\n" . '<td class="playerScore">' . $player["score"] . '</td><td class="playerPing">' . $player["ping"] . '</td></tr>';
+				$c++;
+				if($c > 2) $c = 1;
+			}
+			$playerListbuffer .= "\n";
+		} else {
+			$playerListbuffer .= '<tr><td class="noPlayersOnline">&nbsp;' . $noPlayersOnlineMessage . '</td></tr>';
+		}
+		$playerListbuffer .= '</table>';
+		$buf3='';
+		file_put_contents('info/playerlist.txt', $playerListbuffer);
+
+		return $player_count;
+}
+
+function levelshotFinder($mapName, $maximumLevelshots, $fadeLevelshots)
+{
+		$levelshotBuffer = '';
+
+		$levelshotCount = 0;
+		$levelshotIndex = 1;
+	    $foundLevelshot = 0;
+		do
+		{
+
+		    //Reset this value every iteration so we can check to see if levelshots are being found
+		    $foundLevelshot = 0;
+
+		    //Check for a PNG first
+		    if(file_exists('images/levelshots/' . $mapName . '_' . $levelshotIndex . '.png'))
+		    {
+		        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '_' . $levelshotIndex . '.png");background-size: 300px 225px;background-repeat: no-repeat;}';
+        		$foundLevelshot = 1;
+		    }
+		    else
+		    {
+		    //Failed to find a PNG, so let's check for a JPG
+		        if(file_exists('images/levelshots/' . $mapName . '_' . $levelshotIndex . '.jpg'))
+		        {
+		            $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '_' . $levelshotIndex . '.jpg");background-size: 300px 225px;background-repeat: no-repeat;}';
+		            $foundLevelshot = 1;
+		        }
+		        else
+		        {
+		            //Also failed to find a JPG, so let's check for a GIF
+		            if(file_exists('images/levelshots/' . $mapName . '_' . $levelshotIndex . '.gif'))
+		            {
+		                $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '_' . $levelshotIndex . '.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                $foundLevelshot = 1;
+		            }
+		            else
+		            {
+		            //Could not find any images. One last check - is this the first iteration of the loop?
+		            //If so, we need to try and find a levelshot no matter what. Let's see if the user was
+		            //silly and forgot to add an underscore and number to the file name, and if so, we'll
+		            //just use that one. If not, we'll have to default to a placeholder for missing images.
+		                if ($levelshotCount == 0)
+		                {
+		                //Checking for a PNG again:
+		                	if(file_exists('images/levelshots/' . $mapName . $levelshotIndex . '.png'))
+		            		{
+		                        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '.png");background-size: 300px 225px;background-repeat: no-repeat;}';
+        				    }
+        				    else
+        				    {
+        				        //And checking for a JPG again:
+		                	    if(file_exists('images/levelshots/' . $mapName . $levelshotIndex . '.jpg'))
+		                	    {
+		                	        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '.jpg");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                	    }
+		                	    else
+		                	    {
+		                	        //Lastly...checking for a GIF.
+		                	        if(file_exists('images/levelshots/' . $mapName . $levelshotIndex . '.gif'))
+		                	        {
+		                                $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                	        }
+		                	        else
+		                	        {
+		                	            //Could not find a levelshot! Use the default 'missing picture' image and close out
+		                	            $levelshotBuffer .= '.levelshot1{background: url("images/missing.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                	            $levelshotBuffer .= '.levelshot2{background: url("images/missing.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                	        }
+		                	    }
+        				    }
+		                }
+		            }
+		        }
+		    }
+
+   		$levelshotBuffer .= "\n";
+
+	        if ($foundLevelshot == 1)
+	        {
+	            $levelshotCount++;
+	            $levelshotIndex++;
+	        }
+
+		} While ($foundLevelshot == 1 && $levelshotCount < $maximumLevelshots && $fadeLevelshots == 1);
+
+//This code prevents the Javascript that follows from seeing a value of 0 levelshots when none are found.
+//There will always be a minimum of one levelshot. A placeholder is used if none is found.
+if ($levelshotCount == 0)
+{
+    $levelshotCount = 1;
+}
+
+return array($levelshotBuffer, $levelshotCount);
+}
+
+function javascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime)
+{
+$javascriptFunctions = "";
+
+if($enableAutoRefresh == "1")
+{
+    $javascriptFunctions .= '<script type="text/javascript">
+    pageReloadTimer = setTimeout("pageReload()", ' . ($autoRefreshTimer * 1000) . ');
+    </script>';
+}
+
+
+        $javascriptFunctions .= '<script type="text/javascript"><!--
+		var timer = 0;  //Used for setting re-execution timeout
+		var allowFading = ' . $fadeLevelshots . ';   //Used to test whether fading levelshots is disabled
+		var opac = 1;   //Opacity level for the top layer.
+		var shot = 1;   //Levelshot number
+		var mode = 1;   //0 means we are delaying between fades. 1 means a fade is in progress.
+		var maxLevelshots = ' . $levelshotCount . ';   //The maximum number of levelshots detected by the PHP code goes here.
+		var count = -1; //Counter used for checking the number of executions.
+
+		function fadelevelshot()
+		{
+
+			count++;
+			if (mode == 0 && maxLevelshots > 1 && allowFading == 1)
+			{
+				if (count >= ' . $levelshotFPS * $levelshotTransitionTime . ' || opac < 0)
+				{
+					document.getElementById("topLayerFade").className = document.getElementById("bottomLayerFade").className;
+					document.getElementById("bottomLayerFade").className = document.getElementById("levelshotPreload").className;
+	                document.getElementById("levelshotPreload").className = "levelshotFrame levelshot" + shot;
+					document.getElementById("topLayerFade").style.opacity = 1;
+					opac = 1;
+					count=0;
+					mode=1;
+					timer = setTimeout("fadelevelshot()", ' . 1000 * $levelshotDisplayTime . ');
+				}
+				else
+				{
+					opac -= 1 / (' . $levelshotTransitionTime * $levelshotFPS . ');
+					document.getElementById("topLayerFade").style.opacity = opac;
+					timer = setTimeout("fadelevelshot()", ' . $levelshotTransitionTime * 1000 / ($levelshotFPS * $levelshotTransitionTime) . ');
+				}
+			}
+			else
+			{
+			//A levelshot has finished its transition, so reset everything
+				count=0;
+				mode=0;
+				shot++;
+				if(shot > maxLevelshots) shot = 1;
+				//Now, re-execute the script to start fading a new levelshot!
+				timer = setTimeout("fadelevelshot()", 10);
+			}
+		}
+
+		    //This little bit of code pre-loads the second and third levelshots, and terminates the script if only one levelshot is available.
+	    function firstexecution()
+	    {
+	        if (maxLevelshots > 1 && allowFading == 1);
+	            {
+	                shot++;
+	                document.getElementById("topLayerFade").className = "levelshotFrame levelshot1";
+	                document.getElementById("bottomLayerFade").className = "levelshotFrame levelshot" + shot;
+
+	                //lets set up a pre-loader in case there are more than 2 levelshots
+	                shot++;
+	                //In case there are only two levelshots, then we will just go back to shot 1
+	                if(shot > maxLevelshots) shot = 1;
+	                document.getElementById("levelshotPreload").className = "levelshotFrame levelshot" + shot;
+	                document.getElementById("topLayerFade").style.opacity = 1;
+
+	                opac = 1;
+	                count = 0;
+	                mode = 1;
+	                timer = setTimeout("fadelevelshot()", ' . 1000 * $levelshotDisplayTime . ');
+	            }
+	    }
+
+timer = setTimeout("firstexecution()", 100);';
+
+$javascriptFunctions .= '//--></script>
+
+<style>
+' . $levelshotBuffer . '
+</style>';
+
+file_put_contents("info/javascriptAndCSS.txt", $javascriptFunctions);
+}
+
+function paramRConJavascript($RConEnable, $newWindowSnapToCorner)
+{
+		$output = '<script type="text/javascript">function param_window()
+		{
+			paramWindow = window.open("info/param.html", "paramWindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=600,height=700");';
+
+			if ($newWindowSnapToCorner == "1")
+			{
+			$output .= 'paramWindow.moveTo(0, 0);';
+			}
+
+		$output .= '}';
+		
+		if ($RConEnable == 1)
+		{
+		$output .= 'function rcon_window()
+		{
+			rconWindow = window.open("RCon.php", "rconWindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=780,height=375");
+			';
+
+			if ($newWindowSnapToCorner == "1")
+			{
+			$output .= 'rconWindow.moveTo(0, 0);';
+			}
+			
+		$output .= '}</script>';
+		}
+file_put_contents("info/rconParamScript.txt", $output);
 }
 
 function checkTimeDelay($connectionTimeout)
@@ -790,6 +828,20 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
     $output .= '<div id="' . $cvarName . '" class="collapsedList"><i>' . $iBlewItUp . '</i></div></div>';
 
     return $output;
+}
+
+function htmlDeclarations($pageTitle)
+{
+$pageTitle = stringValidator($pageTitle, "", "ParaTracker");
+$output = '<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
+<link rel="stylesheet" href="ParaStyle.css" type="text/css" />
+<title>' . $pageTitle . '</title>
+<script src="ParaScript.js"></script>';
+return $output;
 }
 
 function colorize($string)
@@ -1125,6 +1177,12 @@ $forcePowerFlags = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", 
 
 //End config file
 ?>';
-file_put_contents('ParaConfig.php', $configBuffer); }
+file_put_contents('ParaConfig.php', $configBuffer);
+}
+
+if (!file_exists("info/"))
+{
+    mkdir("info/");
+}
 
 ?>

@@ -1,13 +1,3 @@
-<!DOCTYPE html><html lang="en">
-<head>
-<meta charset="utf-8"/>
-<link rel="stylesheet" href="ParaStyle.css" type="text/css" />
-<link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
-<title>RCon Console</title>
-<script src="ParaScript.js"></script>
-</head>
-<body class="RConPage">
-
 <?php
 echo "<!-- ";
 
@@ -48,6 +38,7 @@ else
     exit();
 }
 
+$output = htmlDeclarations("Rcon Page") . '<body class="RConPage">';
 
 
 //IMMEDIATELY validate the necessary input from the config file.
@@ -64,8 +55,6 @@ if ($connectionTimeout > $RConFloodProtect)
 {
     $RConFloodProtect = $connectionTimeout;
 }
-
-$output = "";
 
 if ($RConEnable == "1")
 {
@@ -108,7 +97,6 @@ else
             $timeRemaining = intval($RConFloodProtect) + 1;
         }
         $javascriptTimeInterval = intval($RConFloodProtect);
-        echo " " . $javascriptTimeInterval . "  " . $timeRemaining . " " . intval($timeRemaining) . "\n"; //Debug line
         $output .= '<script type="text/javascript">
         var floodProtectTimer = ' . intval($javascriptTimeInterval) . ';
         var initialFloodProtectTimer = ' . floor($RConFloodProtect) . ';

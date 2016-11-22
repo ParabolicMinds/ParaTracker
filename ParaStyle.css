@@ -173,7 +173,6 @@ text-align: left;
 .RConPasswordCommand
 {
 font-family: inherit;
-text-align: right;
 }
 
 input[type=text], input[type=password]

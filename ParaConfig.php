@@ -48,7 +48,7 @@ $floodProtectTimeout = "10";
 //before timing out. Note that, every time the tracker gets data from the server, it will ALWAYS
 //wait the full delay time. Server connections are UDP, so the tracker cannot tell when the data
 //stream is complete. After this time elapses, ParaTracker will assume it has all the data and
-//parse the data. If your web page has a slow response time to the game server, set this value
+//parse it. If your web server has a slow response time to the game server, set this value
 //higher. ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
 //Not recommended to go above 5 seconds, as people will get impatient and leave.
 //This setting also affects RCon wait times.
@@ -112,7 +112,6 @@ $maximumLevelshots = "20";
 // TRACKER SETTINGS
 // TRACKER SETTINGS
 
-
 //This is the name of the game being tracked; I.E. Jedi Academy, Jedi Outcast, Call Of Duty 4, etc.
 //It is displayed underneath the server name in the top left corner of the tracker.
 //For future-proofing, this value is left to you, the user.
@@ -132,7 +131,7 @@ $noPlayersOnlineMessage = "No players online.";
 //limits how often ParaTracker will contact the server.
 //A value of Yes or 1 will enable it, and any other value will disable it.
 //Enabled by default.
-$enableAutoRefresh = "1";
+$enableAutoRefresh = "0";
 
 //This value determines how many seconds ParaTracker waits between refreshes.
 //This value cannot be lower than the value in $floodProtectTimeout, or 5 seconds, whichever is greater.
