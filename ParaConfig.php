@@ -31,6 +31,7 @@
 //it will display a message telling the user to check config.php before running.
 $serverIPAddress = "212.224.101.83";
 
+
 //Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
 //The default port number for Jedi Outcast is 28070.
 //If an invalid entry is given, this value will default to 29070.
@@ -40,7 +41,7 @@ $serverPort = "29070";
 //This variable limits how many seconds are required between each snapshot of the server.
 //This prevents high traffic on the tracker from bogging down the game server it is tracking.
 //ParaTracker forces a minimum value of 5 seconds between snapshots. Maximum is 1200 seconds.
-//This value cannot be lower than the value of $connectionTimeout below.
+//This value cannot be lower than the value of $connectionTimeout (below).
 //Default is 10 seconds.
 $floodProtectTimeout = "10";
 
@@ -134,8 +135,8 @@ $noPlayersOnlineMessage = "No players online.";
 $enableAutoRefresh = "0";
 
 //This value determines how many seconds ParaTracker waits between refreshes.
-//This value cannot be lower than the value in $floodProtectTimeout, or 5 seconds, whichever is greater.
-//It also cannot be higher than 180 seconds.
+//This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
+//It also cannot be higher than 300 seconds.
 //Default is 30 seconds.
 $autoRefreshTimer = "30";
 
@@ -151,6 +152,7 @@ $RConEnable = "1";
 //RCon flood protection forces the user to wait a certain number of seconds before sending another command.
 //Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
 //send the command. Minimum is 10 seconds, maximum is 3600.
+//Cannot be lower than the value of $connectionTimeout.
 //Default is 20 seconds.
 $RConFloodProtect = "20";
 

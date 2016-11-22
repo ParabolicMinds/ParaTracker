@@ -6,45 +6,116 @@ function versionNumber()
     return("1.0 RC");
 }
 
-function doUpdate()
+if (file_exists("ParaConfig.php"))
+{
+    include 'ParaConfig.php';
+}
+else
+{
+    echo "--> <h3>ParaConfig.php not found!</h3><br />Writing default config file...<!--";
+    writeNewConfigFile();
+    if (file_exists("ParaConfig.php"))
+    {
+        echo "<!-- <h4>Default ParaConfig.php successfully written!<br />Please add an IP Address and port to it.</h4> <!--";
+    }
+    else
+    {
+        echo "<!-- <h4>Failed to write new config file!</h4> <!--";
+    }
+    
+    exit();
+}
+
+//Before we go any further, let's validate ALL input from the config file!
+//To validate booleans:
+//$variableName = booleanValidator($variableName, defaultValue);
+
+//To evaluate numeric values:
+//$variableName = numericValidator($variableName, min, max, default);
+
+$serverIPAddress = ipAddressValidator($serverIPAddress);
+$serverPort = numericValidator($serverPort, 1, 65535, 29070);
+
+$floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 10);
+//Have to validate this one twice to make sure it isn't lower than connectionTimeout
+$floodProtectTimeout = numericValidator($floodProtectTimeout, $connectionTimeout, 1200, 10);
+$connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
+
+$disableFrameBorder = booleanValidator($disableFrameBorder, 0);
+
+$fadeLevelshots = booleanValidator($fadeLevelshots, 1);
+$levelshotDisplayTime = numericValidator($levelshotDisplayTime, 1, 15, 3);
+$levelshotTransitionTime = numericValidator($levelshotTransitionTime, 0.1, 5, 0.5);
+$levelshotFPS = numericValidator($levelshotFPS, 1, 60, 20);
+$maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
+
+$gameName = stringValidator($gameName, "", "Jedi Academy");
+$noPlayersOnlineMessage = stringValidator($noPlayersOnlineMessage, "", "No players online.");
+
+$enableAutoRefresh = booleanValidator($enableAutoRefresh, 1);
+//Have to validate this one twice to make sure it isn't lower than the floodprotect limit
+$autoRefreshTimer = numericValidator($autoRefreshTimer, 10, 300, 30);
+$autoRefreshTimer = numericValidator($autoRefreshTimer, $floodProtectTimeout, 300, 30);
+
+$RConEnable = booleanValidator($RConEnable, 0);
+$RConFloodProtect = numericValidator($RConFloodProtect, 10, 3600, 20);
+//Have to validate this one twice to make sure it isn't lower than connectionTimeout
+$RConFloodProtect = numericValidator($RConFloodProtect, $connectionTimeout, 3600, 20);
+$RConLogSize = numericValidator($RConLogSize, 100, 100000, 1000);
+
+$newWindowSnapToCorner = booleanValidator($newWindowSnapToCorner, 0);
+
+//Add some checks to make sure we have directories for the stuff
+if (!file_exists("info/"))
+{
+    mkdir("info/");
+}
+if (!file_exists("info/"))
+{
+    echo 'Failed to create directory "info/" in ParaTracker folder!';
+    exit();
+}
+
+if (!file_exists("logs/"))
+{
+    mkdir("logs/");
+}
+if (!file_exists("logs/"))
+{
+    echo 'Failed to create directory "logs/" in ParaTracker folder!';
+    exit();
+}
+
+
+function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
 
-    include 'ParaConfig.php';
+    $lastRefreshTime = numericValidator(file_get_contents("info/time.txt"), "", "", "0");
 
-    //First and firemost, let's see if the user put any invalid stuff in the config file.
-    //After all, garbage in, garbage out.
 
-    //To validate booleans:
-    //$variableName = booleanValidator($variableName, defaultValue);
+    if ($serverIPAddress == "Invalid")
+    {
+        echo "-->Invalid IP address detected! Cannot continue.<br />Check the IP address in ParaConfig.php.";
+        exit();
+    }
+    else
+    {
 
-    //To evaluate numeric values:
-    //$variableName = numericValidator($variableName, min, max, default);
+        if ($lastRefreshTime + $floodProtectTimeout < time())
+        {
+            file_put_contents("info/time.txt", "wait");
+            doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+            file_put_contents("info/time.txt", time());
+        }
 
-    $serverIPAddress = ipAddressValidator($serverIPAddress);
-    $serverPort = numericValidator($serverPort, 1, 65535, 29070);
+    }
 
-    $floodProtectTimeout = numericValidator($floodProtectTimeout, $connectionTimeout, 1200, 10);
-    //Have to validate this one twice to make sure it isn't lower than the connection timeout limit
-    $floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 10);
-    $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
+}
 
-    $disableFrameBorder = booleanValidator($disableFrameBorder, 0);
+function doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+{
 
-    $fadeLevelshots = booleanValidator($fadeLevelshots, 1);
-    $levelshotDisplayTime = numericValidator($levelshotDisplayTime, 1, 15, 3);
-    $levelshotTransitionTime = numericValidator($levelshotTransitionTime, 0.1, 5, 0.5);
-    $levelshotFPS = numericValidator($levelshotFPS, 1, 60, 20);
-    $maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
-
-    $enableAutoRefresh = booleanValidator($enableAutoRefresh, 1);
-    //Have to validate this one twice to make sure it isn't lower than the floodprotect limit
-    $autoRefreshTimer = numericValidator($autoRefreshTimer, 5, 180, 30);
-    $autoRefreshTimer = numericValidator($autoRefreshTimer, $floodProtectTimeout, 180, 30);
-
-    $RConEnable = booleanValidator($RConEnable, 0);
-    $newWindowSnapToCorner = booleanValidator($newWindowSnapToCorner, 0);
-
-    //Done validating. On with the good stuff!
+    //On with the good stuff!
 	$fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, $connectionTimeout);
 	fwrite($fp, str_repeat(chr(255),4) . "getstatus\n");
 	$s='';
@@ -56,184 +127,43 @@ function doUpdate()
 	}
 	fclose($fp);
 
+	if($errstr == "")
+	{
+	    $errstr = "No response in " . $connectionTimeout . " seconds.";
+	}
+	file_put_contents("info/connectionErrorMessage.txt", stringValidator($errstr, "", ""));
+
 	if(strlen($s))
 	{
-	    //Split the info first, then we'll loop through and remove any dangerous characters
-		$sections = preg_split('_[' . chr(0x0A) . ']_', $s);
-		$cvars_array = preg_split('_[\\\]_', $sections[1]);
-
-		//This block parses the CVars from each other
-		$cvarCount = 0;
-		for($i = 1; $i < count($cvars_array) - 1; $i += 2)
-		{
-			$cvar_name = str_replace(array("\n", "\r"), '', $cvars_array[$i]);
-			$cvar_value = str_replace(array("\n", "\r"), '', $cvars_array[$i+1]);
-			//As we put them into the new array, let's validate them as well
-			$cvar_array_single[$cvarCount++] = array("name" => stringValidator($cvar_name, "", ""), "value" => stringValidator($cvar_value, "", ""));
-			$cvars_hash[$cvar_name] = $cvar_value; 
-		}
-		//Now, let's alphabetize the CVars so the list is easier to read
-		$cvar_array_single = array_sort($cvar_array_single, "name", false);
-
-
-		//This loop parses the players from each other
-		$playerParseCount = 0;
-		for($i = 2; $i < count($sections)-1; $i++)
-		{
-			$player_data_split = preg_split('_["]_', $sections[$i]);
-			$player_numbers_split = preg_split('_[ ]_', $player_data_split[0]);
-			//As we put them into the new array, let's validate them as well
-			$player_array[$i] = array("score" => stringValidator($player_numbers_split[0], "", ""), "ping" => stringValidator($player_numbers_split[1], "", ""), "name" => stringValidator($player_data_split[1], "", ""));
-			$playerParseCount++;
-		}
+	    //Server responded! Call a function to parse the data
+	    $dataParserReturn = dataParser($s);
+	    //Organize the data that came back in the array
+		$cvar_array_single = $dataParserReturn[0];
+		$cvars_hash = $dataParserReturn[1];
+		$player_array = $dataParserReturn[2];
+		$playerParseCount = $dataParserReturn[3];
 
 		cvarList($serverIPAddress, $serverPort, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags);
 
 		$player_count = playerList($player_array, $playerParseCount, $noPlayersOnlineMessage);
+		file_put_contents("info/playerCount.txt", $player_count);
 
-		//The following function detects how many levelshots exist on the server, and passes a buffer of information back, and the final count of levelshots
+		//The following function detects how many levelshots exist on the server, and passes a buffer of information back, the final count of levelshots, and whether they fade or not
 		$levelshotBufferArray = levelshotfinder($cvars_hash["mapname"], $maximumLevelshots, $fadeLevelshots);
 		$levelshotBuffer = $levelshotBufferArray[0];
 		$levelshotCount = $levelshotBufferArray[1];
-
-		$buf2 = htmlDeclarations("ParaTracker");
 
 		javascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime);
 
 		paramRConJavascript($RConEnable, $newWindowSnapToCorner);
 
-		$buf2 .= file_get_contents("info/javascriptAndCSS.txt");
-		$buf2 .= file_get_contents("info/rconParamScript.txt");
-
-
-$buf2 .= '</head>
-
-<div class="TrackerFrameNoBG BackgroundColorImage">
-<div class="TrackerFrame';
-
-if ($disableFrameBorder == 1)
-{
-$buf2 .= 'NoBG';
-}
-
-$buf2 .= '">
-
-
-<div class="trackerLogoSpacer">
-&nbsp;
-</div>
-
-<div class="dataFrame">
-
-<div class="serverFrameSpacer"></div>
-<div class="serverFrame">
-<span class="serverName">
-' . colorize($cvars_hash["sv_hostname"]) . '
-
-</span>
-<br />
-
-<span class="gameTitle">&nbsp;' . $gameName . '</span>
-
-</div>
-
-<div class="nameScorePing">
-<table><tr><td class="playerName">Name</td><td class="playerScore">&nbsp;Score</td><td class="playerPing">&nbsp;Ping</td><td></td></tr></table>
-</div>
-
-<div class="playerList">' . file_get_contents("info/playerlist.txt") . '
-
-</div>
-
-<div class="rconParamSpacer"></div>
-
-<div class="playersRconParamFrame">
-
-<div class="playerCountFrame">
-<table class="playersAlign"><tr><td class="playerCount">
-Players: ' . $player_count . '/' . $cvars_hash["sv_maxclients"] . '</td></tr></table>
-</div>
-
-
-<div class="rconParamFrame">';
-
-		if ($RConEnable == 1)
-		{
-		    $buf2 .= '<div class="rconButton" onclick="rcon_window();"></div>';
-		}
-        $buf2 .= '
-</div>
-<div class="rconParamFrame">
-
-<div class="paramButton" onclick="param_window();"></div>" />
-
-
-</div>
-</div>
-</div>
-
-
-<div class="middleSpacer"></div>
-
-<div class="levelshotFrameWrapper">
-<div id="levelshotPreload" class="levelshotFrame">
-
-
-<div id="bottomLayerFade" class="levelshotFrame">
-<div id="ls" class="levelshotFrame';
-
-if ($disableFrameBorder == 0)
-{
-$buf2 .= ' levelshotCorner';
-}
-
-$buf2 .= '">
-<div id="topLayerFade" class="levelshotFrame levelshot1">';
-
-if ($disableFrameBorder == 0)
-{
-    $buf2 .= '<img src="images/tracker/corner-tr.gif" width="300" height="225" alt="" />';
-}
-
-$buf2 .= '</div>
-</div>
-</div>
-
-</div>
-
-<div class="levelshotSpacer"></div>
-
-<div class="matchData"><div class="mapName"><table class="noPadding1"><tr><td>&nbsp;Map: <span class="color7">' . colorize($cvars_hash["mapname"]) . '</span></td></tr></table></div>
-<div class="gametype"><table class="noPadding1"><tr><td>&nbsp;Gametype: ' . $gametypes[$cvars_hash["g_gametype"]] . '</td></tr></table></div>
-<br />
-<div class="modName"><table class="noPadding1"><tr><td>&nbsp;Mod Name: ' . $cvars_hash["gamename"] . '</td></tr></table></div>
-<br />
-<div class="IPAddress"><table class="noPadding2"><tr><td>&nbsp;Server IP: ' . $serverIPAddress . ':' . $serverPort . '</td><td class="blinkingCursor"></td></tr></table>
-
-
-</div>
-
-
-</div>
-
-</div>
-</div>
-</div>
-
-</body>
-</html>';
-file_put_contents('info/trackerPageA.txt', $buf2);
 
 	}
 	else
 	//Could not connect to the server! Display error page.
+	//NO CONNECTION CODE
 	{
-		$buf =  '<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"/>
-<link rel="stylesheet" href="ParaStyle.css" type="text/css" />
-<link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
-<script src="ParaScript.js"></script>
-';
+		$buf =  htmlDeclarations("", "");
 
 if($enableAutoRefresh == "1")
 {
@@ -273,7 +203,7 @@ function makeReconnectButtonVisible()
 reconnectTimer = setTimeout("makeReconnectButtonVisible()", ' . ($floodProtectTimeout * 1000 + 100) . ');
 </script>
 
-<br /><br /><br />Could not connect<br />to server!<br /><br /><br />' . $serverIPAddress . ':' . $serverPort . '<div class="RConblinkingCursor">&nbsp;</div></div></div>
+<br /><br /><br />Could not connect<br />to server!<br /><br />' . file_get_contents("info/connectionErrorMessage.txt") . '<br /><br /><br />' . $serverIPAddress . ':' . $serverPort . '<div class="RConblinkingCursor">&nbsp;</div></div></div>
 <div class="rconParamSpacer"></div>
 <div class="playersRconParamFrame">
 <div class="playerCountFrame">
@@ -293,15 +223,51 @@ $buf .= '
 
 }
 
+function dataParser($s)
+{
+//Split the info first, then we'll loop through and remove any dangerous characters
+		$sections = preg_split('_[' . chr(0x0A) . ']_', $s);
+		$cvars_array = preg_split('_[\\\]_', $sections[1]);
+
+		//This block parses the CVars from each other
+		$cvarCount = 0;
+		for($i = 1; $i < count($cvars_array) - 1; $i += 2)
+		{
+			$cvar_name = str_replace(array("\n", "\r"), '', $cvars_array[$i]);
+			$cvar_value = str_replace(array("\n", "\r"), '', $cvars_array[$i+1]);
+			//As we put them into the new array, let's validate them as well
+			$cvar_name = stringValidator($cvar_name, "", "");
+			$cvar_value = stringValidator($cvar_value, "", "");
+			$cvar_array_single[$cvarCount++] = array("name" => $cvar_name, "value" => $cvar_value);
+			$cvars_hash[$cvar_name] = $cvar_value; 
+		}
+		//Now, let's alphabetize the CVars so the list is easier to read
+		$cvar_array_single = array_sort($cvar_array_single, "name", false);
+
+
+		//This loop parses the players from each other
+		$playerParseCount = 0;
+		for($i = 2; $i < count($sections)-1; $i++)
+		{
+			$player_data_split = preg_split('_["]_', $sections[$i]);
+			$player_numbers_split = preg_split('_[ ]_', $player_data_split[0]);
+			//As we put them into the new array, let's validate them as well
+			$player_array[$i] = array("score" => stringValidator($player_numbers_split[0], "", ""), "ping" => stringValidator($player_numbers_split[1], "", ""), "name" => stringValidator($player_data_split[1], "", ""));
+			$playerParseCount++;
+		}
+
+		file_put_contents('info/sv_hostname.txt', colorize($cvars_hash["sv_hostname"]));
+		file_put_contents('info/sv_maxclients.txt', $cvars_hash["sv_maxclients"]);
+		file_put_contents('info/g_gametype.txt', $cvars_hash["g_gametype"]);
+		file_put_contents('info/gamename.txt', colorize($cvars_hash["gamename"]));
+		file_put_contents('info/mapname.txt', colorize($cvars_hash["mapname"]));
+
+		return(array($cvar_array_single, $cvars_hash, $player_array, $playerParseCount));
+}
+
 function cvarList($serverIPAddress, $serverPort, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags)
 {
-		$buf='<!DOCTYPE html><html lang="en"><head>
-		<meta charset="utf-8"/>
-		<link rel="stylesheet" href="../ParaStyle.css" type="text/css" />
-		<link rel="stylesheet" href="../Config-DoNotEdit.css" type="text/css" />
-		<title>Server Cvars</title>
-		<script src="../ParaScript.js"></script>
-		</head>
+		$buf = '</head>
 		<body class="cvars_page">
 		<span class="CVarHeading">Server Cvars</span><br />
 		<span class="CVarServerAddress">' . $serverIPAddress . ":" . $serverPort . '</span><br /><br />
@@ -339,8 +305,8 @@ function cvarList($serverIPAddress, $serverPort, $cvar_array_single, $dmflags, $
 			if($c > 2) $c = 1;
 		}
 		$buf .= '</table></td></tr></table><h6 class="center">ParaTracker version ' . versionNumber() . ' - Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited. Your mileage may vary. Please drink and drive responsibly.</h6></body></html>';
+		$buf = htmlDeclarations($cvar['name'] . "CVars", "../") . $buf;
 		file_put_contents('info/param.html', $buf);
-
 }
 
 function playerList($player_array, $playerParseCount, $noPlayersOnlineMessage)
@@ -801,7 +767,7 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
 
             if ($index <= 0)
             {
-                $output .= "None";
+                $output .= '<div id="' . $cvarName . '" class="collapsedList"><br /><i>None</i></div>';
             }
             elseif ($cvarValue >= pow(2, $index))
             {
@@ -830,18 +796,18 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
     return $output;
 }
 
-function htmlDeclarations($pageTitle)
+function htmlDeclarations($pageTitle, $filePath)
 {
-$pageTitle = stringValidator($pageTitle, "", "ParaTracker");
-$output = '<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
-<link rel="stylesheet" href="ParaStyle.css" type="text/css" />
-<title>' . $pageTitle . '</title>
-<script src="ParaScript.js"></script>';
-return $output;
+    $pageTitle = stringValidator($pageTitle, "", "ParaTracker");
+    $output = '<!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="' . $filePath . 'Config-DoNotEdit.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaStyle.css" type="text/css" />
+    <title>' . $pageTitle . '</title>
+    <script src="' . $filePath . 'ParaScript.js"></script>';
+    return $output;
 }
 
 function colorize($string)
@@ -917,10 +883,10 @@ if ($RConPassword != "" && $RConCommand != "")
 
 
 	//Log time! Let's see if a log file exists
-    if (file_exists("info/RConLog.php"))
+    if (file_exists("logs/RConLog.php"))
 {
     //Houston, we have a log file. Read it in.
-    $RConLog2 = file_get_contents("info/RConLog.php");
+    $RConLog2 = file_get_contents("logs/RConLog.php");
 
     //Trim off the PHP tags and comment markers at the beginning and end of the file
     $RConLog2 = substr($RConLog2, 8, count($RConLog2) - 7);
@@ -944,7 +910,7 @@ if ($RConPassword != "" && $RConCommand != "")
     $RConLog = "<?php /*\n" . $RConLog . "\n*/ ?>";
 
     //Write the newly appended RCon log to a file
-    file_put_contents("info/RConLog.php", $RConLog);
+    file_put_contents("logs/RConLog.php", $RConLog);
 
     return $output;
 }
@@ -1089,7 +1055,7 @@ $RConEnable = "0";
 $RConFloodProtect = "20";
 
 
-//RCon events are logged in RConLog.php for security. This variable will determine
+//RCon events are logged in logs/RConLog.php for security. This variable will determine
 //the maximum number of lines that will be stored in the log file before the old
 //entries are truncated. Minimum is 100 lines. Maximum is 100000.
 //Default is 1000 lines.
@@ -1178,11 +1144,6 @@ $forcePowerFlags = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", 
 //End config file
 ?>';
 file_put_contents('ParaConfig.php', $configBuffer);
-}
-
-if (!file_exists("info/"))
-{
-    mkdir("info/");
 }
 
 ?>

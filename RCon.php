@@ -4,10 +4,7 @@ echo "<!-- ";
 //Prevent users from aborting the page! This will reduce load on both the game server, and the web server.
 ignore_user_abort(true);
 
-//Declaring these variables before loading the config file will avoid error messages
-$RConEnable = "";
-
-//Check to see if the library file exists, and load it in.
+//ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
     include 'ParaFunc.php';
@@ -18,43 +15,8 @@ else
     exit();
 }
 
-if (file_exists("ParaConfig.php"))
-{
-    include 'ParaConfig.php';
-}
-else
-{
-    echo "--> <h3>ParaConfig.php not found!</h3><br />Writing default config file...<!--";
-    writeNewConfigFile();
-    if (file_exists("ParaConfig.php"))
-    {
-        echo "<!-- <h4>Default ParaConfig.php successfully written!<br />Please add an IP Address and port to it.</h4> <!--";
-    }
-    else
-    {
-        echo "<!-- <h4>Failed to write new config file!</h4> <!--";
-    }
-    
-    exit();
-}
-
 $output = htmlDeclarations("Rcon Page") . '<body class="RConPage">';
 
-
-//IMMEDIATELY validate the necessary input from the config file.
-$serverIPAddress = ipAddressValidator($serverIPAddress);
-$serverPort = numericValidator($serverPort, 1, 65535, 29070);
-$connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2.5);
-$RConEnable = booleanValidator($RConEnable, 0);
-$RConFloodProtect = numericValidator($RConFloodProtect, 10, 3600, 20);
-$RConFloodProtect = numericValidator($RConFloodProtect, $connectionTimeout, 3600, 20);
-$RConLogSize = numericValidator($RConLogSize, 100, 100000, 1000);
-
-//If someone was silly and made the connection timeout longer than the floodprotect, we should force them to be equal
-if ($connectionTimeout > $RConFloodProtect)
-{
-    $RConFloodProtect = $connectionTimeout;
-}
 
 if ($RConEnable == "1")
 {

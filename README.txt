@@ -21,7 +21,7 @@ __________________________________________
 INSTALLATION INSTRUCTIONS:
 
 You must have PHP on your web server to use ParaTracker.
-To use this version of ParaTracker, you need to open "ParaTracker-A.php".
+To use this version of ParaTracker, you need to open "ParaTrackerA.php".
 
 To insert it onto a web page, add a frame somewhere on your website that
 references the file.
