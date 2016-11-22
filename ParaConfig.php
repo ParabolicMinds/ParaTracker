@@ -29,13 +29,13 @@
 //This is the IP Address of the server. Do not include the port number!
 //By default, and for security, this value is empty. If ParaTracker is launched without a value here,
 //it will display a message telling the user to check config.php before running.
-$serverIPAddress = "212.224.101.83";
+$serverIPAddress = "";
 
 
 //Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
 //The default port number for Jedi Outcast is 28070.
 //If an invalid entry is given, this value will default to 29070.
-$serverPort = "29070";
+$serverPort = "";
 
 
 //This variable limits how many seconds are required between each snapshot of the server.
@@ -132,7 +132,7 @@ $noPlayersOnlineMessage = "No players online.";
 //limits how often ParaTracker will contact the server.
 //A value of Yes or 1 will enable it, and any other value will disable it.
 //Enabled by default.
-$enableAutoRefresh = "0";
+$enableAutoRefresh = "1";
 
 //This value determines how many seconds ParaTracker waits between refreshes.
 //This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
@@ -147,7 +147,7 @@ $autoRefreshTimer = "30";
 //This value will enable or disable RCon.
 //A value of Yes or 1 will enable it, and any other value will disable it.
 //Disabled by default for security.
-$RConEnable = "1";
+$RConEnable = "0";
 
 //RCon flood protection forces the user to wait a certain number of seconds before sending another command.
 //Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
