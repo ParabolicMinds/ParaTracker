@@ -1,0 +1,382 @@
+/*
+This file contains all the fonts and color styles in ParaTracker.
+Edit it however you see fit.
+
+If you are looking for the tracker configuration,
+you will find it in ParaConfig.php
+*/
+
+
+.BackgroundColorImage
+{
+
+/* This next line is the background color of the tracker.
+The numbers are given in RGBA, which is Red, Green, Blue, and Alpha.
+All values are 0-255, except alpha which is 0-1. 0 is transparent,
+1 is solid.
+Default is: background-color: rgba(0, 0, 0, 1); */
+background-color: rgba(0, 0, 0, 1);
+
+/* If you want a background image on the tracker,
+this next line is the place to add it. */
+background-image: url("");
+}
+
+.gameTitle
+{
+color:#808080;
+font-size:10pt;
+font-family: verdana;
+font-style:italic;
+}
+
+.serverName
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family:"Trebuchet MS";
+font-weight:bold;
+}
+
+.nameScorePing
+{
+overflow: hidden;
+color:#FFFFBB;
+width: 300px;
+height: 26px;
+float: left;
+}
+
+.playerList
+{
+width: 321px;
+height: 164px;
+overflow: auto;
+border-spacing: 0px;
+}
+
+.playerName
+{
+font-size:10pt;
+font-family: monospace;
+width: 180px;
+height: 20px;
+}
+
+.playerScore
+{
+font-size:10pt;
+font-family: monospace;
+width: 60px;
+height: 20px;
+text-align: center;
+}
+
+.playerPing
+{
+font-size:10pt;
+font-family: monospace;
+width: 60px;
+height: 20px;
+text-align: center;
+}
+
+.noPlayersOnline
+{
+color: #FFFFFF;
+font-size:10pt;
+font-family: monospace;
+width: 60px;
+height: 20px;
+text-align: left;
+}
+.playerRow1
+{
+background-color:#191919;
+font-family:monospace;
+color: #FFFFFF;
+}
+
+.playerRow2
+{
+background-color:#2a2a2a;
+font-family:monospace;
+color: #FFFFFF;
+}
+
+.playerCount
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family:arial;
+vertical-align: middle;
+text-align: center;
+}
+
+.mapName
+{
+color:#EEEEEE;
+font-size:9pt;
+font-family:monospace;
+overflow: hidden;
+height: 20px;
+width: 150px;
+float: left;
+word-wrap: break-word;
+}
+
+.gametype
+{
+color:#EFEFEF;
+font-size:9pt;
+font-family:monospace;
+overflow: hidden;
+height: 20px;
+width: 150px;
+float: left;
+word-wrap: break-word;
+}
+
+.modName
+{
+color:#EFEFEF;
+font-size:9pt;
+font-family:monospace;
+overflow: hidden;
+float: left;
+height: 20px;
+width: 300px;
+word-wrap: break-word;
+}
+
+.IPAddress
+{
+color: #EFEFEF;
+font-size: 9pt;
+font-family: monospace;
+overflow: hidden;
+float: left;
+height: 20px;
+width: 300px;
+word-wrap: break-word;
+}
+
+.RConPage
+{
+background-color: #000000;
+color: #EEEEEE;
+font-size: 11pt;
+font-family: monospace;
+text-align: left;
+}
+
+.RConPasswordCommand
+{
+font-family: inherit;
+text-align: right;
+}
+
+input[type=text], input[type=password]
+{
+padding: 4px 10px;
+border: 1px;
+border-bottom-style: solid;
+border-top-style: none;
+border-right-style: none;
+border-left-style: none;
+font-family: inherit;
+}
+
+input[type=submit]
+{
+padding: 10px 10px;
+border: 1px;
+background-color: #292929;
+cursor: pointer;
+color: #EEEEEE;
+font-family: inherit;
+}
+
+.RConServerAddressResponse
+{
+background-color: inherit;
+font-family: inherit;
+}
+
+.RConServerResponse
+{
+background-color: inherit;
+font-family: inherit;
+color: #EEEEEE;
+}
+
+.cvars_page
+{
+background-color:#202020;
+color:#EFEFEF;
+font-size:8pt;
+font-family: "Trebuchet MS";
+text-align:center;
+}
+
+.cvars_row1
+{
+height: 28px;
+background-color:#333333;
+text-align: center;
+font-size: 10pt;
+}
+
+.cvars_row2
+{
+height: 28px;
+background-color:#3F3F3F;
+text-align: center;
+font-size: 10pt;
+}
+
+.CVarHeading
+{
+color:#EFEFEF;
+font-size:22pt;
+font-weight:bold;
+text-align:center;
+}
+
+.CVarServerAddress
+{
+color:#EFEFEF;
+font-size:9pt;
+font-weight:bold;
+text-align:center;
+}
+
+.cvars_titleRow
+{
+background-color:#383833;
+font-weight:bold;
+font-size: 14pt;
+text-align: center;
+vertical-align: middle;
+}
+
+.CVarCell
+{
+width: 270px;
+text-align: center;
+font-size: 10pt;
+padding-bottom: 10px;
+vertical-align: middle;
+}
+
+.expandCollapse
+{
+font-size: 7pt;
+}
+
+.heading
+{
+color:#EFEFEF;
+font-size:18pt;
+font-weight:bold;
+}
+
+.couldNotConnectText
+{
+color:#EEEEEE;
+font-size:11pt;
+font-family: monospace;
+}
+
+.info
+{
+color:#EFEFEF;
+font-size:9pt;
+font-family:monospace;
+line-height:90%;
+}
+
+
+
+/*
+The following values are used for colorizing names.
+They are already accurate. Do not change them unless
+you have a very good reason!
+*/
+
+.color0
+/* Black (Gray is used for readability)
+Default is #6F6F6F */
+{
+color: #6F6F6F;
+}
+
+.color1
+/* Red
+Default is #FF0000 */
+{
+color: #FF0000;
+}
+
+.color2
+/* Green
+Default is #00FF00 */
+{
+color: #00FF00;
+}
+
+.color3
+/* Yellow
+Default is #FFFF00 */
+{
+color: #FFFF00;
+}
+
+.color4
+/* Blue
+Default is #0000FF */
+{
+color: #0000FF;
+}
+
+.color5
+/* Cyan
+Default is #00FFFF */
+{
+color: #00FFFF;
+}
+
+.color6
+/* Pink/Purple
+Default is #FF00FF */
+{
+color: #FF00FF;
+}
+
+.color7
+/* White
+Default is #FFFFFF */
+{
+color: #FFFFFF;
+}
+
+.color8
+/* Gray
+Default is #8A8A8A */
+{
+color: #8A8A8A;
+}
+
+.color9
+/* Orange
+Default is #FF4400 */
+{
+color: #FF4400;
+}
+
+.color?
+/* Unknown Colors
+Default is #FFFFFF */
+{
+color: #FFFFFF;
+}
