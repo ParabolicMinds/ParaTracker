@@ -56,6 +56,7 @@ $serverPort = numericValidator($serverPort, 1, 65535, 29070);
 $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2.5);
 $RConEnable = booleanValidator($RConEnable, 0);
 $RConFloodProtect = numericValidator($RConFloodProtect, 10, 3600, 20);
+$RConFloodProtect = numericValidator($RConFloodProtect, $connectionTimeout, 3600, 20);
 $RConLogSize = numericValidator($RConLogSize, 100, 100000, 1000);
 
 //If someone was silly and made the connection timeout longer than the floodprotect, we should force them to be equal

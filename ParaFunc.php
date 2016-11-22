@@ -23,6 +23,7 @@ function do_update()
     $serverPort = numericValidator($serverPort, 1, 65535, 29070);
 
     $floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 10);
+    $floodProtectTimeout = numericValidator($floodProtectTimeout, $connectionTimeout, 1200, 10);
     $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
 
     $disableFrameBorder = booleanValidator($disableFrameBorder, 0);
@@ -32,6 +33,11 @@ function do_update()
     $levelshotTransitionTime = numericValidator($levelshotTransitionTime, 0.1, 5, 0.5);
     $levelshotFPS = numericValidator($levelshotFPS, 1, 60, 20);
     $maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
+
+    $enableAutoRefresh = booleanValidator($enableAutoRefresh, 1);
+    //Have to validate this one twice to make sure it isn't lower than the floodprotect limit
+    $autoRefreshTimer = numericValidator($autoRefreshTimer, 5, 180, 30);
+    $autoRefreshTimer = numericValidator($autoRefreshTimer, $floodProtectTimeout, 180, 30);
 
     $RConEnable = booleanValidator($RConEnable, 0);
     $newWindowSnapToCorner = booleanValidator($newWindowSnapToCorner, 0);
@@ -277,8 +283,17 @@ if ($levelshotCount == 0)
 <link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
 <link rel="stylesheet" href="ParaStyle.css" type="text/css" />
 <title>ParaTracker</title>
-<script src="ParaScript.js"></script>
-        <script type="text/javascript"><!--
+<script src="ParaScript.js"></script>';
+
+if($enableAutoRefresh == "1")
+{
+    $buf2 .= '<script type="text/javascript">
+    pageReloadTimer = setTimeout("pageReload()", ' . ($autoRefreshTimer * 1000) . ');
+    </script>';
+}
+
+
+$buf2 .= '<script type="text/javascript"><!--
 		var timer = 0;  //Used for setting re-execution timeout
 		var allowFading = ' . $fadeLevelshots . ';   //Used to test whether fading levelshots is disabled
 		var opac = 1;   //Opacity level for the top layer.
