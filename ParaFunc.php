@@ -1,5 +1,10 @@
 ﻿<?php
 
+if (!file_exists("info/"))
+{
+    mkdir("info/");
+}
+
 function do_update()
 {
 
