@@ -19,7 +19,7 @@ else
 //Check the time delay between refreshes
 checkTimeDelay($connectionTimeout);
 
-checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
 
 
 $output = htmlDeclarations("ParaTracker", "");
@@ -58,11 +58,11 @@ $output .= '">
 
 </div>
 
-<div class="nameScorePing">
-<table><tr><td class="playerName">Name</td><td class="playerScore">&nbsp;Score</td><td class="playerPing">&nbsp;Ping</td><td></td></tr></table>
+<div class="nameScorePing nameScorePingSize">
+<div class="playerName playerNameSize">Name</div><div class="playerScore playerScoreSize">&nbsp;Score</div><div class="playerPing playerPingSize">&nbsp;Ping</div>
 </div>
 
-<div class="playerList">' . file_get_contents("info/playerlist.txt") . '
+<div class="playerList">' . file_get_contents("info/playerList.txt") . '
 
 </div>
 

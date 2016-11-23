@@ -3,11 +3,8 @@
 // ParaTracker Configuration //
 ///////////////////////////////
 
-//ParaTracker version 1.0
-//This version only has one layout. To use it, invoke ParaTracker-A.php on your web page.
-//Future versions will have more layouts.
-
 //This is the config file for ParaTracker.
+//The only visual setting found here is the frame border.
 //If you want to edit fonts and colors,
 //they are found in ParaStyle.css, not here.
 
@@ -29,21 +26,19 @@
 //This is the IP Address of the server. Do not include the port number!
 //By default, and for security, this value is empty. If ParaTracker is launched without a value here,
 //it will display a message telling the user to check config.php before running.
-$serverIPAddress = "";
-
+$serverIPAddress = "212.224.101.83";
 
 //Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
 //The default port number for Jedi Outcast is 28070.
 //If an invalid entry is given, this value will default to 29070.
-$serverPort = "";
-
+$serverPort = "29070";
 
 //This variable limits how many seconds are required between each snapshot of the server.
 //This prevents high traffic on the tracker from bogging down the game server it is tracking.
 //ParaTracker forces a minimum value of 5 seconds between snapshots. Maximum is 1200 seconds.
 //This value cannot be lower than the value of $connectionTimeout (below).
-//Default is 10 seconds.
-$floodProtectTimeout = "10";
+//Default is 15 seconds.
+$floodProtectTimeout = "15";
 
 //This value is the number of seconds ParaTracker will wait for a response from the game server
 //before timing out. Note that, every time the tracker gets data from the server, it will ALWAYS
@@ -79,7 +74,6 @@ $disableFrameBorder = "0";
 
 //ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be used first, JPGs second,
 //and GIFs third. If no images are found, a placeholder image will be displayed instead.
-
 
 //The following value will enable or disable fading levelshots. A value of 1 or "Yes" will allow them,
 //and any other value with disable them. If this is disabled, only the first levelshot will show.
@@ -119,26 +113,29 @@ $maximumLevelshots = "20";
 //Default is "Jedi Academy."
 $gameName = "Jedi Academy";
 
-
 //No Players Online Message
 //This message displays in place of the player list when nobody is online.
 //Default is "No players online."
 $noPlayersOnlineMessage = "No players online.";
 
-
-//Auto-Refresh
-//ParaTracker can automatically refresh the server page every so often.
+//ParaTracker can automatically refresh itself every so often.
 //This will not cause any disruption to the game, because the flood protection
 //limits how often ParaTracker will contact the server.
 //A value of Yes or 1 will enable it, and any other value will disable it.
 //Enabled by default.
-$enableAutoRefresh = "1";
+$enableAutoRefresh = "0";
 
 //This value determines how many seconds ParaTracker waits between refreshes.
 //This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
 //It also cannot be higher than 300 seconds.
 //Default is 30 seconds.
 $autoRefreshTimer = "30";
+
+//This variable will set the maximum number of characters ParaTracker will accept from the server.
+//This prevents pranksters from sending 50MB back, in the unlikely event that you connect to
+//the wrong server. Minimum is 2000 characters, maximum is 50000 characters.
+//Default is 4000 characters.
+$maximumServerInfoSize = "4000";
 
 
 // RCON SETTINGS
@@ -147,7 +144,7 @@ $autoRefreshTimer = "30";
 //This value will enable or disable RCon.
 //A value of Yes or 1 will enable it, and any other value will disable it.
 //Disabled by default for security.
-$RConEnable = "0";
+$RConEnable = "1";
 
 //RCon flood protection forces the user to wait a certain number of seconds before sending another command.
 //Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
@@ -155,7 +152,6 @@ $RConEnable = "0";
 //Cannot be lower than the value of $connectionTimeout.
 //Default is 20 seconds.
 $RConFloodProtect = "20";
-
 
 //RCon events are logged in RConLog.php for security. This variable will determine
 //the maximum number of lines that will be stored in the log file before the old

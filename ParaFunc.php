@@ -12,15 +12,15 @@ if (file_exists("ParaConfig.php"))
 }
 else
 {
-    echo "--> <h3>ParaConfig.php not found!</h3><br />Writing default config file...<!--";
+    echo "--> <h3>ParaConfig.php not found!</h3><br />Writing default config file...<!-- ";
     writeNewConfigFile();
     if (file_exists("ParaConfig.php"))
     {
-        echo "<!-- <h4>Default ParaConfig.php successfully written!<br />Please add an IP Address and port to it.</h4> <!--";
+        echo "--> <h4>Default ParaConfig.php successfully written!<br />Please add an IP Address and port to it.</h4>";
     }
     else
     {
-        echo "<!-- <h4>Failed to write new config file!</h4> <!--";
+        echo "--> <h4>Failed to write new config file!</h4>";
     }
     
     exit();
@@ -31,12 +31,15 @@ else
 //$variableName = booleanValidator($variableName, defaultValue);
 
 //To evaluate numeric values:
-//$variableName = numericValidator($variableName, min, max, default);
+//$variableName = numericValidator($variableName, minValue, maxValue, defaultValue);
+
+//To evaluate strings:
+//$variableName = stringValidator($variableName, maxLength, defaultValue);
 
 $serverIPAddress = ipAddressValidator($serverIPAddress);
 $serverPort = numericValidator($serverPort, 1, 65535, 29070);
 
-$floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 10);
+$floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 15);
 //Have to validate this one twice to make sure it isn't lower than connectionTimeout
 $floodProtectTimeout = numericValidator($floodProtectTimeout, $connectionTimeout, 1200, 10);
 $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
@@ -56,6 +59,7 @@ $enableAutoRefresh = booleanValidator($enableAutoRefresh, 1);
 //Have to validate this one twice to make sure it isn't lower than the floodprotect limit
 $autoRefreshTimer = numericValidator($autoRefreshTimer, 10, 300, 30);
 $autoRefreshTimer = numericValidator($autoRefreshTimer, $floodProtectTimeout, 300, 30);
+$maximumServerInfoSize = numericValidator($maximumServerInfoSize, 2000, 50000, 4000);
 
 $RConEnable = booleanValidator($RConEnable, 0);
 $RConFloodProtect = numericValidator($RConFloodProtect, 10, 3600, 20);
@@ -87,8 +91,28 @@ if (!file_exists("logs/"))
 }
 
 
-function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
+
+if (file_exists("info/time.txt"))
+{
+    $lastRefreshTime = numericValidator(file_get_contents("info/time.txt"), "", "", "0");
+}
+else
+{
+    file_put_contents("info/time.txt", "0");
+    
+    if (file_exists("info/time.txt"))
+    {
+        $lastRefreshTime = numericValidator(file_get_contents("info/time.txt"), "", "", "0");
+    }
+    else
+    {
+        echo "--> <h4>Could not create info/time.txt.<br />Cannot continue until filesystem is accessible!</h4>";
+        exit();
+    }
+}
+
 
     $lastRefreshTime = numericValidator(file_get_contents("info/time.txt"), "", "", "0");
 
@@ -104,7 +128,7 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodPro
         if ($lastRefreshTime + $floodProtectTimeout < time())
         {
             file_put_contents("info/time.txt", "wait");
-            doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+            doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
             file_put_contents("info/time.txt", time());
         }
 
@@ -112,7 +136,7 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodPro
 
 }
 
-function doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
 
     //On with the good stuff!
@@ -126,6 +150,12 @@ function doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connecti
 		$s .= $char;
 	}
 	fclose($fp);
+
+	if(strlen($s) > $maximumServerInfoSize)
+	{
+	    echo '--> <h2>Received too much data!</h2><h4>' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '</h4><br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.';
+	    exit();
+	}
 
 	if($errstr == "")
 	{
@@ -311,12 +341,12 @@ function cvarList($serverIPAddress, $serverPort, $cvar_array_single, $dmflags, $
 
 function playerList($player_array, $playerParseCount, $noPlayersOnlineMessage)
 {
-		$playerListbuffer = '<table class="playerTable">';
+		$playerListbuffer = '<div class="playerTable">';
 		$player_count = 0;
-		
+
 		//FIXME: Doesn't work
 		$playerNameCharacterLimit = 40;
-		
+
 		if($playerParseCount > 0)
 		{
 			$player_array = array_sort($player_array, "score", true);
@@ -344,18 +374,20 @@ function playerList($player_array, $playerParseCount, $noPlayersOnlineMessage)
 					$k = $playerNameCharacterLimit;
 				}
 				$player_count++;
-				$playerListbuffer .= "\n" . '<tr class="playerRow' . $c . '"><td class="playerName">'. colorize(substr($player_name,0,$k));
-				$playerListbuffer .= '</td>' . "\n" . '<td class="playerScore">' . $player["score"] . '</td><td class="playerPing">' . $player["ping"] . '</td></tr>';
+				$playerListbuffer .= "\n" . '
+<div class="playerRow' . $c . ' playerRowSize"><div class="playerName playerNameSize">'. colorize(substr($player_name,0,$k));
+				$playerListbuffer .= '</div>' . "\n" . '
+<div class="playerScore playerScoreSize">' . $player["score"] . '</div><div class="playerPing playerPingSize">' . $player["ping"] . '</div></div>';
 				$c++;
 				if($c > 2) $c = 1;
 			}
 			$playerListbuffer .= "\n";
 		} else {
-			$playerListbuffer .= '<tr><td class="noPlayersOnline">&nbsp;' . $noPlayersOnlineMessage . '</td></tr>';
+			$playerListbuffer .= '<div class="noPlayersOnline">&nbsp;' . $noPlayersOnlineMessage . '</div>';
 		}
-		$playerListbuffer .= '</table>';
+		$playerListbuffer .= '<div></div></div>';
 		$buf3='';
-		file_put_contents('info/playerlist.txt', $playerListbuffer);
+		file_put_contents('info/playerList.txt', $playerListbuffer);
 
 		return $player_count;
 }
@@ -923,6 +955,7 @@ $configBuffer = '<?php
 ///////////////////////////////
 
 //This is the config file for ParaTracker.
+//The only visual setting found here is the frame border.
 //If you want to edit fonts and colors,
 //they are found in ParaStyle.css, not here.
 
@@ -951,18 +984,18 @@ $serverIPAddress = "";
 //If an invalid entry is given, this value will default to 29070.
 $serverPort = "29070";
 
-
 //This variable limits how many seconds are required between each snapshot of the server.
 //This prevents high traffic on the tracker from bogging down the game server it is tracking.
 //ParaTracker forces a minimum value of 5 seconds between snapshots. Maximum is 1200 seconds.
-//Default is 10 seconds.
-$floodProtectTimeout = "10";
+//This value cannot be lower than the value of $connectionTimeout (below).
+//Default is 15 seconds.
+$floodProtectTimeout = "15";
 
 //This value is the number of seconds ParaTracker will wait for a response from the game server
 //before timing out. Note that, every time the tracker gets data from the server, it will ALWAYS
 //wait the full delay time. Server connections are UDP, so the tracker cannot tell when the data
 //stream is complete. After this time elapses, ParaTracker will assume it has all the data and
-//parse the data. If your web page has a slow response time to the game server, set this value
+//parse it. If your web server has a slow response time to the game server, set this value
 //higher. ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
 //Not recommended to go above 5 seconds, as people will get impatient and leave.
 //This setting also affects RCon wait times.
@@ -992,7 +1025,6 @@ $disableFrameBorder = "0";
 
 //ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be used first, JPGs second,
 //and GIFs third. If no images are found, a placeholder image will be displayed instead.
-
 
 //The following value will enable or disable fading levelshots. A value of 1 or "Yes" will allow them,
 //and any other value with disable them. If this is disabled, only the first levelshot will show.
@@ -1026,18 +1058,35 @@ $maximumLevelshots = "20";
 // TRACKER SETTINGS
 // TRACKER SETTINGS
 
-
 //This is the name of the game being tracked; I.E. Jedi Academy, Jedi Outcast, Call Of Duty 4, etc.
 //It is displayed underneath the server name in the top left corner of the tracker.
 //For future-proofing, this value is left to you, the user.
 //Default is "Jedi Academy."
 $gameName = "Jedi Academy";
 
-
 //No Players Online Message
 //This message displays in place of the player list when nobody is online.
 //Default is "No players online."
 $noPlayersOnlineMessage = "No players online.";
+
+//ParaTracker can automatically refresh itself every so often.
+//This will not cause any disruption to the game, because the flood protection
+//limits how often ParaTracker will contact the server.
+//A value of Yes or 1 will enable it, and any other value will disable it.
+//Enabled by default.
+$enableAutoRefresh = "1";
+
+//This value determines how many seconds ParaTracker waits between refreshes.
+//This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
+//It also cannot be higher than 300 seconds.
+//Default is 30 seconds.
+$autoRefreshTimer = "30";
+
+//This variable will set the maximum number of characters ParaTracker will accept from the server.
+//This prevents pranksters from sending 50MB back, in the unlikely event that you connect to
+//the wrong server. Minimum is 2000 characters, maximum is 50000 characters.
+//Default is 4000 characters.
+$maximumServerInfoSize = "4000";
 
 
 // RCON SETTINGS
@@ -1051,11 +1100,11 @@ $RConEnable = "0";
 //RCon flood protection forces the user to wait a certain number of seconds before sending another command.
 //Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
 //send the command. Minimum is 10 seconds, maximum is 3600.
+//Cannot be lower than the value of $connectionTimeout.
 //Default is 20 seconds.
 $RConFloodProtect = "20";
 
-
-//RCon events are logged in logs/RConLog.php for security. This variable will determine
+//RCon events are logged in RConLog.php for security. This variable will determine
 //the maximum number of lines that will be stored in the log file before the old
 //entries are truncated. Minimum is 100 lines. Maximum is 100000.
 //Default is 1000 lines.
