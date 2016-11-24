@@ -15,7 +15,7 @@ else
     exit();
 }
 
-$output = htmlDeclarations("Rcon Page") . '<body class="RConPage">';
+$output = htmlDeclarations("Rcon Page", "") . '<body class="RConPage">';
 
 
 if ($RConEnable == "1")
@@ -23,12 +23,12 @@ if ($RConEnable == "1")
 if ($serverIPAddress == "Invalid")
 {
     $output = "Invalid IP address detected! Cannot continue.<br />Check the IP address in ParaConfig.php.";
+    exit();
 }
 else
 {
     $RConCommand = stringValidator($_POST["command"], "", "");
     $RConPassword = stringValidator($_POST["password"], "", "");
-
 
     $output .= '<form action="RCon.php" method="post"><div class="RConPasswordCommand RConPasswordCommandSize">Password:<input class="RConInput" type="password" name="password" value="" />
     &nbsp;Command:<input class="RConInput" size="35" type="text" value="' . $RConCommand . '" name="command" />
@@ -36,6 +36,21 @@ else
     </div>
     </form>
     <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . $serverIPAddress . ":" . $serverPort . '<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse">';
+
+echo $RConMaximumMessageSize;
+
+    if(strlen($RConCommand) > $RConMaximumMessageSize)
+    {
+        $output .= 'RCon command exceeds maximum size! Limit is ' . $RConMaximumMessageSize . ' characters.<br />If you need the limit raised, change it in ParaConfig.php.';
+    }
+    else
+    {
+        if(strlen($RConPassword) > $RConMaximumMessageSize)
+        {
+            $output .= 'RCon password exceeds maximum size! Limit is ' . $RConMaximumMessageSize . ' characters.<br />If you need the limit raised, change it in ParaConfig.php.';
+        }
+        else
+        {
 
     if ($RConCommand != "" && $RConPassword != "")
     {
@@ -109,8 +124,11 @@ else
         }
     }
 
+        }
+    }
 
 }
+
 }
 else
 {

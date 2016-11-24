@@ -146,6 +146,12 @@ $maximumServerInfoSize = "4000";
 //Disabled by default for security.
 $RConEnable = "1";
 
+//This value sets the maximum number of characters ParaTracker will send to the server.
+//If the command or password is any larger than this, the command will not be sent.
+//Minimum is 20 characters, maximum is 10000 characters.
+//Default is 100 characters.
+$RConMaximumMessageSize = "100";
+
 //RCon flood protection forces the user to wait a certain number of seconds before sending another command.
 //Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
 //send the command. Minimum is 10 seconds, maximum is 3600.

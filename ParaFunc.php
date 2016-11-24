@@ -62,6 +62,8 @@ $autoRefreshTimer = numericValidator($autoRefreshTimer, $floodProtectTimeout, 30
 $maximumServerInfoSize = numericValidator($maximumServerInfoSize, 2000, 50000, 4000);
 
 $RConEnable = booleanValidator($RConEnable, 0);
+$RConMaximumMessageSize = numericValidator($RConMaximumMessageSize, 20, 10000, 100);
+
 $RConFloodProtect = numericValidator($RConFloodProtect, 10, 3600, 20);
 //Have to validate this one twice to make sure it isn't lower than connectionTimeout
 $RConFloodProtect = numericValidator($RConFloodProtect, $connectionTimeout, 3600, 20);
@@ -91,7 +93,7 @@ if (!file_exists("logs/"))
 }
 
 
-function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
 
 if (file_exists("info/time.txt"))
@@ -128,7 +130,7 @@ else
         if ($lastRefreshTime + $floodProtectTimeout < time())
         {
             file_put_contents("info/time.txt", "wait");
-            doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+            doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
             file_put_contents("info/time.txt", time());
         }
 
@@ -136,7 +138,7 @@ else
 
 }
 
-function doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
 
     //On with the good stuff!
@@ -1096,6 +1098,12 @@ $maximumServerInfoSize = "4000";
 //A value of Yes or 1 will enable it, and any other value will disable it.
 //Disabled by default for security.
 $RConEnable = "0";
+
+//This value sets the maximum number of characters ParaTracker will send to the server.
+//If the command or password is any larger than this, the command will not be sent.
+//Minimum is 20 characters, maximum is 10000 characters.
+//Default is 100 characters.
+$RConMaximumMessageSize = "100";
 
 //RCon flood protection forces the user to wait a certain number of seconds before sending another command.
 //Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
