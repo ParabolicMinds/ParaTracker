@@ -15,8 +15,9 @@ else
     exit();
 }
 
-$output = htmlDeclarations("Rcon Page", "") . '<body class="RConPage">';
+$output = htmlDeclarations("Rcon Page", "");
 
+$output .= '</head><body class="RConPage">';
 
 if ($RConEnable == "1")
 {
@@ -30,9 +31,11 @@ else
     $RConCommand = stringValidator($_POST["command"], "", "");
     $RConPassword = stringValidator($_POST["password"], "", "");
 
-    $output .= '<form action="RCon.php" method="post"><div class="RConPasswordCommand RConPasswordCommandSize">Password:<input class="RConInput" type="password" name="password" value="" />
-    &nbsp;Command:<input class="RConInput" size="35" type="text" value="' . $RConCommand . '" name="command" />
-    <input type="submit" value=" Send " />
+    $output .= '<form action="RCon.php" method="post" onsubmit="disableRConForm()">
+    <div class="RConPasswordCommand RConPasswordCommandSize">
+    Command:<input id="commandTextField" class="RConInput" size="35" type="text" value="' . $RConCommand . '" name="command" />
+    &nbsp;Password:<input id="passwordTextField" class="RConInput" type="password" name="password" value="" />
+    <input id="submitButton" type="submit" value=" Send " />
     </div>
     </form>
     <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . $serverIPAddress . ":" . $serverPort . '<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse">';
