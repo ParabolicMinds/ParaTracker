@@ -23,12 +23,13 @@ checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $floodProtectTimeo
 
 
 $output = htmlDeclarations("ParaTracker", "");
-$output .= file_get_contents("info/javascriptAndCSS.txt");
+$output .= file_get_contents("info/refreshCode.txt");
+$output .= file_get_contents("info/levelshotJavascriptAndCSS.txt");
 $output .= file_get_contents("info/rconParamScript.txt");
 
 
 $output .= '</head>
-<body>
+<body class="ParaTrackerPage">
 <div class="TrackerFrameNoBG BackgroundColorImage">
 <div class="TrackerFrame';
 

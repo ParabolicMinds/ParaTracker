@@ -12,6 +12,12 @@ you will find it in ParaConfig.php
 
 */
 
+.ParaTrackerPage
+{    
+    margin: 0px;
+    padding: 0px;
+}
+
 .TrackerFrame
 {
 /*

@@ -22,7 +22,6 @@ else
     {
         echo "--> <h4>Failed to write new config file!</h4>";
     }
-    
     exit();
 }
 
@@ -78,7 +77,7 @@ if (!file_exists("info/"))
 }
 if (!file_exists("info/"))
 {
-    echo 'Failed to create directory "info/" in ParaTracker folder!';
+    echo 'Failed to create directory "info/" in ParaTracker folder! Cannot continue!';
     exit();
 }
 
@@ -88,7 +87,7 @@ if (!file_exists("logs/"))
 }
 if (!file_exists("logs/"))
 {
-    echo 'Failed to create directory "logs/" in ParaTracker folder!';
+    echo 'Failed to create directory "logs/" in ParaTracker folder! Cannot continue!';
     exit();
 }
 
@@ -185,10 +184,11 @@ function doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connecti
 		$levelshotBuffer = $levelshotBufferArray[0];
 		$levelshotCount = $levelshotBufferArray[1];
 
-		javascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime);
+		autoRefreshScript($enableAutoRefresh, $autoRefreshTimer);
+
+		levelshotJavascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime);
 
 		paramRConJavascript($RConEnable, $newWindowSnapToCorner);
-
 
 	}
 	else
@@ -489,17 +489,23 @@ if ($levelshotCount == 0)
 return array($levelshotBuffer, $levelshotCount);
 }
 
-function javascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime)
+function autoRefreshScript($enableAutoRefresh, $autoRefreshTimer)
 {
-$javascriptFunctions = "";
-
-if($enableAutoRefresh == "1")
-{
-    $javascriptFunctions .= '<script type="text/javascript">
-    pageReloadTimer = setTimeout("pageReload()", ' . ($autoRefreshTimer * 1000) . ');
-    </script>';
+$output = "";
+    if($enableAutoRefresh == "1")
+    {
+        $output .= '
+<script type="text/javascript">
+        pageReloadTimer = setTimeout("pageReload()", ' . ($autoRefreshTimer * 1000) . ');
+        </script>
+';
+    }
+file_put_contents("info/refreshCode.txt", $output);
 }
 
+function levelshotJavascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime)
+{
+$javascriptFunctions = "";
 
         $javascriptFunctions .= '<script type="text/javascript"><!--
 		var timer = 0;  //Used for setting re-execution timeout
@@ -577,35 +583,38 @@ $javascriptFunctions .= '//--></script>
 ' . $levelshotBuffer . '
 </style>';
 
-file_put_contents("info/javascriptAndCSS.txt", $javascriptFunctions);
+file_put_contents("info/levelshotJavascriptAndCSS.txt", $javascriptFunctions);
 }
 
 function paramRConJavascript($RConEnable, $newWindowSnapToCorner)
 {
 		$output = '<script type="text/javascript">function param_window()
 		{
-			paramWindow = window.open("info/param.html", "paramWindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=600,height=700");';
+		paramWindow = window.open("info/param.html", "paramWindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=600,height=700");
+';
 
 			if ($newWindowSnapToCorner == "1")
 			{
 			$output .= 'paramWindow.moveTo(0, 0);';
 			}
 
-		$output .= '}';
-		
+		$output .= '}
+';
+
 		if ($RConEnable == 1)
 		{
 		$output .= 'function rcon_window()
 		{
-			rconWindow = window.open("RCon.php", "rconWindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=780,height=375");
-			';
+		rconWindow = window.open("RCon.php", "rconWindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=780,height=375");
+';
 
 			if ($newWindowSnapToCorner == "1")
 			{
 			$output .= 'rconWindow.moveTo(0, 0);';
 			}
 			
-		$output .= '}</script>';
+		$output .= '}
+</script>';
 		}
 file_put_contents("info/rconParamScript.txt", $output);
 }
@@ -624,9 +633,9 @@ else
 }
 
 $i = 0;
-$sleepTimer = "0.1";
+$sleepTimer = "0.15";
 
-while ($lastRefreshTime == "wait" && $i < $connectionTimeout + $sleepTimer * 3)
+while ($lastRefreshTime == "wait" && $i < $connectionTimeout + 1)
 {
     //info/Time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
     usleep($sleepTimer * 1000000);
