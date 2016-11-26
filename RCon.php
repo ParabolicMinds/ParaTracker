@@ -15,6 +15,16 @@ else
     exit();
 }
 
+if (!file_exists("logs/RConLog.php"))
+{
+    file_put_contents("logs/RConLog.php", "<?php /*\n*/ ?>");
+}
+if (!file_exists("logs/RConLog.php"))
+{
+    echo '--><h3>Failed to create logs/RConLog.php!<br />Cannot continue!</h3>';
+    exit();
+}
+
 $output = htmlDeclarations("Rcon Page", "");
 
 $output .= '</head><body class="RConPage">';

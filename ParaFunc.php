@@ -186,7 +186,7 @@ function doUpdate($serverIPAddress, $serverPort, $floodProtectTimeout, $connecti
 
 		autoRefreshScript($enableAutoRefresh, $autoRefreshTimer);
 
-		levelshotJavascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime);
+		levelshotJavascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime);
 
 		paramRConJavascript($RConEnable, $newWindowSnapToCorner);
 
@@ -503,7 +503,7 @@ $output = "";
 file_put_contents("info/refreshCode.txt", $output);
 }
 
-function levelshotJavascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotTransitionTime)
+function levelshotJavascriptAndCSS($levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime)
 {
 $javascriptFunctions = "";
 
@@ -925,10 +925,7 @@ if ($RConPassword != "" && $RConCommand != "")
 	}
 
 
-	//Log time! Let's see if a log file exists
-    if (file_exists("logs/RConLog.php"))
-{
-    //Houston, we have a log file. Read it in.
+	//Log time!
     $RConLog2 = file_get_contents("logs/RConLog.php");
 
     //Trim off the PHP tags and comment markers at the beginning and end of the file
@@ -939,7 +936,6 @@ if ($RConPassword != "" && $RConCommand != "")
     $RConLogArray = array_slice($RConLogArray, 0, $RConLogSize);
 
     $RConLog2 = implode("\n", $RConLogArray);
-}
 
     //Assemble the new log entry.
     $RConLog = date(DATE_RFC2822) . "  IP Address: " . $_SERVER['REMOTE_ADDR'] . "  Command: " . $_POST["command"] . "  Response: " . $newRConLogEntry . $RConLog2;
