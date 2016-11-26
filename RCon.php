@@ -1,9 +1,6 @@
 <?php
 echo "<!-- ";
 
-//Prevent users from aborting the page! This will reduce load on both the game server, and the web server.
-ignore_user_abort(true);
-
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
@@ -15,13 +12,13 @@ else
     exit();
 }
 
-if (!file_exists("logs/RConLog.php"))
+if (!file_exists("logs/" . $dynamicIPAddressPath . "RConLog.php"))
 {
-    file_put_contents("logs/RConLog.php", "<?php /*\n*/ ?>");
+    file_put_contents("logs/" . $dynamicIPAddressPath . "RConLog.php", "<?php /*\n*/ ?>");
 }
-if (!file_exists("logs/RConLog.php"))
+if (!file_exists("logs/" . $dynamicIPAddressPath . "RConLog.php"))
 {
-    echo '--><h3>Failed to create logs/RConLog.php!<br />Cannot continue!</h3>';
+    echo '--><h3>Failed to create logs/' . $dynamicIPAddressPath . 'RConLog.php!<br />Cannot continue!</h3>';
     exit();
 }
 
@@ -38,8 +35,22 @@ if ($serverIPAddress == "Invalid")
 }
 else
 {
-    $RConCommand = stringValidator($_POST["command"], "", "");
+    if(isset($_POST["command"]))
+    {
+        $RConCommand = stringValidator($_POST["command"], "", "");
+    }
+    else
+    {
+        $RConCommand = "";
+    }
+    if(isset($_POST["password"]))
+    {
     $RConPassword = stringValidator($_POST["password"], "", "");
+    }
+    else
+    {
+        $RConPassword = "";
+    }
 
     $output .= '<form action="RCon.php" method="post" onsubmit="disableRConForm()">
     <div class="RConPasswordCommand RConPasswordCommandSize">
@@ -49,8 +60,6 @@ else
     </div>
     </form>
     <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . $serverIPAddress . ":" . $serverPort . '<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse">';
-
-echo $RConMaximumMessageSize;
 
     if(strlen($RConCommand) > $RConMaximumMessageSize)
     {
@@ -68,15 +77,15 @@ echo $RConMaximumMessageSize;
     if ($RConCommand != "" && $RConPassword != "")
     {
         $lastRefreshTime = "0";
-        if (file_exists("info/RConTime.txt"))
+        if (file_exists("info/" . $dynamicIPAddressPath . "RConTime.txt"))
         {
-            $lastRefreshTime = numericValidator(file_get_contents("info/RConTime.txt"), "", "", 0);
+            $lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddressPath . "RConTime.txt"), "", "", 0);
         }
 
         if ($lastRefreshTime + $RConFloodProtect < time())
         {
-            file_put_contents("info/RConTime.txt", time());
-            $output .= sendRecieveRConCommand($serverIPAddress, $serverPort, $connectionTimeout, $RConEnable, $RConFloodProtect, $RConPassword, $RConCommand, $RConLogSize);
+            file_put_contents("info/" . $dynamicIPAddressPath . "RConTime.txt", time());
+            $output .= sendRecieveRConCommand($serverIPAddress, $serverPort, $dynamicIPAddressPath, $connectionTimeout, $RConEnable, $RConFloodProtect, $RConPassword, $RConCommand, $RConLogSize);
         }
         else
         {
