@@ -1,7 +1,10 @@
 ﻿<?php
 
-//Prevent users from aborting the page! This will reduce load on both the game server, and the web server.
-ignore_user_abort(true);
+if (!isset($safeToExecuteParaFunc))
+{
+    echo "<h3>ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerA.php or ParaTrackerDynamic.php instead.</h3>";
+    exit();
+}
 
 function versionNumber()
 {
@@ -23,9 +26,15 @@ else
     }
     else
     {
-        echo "--> <h3>Failed to write new config file!</h3>";
+        echo "--> <h3>Failed to write new config file! Make sure ParaTracker has file system access, and that the disk is not full!</h3>";
     }
     exit();
+}
+
+//This IF statement will avoid warning messages during validation
+if (!isset($dynamicTrackerCalledFromCorrectFile))
+{
+    $dynamicTrackerCalledFromCorrectFile = "0";
 }
 
 //Before we go any further, let's validate ALL input from the config file!
@@ -41,10 +50,6 @@ else
 //These two values MUST be evaluated first, because they are used in the IP address validation.
 //ParaTrackerDynamic.php calls this same file, so we need to be sure which file is calling,
 //and what to do about it.
-if (!isset($dynamicTrackerCalledFromCorrectFile))
-{
-    $dynamicTrackerCalledFromCorrectFile = "0";
-}
 $dynamicTrackerCalledFromCorrectFile = booleanValidator($dynamicTrackerCalledFromCorrectFile, 0);
 $dynamicTrackerEnabled = booleanValidator($dynamicTrackerEnabled, 0);
 
@@ -53,7 +58,8 @@ if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
 {
     $serverIPAddress = ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
     $serverPort = numericValidator($_GET["port"], 1, 65535, 29070);
-    $paraTrackerSkin = stringValidator(strtoupper($_GET["skin"]), "", "A");
+    //We need to make sure the skin given is a valid value. If not, we just default to A.
+    $paraTrackerSkin = skinValidator($_GET["skin"]);
 }
 else
 {
@@ -76,7 +82,15 @@ $levelshotTransitionTime = numericValidator($levelshotTransitionTime, 0.1, 5, 0.
 $levelshotFPS = numericValidator($levelshotFPS, 1, 60, 20);
 $maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
 
-$gameName = stringValidator($gameName, "", "Jedi Academy");
+//Gamename can also be given dynamically, so let's check for that too.
+if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
+{
+    $gameName = stringValidator($_GET["game"], "", "Jedi Academy");
+}
+else
+{
+    $gameName = stringValidator($gameName, "", "Jedi Academy");
+}
 $noPlayersOnlineMessage = stringValidator($noPlayersOnlineMessage, "", "No players online.");
 
 $enableAutoRefresh = booleanValidator($enableAutoRefresh, 1);
@@ -136,7 +150,7 @@ function checkFileExistence($filename, $dynamicIPAddressPath)
         file_put_contents($dynamicIPAddressPath . $filename, "");
         if (!file_exists($dynamicIPAddressPath . $filename))
         {
-            echo '--><h3>Failed to create file ' . $dynamicIPAddressPath . $filename . '!<br />Make sure ParaTracker has file system access, and that there is space to write files!</h3>';
+            echo '--><h3>Failed to create file ' . $dynamicIPAddressPath . $filename . '!<br />Make sure ParaTracker has file system access, and that the disk is not full!</h3>';
             exit();
         }
     }
@@ -173,11 +187,19 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
 
         if ($lastRefreshTime + $floodProtectTimeout < time())
         {
+            //Prevent users from aborting the page! This will reduce load on both the game server and the web server
+            //by forcing the refresh to finish.
+            ignore_user_abort(true);
+
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
             
             doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
             
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", time());
+
+            //Allow users to abort the page again.
+            ignore_user_abort(false);
+
         }
 
     }
@@ -186,7 +208,6 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
 
 function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
-
     //On with the good stuff!
 	$fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, $connectionTimeout);
 	fwrite($fp, str_repeat(chr(255),4) . "getstatus\n");
@@ -201,7 +222,7 @@ function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodPr
 
 	if(strlen($s) > $maximumServerInfoSize)
 	{
-	    echo '--> <h2>Received too much data!</h2><h4>' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '</h4><br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.';
+	    echo '--><h3>Received too much data!</h3><h4>' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '</h4><br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.';
 	    exit();
 	}
 
@@ -217,6 +238,10 @@ file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 	if(strlen($s))
 	{
 	    //Server responded!
+	    
+	    //Mark the time in microseconds so we can see how long this takes.
+	    $parseTimer = microtime(true);
+
 	    //Now, we call a function to parse the data
 	    $dataParserReturn = dataParser($s, $dynamicIPAddressPath);
 	    //Organize the data that came back in the array
@@ -225,7 +250,6 @@ file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 		$player_array = $dataParserReturn[2];
 		$playerParseCount = $dataParserReturn[3];
 
-		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags);
 
 		$player_count = playerList($dynamicIPAddressPath, $player_array, $playerParseCount, $noPlayersOnlineMessage);
 		file_put_contents("info/" . $dynamicIPAddressPath . "playerCount.txt", $player_count);
@@ -240,6 +264,9 @@ file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 		levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime);
 
 		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner);
+
+		//This has to be last, because the timer will output on this page
+		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags, $parseTimer);
 
 	}
 
@@ -278,6 +305,7 @@ function dataParser($s, $dynamicIPaddressPath)
 			$playerParseCount++;
 		}
 
+
 		file_put_contents('info/' . $dynamicIPaddressPath . 'sv_hostname.txt', colorize($cvars_hash["sv_hostname"]));
 		file_put_contents('info/' . $dynamicIPaddressPath . 'sv_maxclients.txt', $cvars_hash["sv_maxclients"]);
 		file_put_contents('info/' . $dynamicIPaddressPath . 'g_gametype.txt', $cvars_hash["g_gametype"]);
@@ -287,7 +315,7 @@ function dataParser($s, $dynamicIPaddressPath)
 		return(array($cvar_array_single, $cvars_hash, $player_array, $playerParseCount));
 }
 
-function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags)
+function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags, $parseTimer)
 {
 		$buf = '</head>
 		<body class="cvars_page">
@@ -326,13 +354,14 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_ar
 			$c++;
 			if($c > 2) $c = 1;
 		}
-		$buf .= '</table></td></tr></table><h6 class="center">ParaTracker version ' . versionNumber() . ' - Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited. Your mileage may vary. Please drink and drive responsibly.</h6></body></html>';
+		$buf .= '</table></td></tr></table><h4 class="center">ParaTracker version ' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5></body></html>';
 		$buf = htmlDeclarations($cvar['name'] . "CVars", "../../") . $buf;
 		file_put_contents('info/' . $dynamicIPAddressPath . 'param.html', $buf);
 }
 
 function playerList($dynamicIPAddressPath, $player_array, $playerParseCount, $noPlayersOnlineMessage)
 {
+
 		$playerListbuffer = '<div class="playerTable">';
 		$player_count = 0;
 
@@ -793,6 +822,21 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 return $input;
 }
 
+function skinValidator($paraTrackerSkin)
+{
+    //Skip stringValidator - just we'll compare it to strings that we know are safe.
+    $paraTrackerSkin = strtoupper(trim($paraTrackerSkin));
+
+    //Next we'll make sure the value matches ONLY the existing skins.
+    //Right now we'll have A through H.
+    if($paraTrackerSkin != "A" && $paraTrackerSkin != "B" && $paraTrackerSkin != "C" && $paraTrackerSkin != "D" && $paraTrackerSkin != "E" && $paraTrackerSkin != "F" && $paraTrackerSkin != "G" && $paraTrackerSkin != "H")
+    {
+        //Invalid value! Reset to default.
+        $paraTrackerSkin = "A";
+    }
+    return $paraTrackerSkin;
+}
+
 function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
 {
             $output = '<script type="text/javascript">
@@ -1109,10 +1153,10 @@ $maximumServerInfoSize = "4000";
 
 // This next setting enables "Dynamic" ParaTracker. Clients can load "ParaTrackerDynamic.php" and give
 // an IP address, port number and visual theme ID in the URL, and ParaTracker will connect to that server.
-// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=A"
+// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=A&game=Jedi%20Academy"
 // DO *NOT*, I REPEAT, DO *NOT* ENABLE THIS FEATURE UNLESS YOU WANT PEOPLE USING YOUR WEBSITE TO TRACK THEIR SERVERS.
 // Also, DO NOT run ParaTracker in this mode without isolating it in its own webroot first - the consequences
-// can be grave if there is a security hole!
+// can be grave if there is a security hole that I have not yet found!
 // If you do not understand what this feature is, DO NOT enable it.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default.

@@ -1,6 +1,11 @@
 <?php
 echo "<!--";
 
+//This variable will allow ParaFunc to execute.
+//The point of this variable is to prevent ParaFunc from being executed directly,
+//as it would be a complete waste of CPU power.
+$safeToExecuteParaFunc = "1";
+
 //Check to see if we're running in Dynamic mode. If we are, DO NOT load ParaFunc.php, as it
 //has already been loaded.
 if(!isset($dynamicTrackerCalledFromCorrectFile))
@@ -17,6 +22,7 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
         exit();
     }
 }
+
 
 //Check the time delay between refreshes. Make sure we wait if need be
 checkTimeDelay($connectionTimeout, $refreshTimeout, $dynamicIPAddressPath);

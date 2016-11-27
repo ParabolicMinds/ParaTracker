@@ -4,9 +4,19 @@ echo "<!--";
 //This variable allows ParaFunc.php to see that we are running in dynamic mode
 $dynamicTrackerCalledFromCorrectFile = "1";
 
+//This variable will allow ParaFunc to execute.
+//The point of this variable is to prevent ParaFunc from being executed directly,
+//as it would be a complete waste of CPU power.
+$safeToExecuteParaFunc = "1";
+
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
+    if (!isset($_GET["ip"]))
+    {
+        echo "--><h3>No IP address given! In dynamic mode, the IP address must be given in the URL. For example:<br /></h3><p>" . $_SERVER['SERVER_NAME'] . "/ParaTrackerDynamic.php?<strong>ip=127.143.12.88</strong>&port=29070&skin=A&game=Jedi Academy</p>";
+        exit();
+    }
     include 'ParaFunc.php';
 }
 else
@@ -21,10 +31,6 @@ if($dynamicTrackerEnabled != "1")
     exit();
 }
 
-if($paraTrackerSkin != "A" && $paraTrackerSkin != "B" && $paraTrackerSkin != "C" && $paraTrackerSkin != "D" && $paraTrackerSkin != "E" && $paraTrackerSkin != "F" && $paraTrackerSkin != "G" && $paraTrackerSkin != "H")
-{
-    $paraTrackerSkin = "A";
-}
 
 include("ParaTracker" . $paraTrackerSkin . ".php");
 
