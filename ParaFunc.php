@@ -2,8 +2,7 @@
 
 if (!isset($safeToExecuteParaFunc))
 {
-    echo "<h3>ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerA.php or ParaTrackerDynamic.php instead.</h3>";
-    exit();
+    displayError("ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerA.php or ParaTrackerDynamic.php instead.");
 }
 
 function versionNumber()
@@ -18,17 +17,15 @@ if (file_exists("ParaConfig.php"))
 }
 else
 {
-    echo "--> <h3>ParaConfig.php not found!</h3>Writing default config file...<!-- ";
     writeNewConfigFile();
     if (file_exists("ParaConfig.php"))
     {
-        echo "--> <h3>Default ParaConfig.php successfully written!<br />Please add an IP Address and port to it.</h3>";
+        displayError("ParaConfig.php not found! A default config file has been written to disk.<br />Please add an IP Address and port to it.");
     }
     else
     {
-        echo "--> <h3>Failed to write new config file! Make sure ParaTracker has file system access, and that the disk is not full!</h3>";
+        displayError("ParaConfig.php not found! Attempted to write a default config file, but failed!<br />Make sure ParaTracker has file system access, and that the disk is not full!");
     }
-    exit();
 }
 
 //This IF statement will avoid warning messages during validation
@@ -135,6 +132,7 @@ function checkForMissingFiles($dynamicIPAddressPath)
     checkFileExistence("playerList.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("rconParamScript.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("RConTime.txt", "info/" . $dynamicIPAddressPath);
+    checkFileExistence("RConLog.php", "logs/" . $dynamicIPAddressPath);
     checkFileExistence("refreshCode.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("serverDump.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("sv_hostname.txt", "info/" . $dynamicIPAddressPath);
@@ -150,8 +148,7 @@ function checkFileExistence($filename, $dynamicIPAddressPath)
         file_put_contents($dynamicIPAddressPath . $filename, "");
         if (!file_exists($dynamicIPAddressPath . $filename))
         {
-            echo '--><h3>Failed to create file ' . $dynamicIPAddressPath . $filename . '!<br />Make sure ParaTracker has file system access, and that the disk is not full!</h3>';
-            exit();
+            displayError("Failed to create file " . $dynamicIPAddressPath . $filename . "!<br />Make sure ParaTracker has file system access, and that the disk is not full!");
         }
     }
     return 1;
@@ -166,8 +163,7 @@ function checkDirectoryExistence($dirname, $dynamicIPAddressPath)
     }
     if (!file_exists($dynamicIPAddressPath . $dirname))
     {
-        echo '--><h3>Failed to create directory ' . $dynamicIPAddressPath . $dirname .' in ParaTracker folder!<br />Cannot continue without file system access!</h3>';
-    exit();
+        displayError("Failed to create directory " . $dynamicIPAddressPath . $dirname . " in ParaTracker folder!<br />Cannot continue without file system access!");
     }
 }
 
@@ -179,8 +175,7 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
 
     if ($serverIPAddress == "Invalid")
     {
-        echo "-->Invalid IP address detected! Cannot continue.<br />Check the IP address in ParaConfig.php.";
-        exit();
+        displayError("Invalid IP address detected! Cannot continue.<br />Check the IP address in ParaConfig.php.");
     }
     else
     {
@@ -220,10 +215,10 @@ function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodPr
 	}
 	fclose($fp);
 
+
 	if(strlen($s) > $maximumServerInfoSize)
 	{
-	    echo '--><h3>Received too much data!</h3><h4>' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '</h4><br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.';
-	    exit();
+	    displayError('Received too much data!<br />' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.');
 	}
 
 //This file is used for determining if the server connection was successful
@@ -799,8 +794,7 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 {
     if($input == "" && $dynamicTrackerEnabled == "0")
     {
-        echo '--><h3>Invalid IP address! ' . $input . '<br />Please add an IP Address and port to ParaConfig.php</h3>';
-        exit();
+        displayError('Invalid IP address! ' . $input . '<br />Please add an IP Address and port to ParaConfig.php</h3>');
     }
 
     //Remove whitespace
@@ -811,11 +805,11 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
     {
         If($dynamicTrackerEnabled == “1”)
         {
-            echo '--><h3>Invalid IP address! ' . $input . '<br />Check the IP address and try again.</h3>';
+            displayError('Invalid IP address! ' . $input . '<br />Check the IP address and try again.</h3>');
         }
         else
         {
-            echo '--><h3>Invalid IP address! ' . $input . '<br />Check the IP address in ParaConfig.php</h3>';
+            displayError('Invalid IP address! ' . $input . '<br />Check the IP address in ParaConfig.php</h3>');
         }
         exit();
     }
@@ -824,17 +818,42 @@ return $input;
 
 function skinValidator($paraTrackerSkin)
 {
-    //Skip stringValidator - just we'll compare it to strings that we know are safe.
-    $paraTrackerSkin = strtoupper(trim($paraTrackerSkin));
+    $paraTrackerSkin = stringValidator($paraTrackerSkin, "", "A");
 
-    //Next we'll make sure the value matches ONLY the existing skins.
-    //Right now we'll have A through H.
-    if($paraTrackerSkin != "A" && $paraTrackerSkin != "B" && $paraTrackerSkin != "C" && $paraTrackerSkin != "D" && $paraTrackerSkin != "E" && $paraTrackerSkin != "F" && $paraTrackerSkin != "G" && $paraTrackerSkin != "H")
+    if(strlen($paraTrackerSkin) == 1)
     {
-        //Invalid value! Reset to default.
+        $paraTrackerSkin = strtoupper($paraTrackerSkin);
+    }
+
+    if(strtolower($paraTrackerSkin) == "dynamic" || strtolower($paraTrackerSkin) == "template")
+    {
         $paraTrackerSkin = "A";
+        echo "Invalid skin specified! Assuming default skin.";
+    }
+
+    if(!file_exists("ParaTracker" . $paraTrackerSkin . ".php"))
+    {
+        if(!file_exists("ParaTrackerA.php"))
+        {
+            displayError("Invalid skin specified!<br />Default skin could not be found!");
+        }
+        else
+        {
+        $paraTrackerSkin = "A";
+        echo "Invalid skin specified! Assuming default skin.";
+        }
     }
     return $paraTrackerSkin;
+}
+
+function displayError($errorMessage)
+{
+    if(trim($errorMessage) == "")
+    {
+        $errorMessage = "An unknown error has occurred!<br />ParaTracker must terminate.";
+    }
+    echo '<!-- --><h3 class="errorMessage">' . $errorMessage . '</h3>';
+    exit();
 }
 
 function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
@@ -979,8 +998,10 @@ if ($RConPassword != "" && $RConCommand != "")
     $RConLog2 = file_get_contents("logs/" . $dynamicIPAddressPath . "RConLog.php");
 
     //Trim off the PHP tags and comment markers at the beginning and end of the file
-    $RConLog2 = substr($RConLog2, 8, count($RConLog2) - 7);
+    $RConLog2 = substr($RConLog2, 183, count($RConLog2) - 8);
 
+    echo " " . $RConLog2 . " ";  //Debug line
+    
     //If there are too many lines, truncate them
     $RConLogArray = explode("\n", $RConLog2);
     $RConLogArray = array_slice($RConLogArray, 0, $RConLogSize);
@@ -996,11 +1017,17 @@ if ($RConPassword != "" && $RConCommand != "")
 	$RConLog = str_replace("*/", 'EXPLOIT REMOVED ', $RConLog);
 
     //Assemble the new log entry. This is the log, so validating anything other than what was already validated is a bad idea.
-    $RConLog = "<?php /*\n" . $RConLog . "\n*/ ?>";
+    $RConLog = RConLogHeader() . "\n" . $RConLog . "\n*/ ?> ";
 
     //Write the newly appended RCon log to a file
     file_put_contents("logs/" . $dynamicIPAddressPath . "RConLog.php", $RConLog);
 
+    return $output;
+}
+
+function RConLogHeader()
+{
+    $output = "<?php \n echo '<h3 class=" . '"errorMessage"' . ">RConLog.php can only be viewed with direct file system access.<br />Download it and open it in a text editor.</h3>';\n exit(); \n/*  LOG ENTRIES:\n";
     return $output;
 }
 

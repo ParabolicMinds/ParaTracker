@@ -13,18 +13,14 @@ if (file_exists("ParaFunc.php"))
 }
 else
 {
-    echo "--> <h3>ParaFunc.php not found - cannot continue!</h3> <!--";
+    echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3> <!--';
     exit();
 }
 
-if (!file_exists("logs/" . $dynamicIPAddressPath . "RConLog.php"))
+//ParaFunc.php checks for the existence of the logs folder and for RConLog.php, otherwise we would check for it here.
+if (trim(file_get_contents("logs/" . $dynamicIPAddressPath . "RConLog.php")) == "")
 {
-    file_put_contents("logs/" . $dynamicIPAddressPath . "RConLog.php", "<?php /*\n*/ ?>");
-}
-if (!file_exists("logs/" . $dynamicIPAddressPath . "RConLog.php"))
-{
-    echo '--><h3>Failed to create logs/' . $dynamicIPAddressPath . 'RConLog.php!<br />Cannot continue!</h3>';
-    exit();
+    file_put_contents("logs/" . $dynamicIPAddressPath . "RConLog.php", RConLogHeader() . "*/\n?>");
 }
 
 $output = htmlDeclarations("Rcon Page", "");

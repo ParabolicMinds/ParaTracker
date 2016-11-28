@@ -12,6 +12,11 @@ you will find it in ParaConfig.php
 
 */
 
+.errorMessage
+{
+
+}
+
 .ParaTrackerPage
 {    
     margin: 0px;

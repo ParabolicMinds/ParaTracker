@@ -1,6 +1,16 @@
 <?php
 echo "<!--";
 
+//This file is used for making your own skins for ParaTracker. Save this file under a new name before editing. 
+
+
+
+//REMOVE THE NEXT TWO LINES when you make your own template! Otherwise it will terminate with an error message!
+echo '--><h3 class="errorMessage">ParaTrackerTemplate.php cannot be executed! It is merely a template<br />for making new skins. Try ParaTrackerA.php or ParaTrackerDynamic.php instead.</h3>';
+exit();
+
+
+
 //This variable will allow ParaFunc to execute.
 //The point of this variable is to prevent ParaFunc from being executed directly,
 //as it would be a complete waste of CPU power.
@@ -18,7 +28,7 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
     }
     else
     {
-        echo "--> <h3>ParaFunc.php not found - cannot continue!</h3> <!--";
+        echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3> <!--';
         exit();
     }
 }
@@ -33,7 +43,9 @@ checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressP
 
 if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt") != "")
 {
-//Connection was successful! Rendering a normal page.
+//Server dump detected - connection assumed successful! Rendering a normal page.
+
+//Insert tracker HTML here
 
 $output = htmlDeclarations("ParaTracker - The Ultimate Quake 3 Server Tracker", "");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
@@ -60,6 +72,9 @@ $output .= '</body>
 else
 {
 //Could not connect to the server! Display error page.
+//Insert "Could not connect" HTML here.
+
+
 $output =  htmlDeclarations("ParaTracker - Could Not Connect To Server", "");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
 $output .= '<script type="text/javascript">

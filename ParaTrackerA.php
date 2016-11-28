@@ -18,7 +18,7 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
     }
     else
     {
-        echo "--> <h3>ParaFunc.php not found - cannot continue!</h3> <!--";
+        echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3> <!--';
         exit();
     }
 }
@@ -33,7 +33,7 @@ checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressP
 
 if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt") != "")
 {
-//Connection was successful! Rendering a normal page.
+//Server dump detected - connection assumed successful! Rendering a normal page.
 
 $output = htmlDeclarations("ParaTracker - The Ultimate Quake 3 Server Tracker", "");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
