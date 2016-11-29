@@ -47,7 +47,7 @@ if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_
 
 //Insert tracker HTML here
 
-$output = htmlDeclarations("ParaTracker - The Ultimate Quake 3 Server Tracker", "");
+$output = htmlDeclarations("ParaTracker - The Ultimate Quake III Server Tracker", "");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "levelshotJavascriptAndCSS.txt");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "rconParamScript.txt");

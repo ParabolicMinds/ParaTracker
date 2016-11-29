@@ -23,7 +23,7 @@ if (trim(file_get_contents("logs/" . $dynamicIPAddressPath . "RConLog.php")) == 
     file_put_contents("logs/" . $dynamicIPAddressPath . "RConLog.php", RConLogHeader() . "*/\n?>");
 }
 
-$output = htmlDeclarations("Rcon Page", "");
+$output = htmlDeclarations("Rcon - " . $serverIPAddress . " - ParaTracker", "");
 
 $output .= '</head><body class="RConPage">';
 

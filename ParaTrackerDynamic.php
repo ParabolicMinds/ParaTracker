@@ -12,11 +12,6 @@ $safeToExecuteParaFunc = "1";
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
-    if (!isset($_GET["ip"]))
-    {
-        echo '--><h3 class="errorMessage">No IP address given! In dynamic mode, the IP address must be given in the URL. For example:<br /></h3><p>' . $_SERVER['SERVER_NAME'] . '/ParaTrackerDynamic.php?<strong>ip=127.143.12.88</strong>&port=29070&skin=A&game=Jedi Academy</p>';
-        exit();
-    }
     include 'ParaFunc.php';
 }
 else
@@ -27,8 +22,7 @@ else
 
 if($dynamicTrackerEnabled != "1")
 {
-    echo '--><h3 class="errorMessage">Dynamic ParaTracker is disabled! If you wish to enable it,<br />first read the warnings in ParaConfig.php then PROCEED WITH CAUTION!</h3>';
-    exit();
+    displayError('<h3 class="errorMessage">Dynamic ParaTracker is disabled! If you wish to enable it,<br />first read the warnings in ParaConfig.php then PROCEED WITH CAUTION!</h3>');
 }
 
 

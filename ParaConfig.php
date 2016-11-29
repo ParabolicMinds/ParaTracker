@@ -2,7 +2,7 @@
 ///////////////////////////////
 // ParaTracker Configuration //
 ///////////////////////////////
- 
+
 // This is the config file for ParaTracker.
 // The only visual setting found here is the frame border.
 // If you want to edit fonts and colors,
@@ -11,8 +11,8 @@
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
 
-// If you are not sure what you are doing, just change the IP address and port to match
-// your game server, and let the default settings take care of the rest.
+// If this file ever breaks and you have no idea what is wrong, just delete it.
+// When ParaTracker is run, it will write a new one.
 
 // If you find any exploits in the code, please bring them to my attention immediately!
 // Thank you and enjoy!
@@ -189,6 +189,7 @@ $RConLogSize = "1000";
 // This value is boolean. When the RCon and PARAM buttons are clicked, the popup
 // window will snap to the top left corner of the screen by default. When this
 // variable is set to any value other than Yes or 1, the behavior is disabled.
+// Does not appear to work correctly in Chrome.
 // Default is 0.
 $newWindowSnapToCorner = "0";
 

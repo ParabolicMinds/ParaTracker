@@ -7,14 +7,21 @@ you will find it in ParaConfig.php
 */
 
 
+
+/*
+SKIN A CLASSES
+SKIN A CLASSES
+*/
+
 .BackgroundColorImage
 {
 
 /* This next line is the background color of the tracker.
 The numbers are given in RGBA, which is Red, Green, Blue, and Alpha.
-All values are 0-255, except alpha which is 0-1. 0 is transparent,
-1 is solid.
-Default is: background-color: rgba(0, 0, 0, 1); */
+All values are 0 to 255, except alpha which is 0 to 1.
+0 is transparent, 1 is solid.
+Default is: background-color: rgba(0, 0, 0, 1);
+*/
 background-color: rgba(0, 0, 0, 1);
 
 /* If you want a background image on the tracker,
@@ -22,14 +29,7 @@ this next line is the place to add it. */
 background-image: url("");
 }
 
-.gameTitle
-{
-color:#808080;
-font-size:10pt;
-font-family: verdana;
-font-style:italic;
-}
-
+/* This is the server name, shown at the top of the tracker */
 .serverName
 {
 color:#EFEFEF;
@@ -38,25 +38,45 @@ font-family:"Trebuchet MS";
 font-weight:bold;
 }
 
+/* This is the title of the game, shown just below the server name */
+.gameTitle
+{
+color:#808080;
+font-size:10pt;
+font-family: verdana;
+font-style:italic;
+}
+
+/* This is the color of the Name Score and Ping column headers for the player list */
 .nameScorePing
 {
 color:#FFFFBB;
 }
 
-.playerList
+/* This class is used for the odd rows in the player list */
+.playerRow1
 {
-width: 321px;
-height: 164px;
-overflow: auto;
-border-spacing: 0px;
+background-color:#191919;
+font-family:monospace;
+color: #FFFFFF;
 }
 
+/* This class is used for the even rows in the player list */
+.playerRow2
+{
+background-color:#2a2a2a;
+font-family:monospace;
+color: #FFFFFF;
+}
+
+/* All player names use this class */
 .playerName
 {
 font-size:10pt;
 font-family: monospace;
 }
 
+/* All player scores use this class */
 .playerScore
 {
 font-size:10pt;
@@ -64,6 +84,7 @@ font-family: monospace;
 text-align: center;
 }
 
+/* All player pings use this class */
 .playerPing
 {
 font-size:10pt;
@@ -71,6 +92,7 @@ font-family: monospace;
 text-align: center;
 }
 
+/* This class is used to style the message when there are no players online */
 .noPlayersOnline
 {
 color: #FFFFFF;
@@ -79,20 +101,7 @@ font-family: monospace;
 text-align: left;
 }
 
-.playerRow1
-{
-background-color:#191919;
-font-family:monospace;
-color: #FFFFFF;
-}
-
-.playerRow2
-{
-background-color:#2a2a2a;
-font-family:monospace;
-color: #FFFFFF;
-}
-
+/* This class is used for the player count, displayed on the bottom left */
 .playerCount
 {
 color:#EFEFEF;
@@ -102,6 +111,7 @@ vertical-align: middle;
 text-align: center;
 }
 
+/* This class is used for the map name, below the levelshot */
 .mapName
 {
 color:#EEEEEE;
@@ -114,6 +124,7 @@ float: left;
 word-wrap: break-word;
 }
 
+/* This class is used for the gametype, below the levelshot */
 .gametype
 {
 color:#EFEFEF;
@@ -126,6 +137,7 @@ float: left;
 word-wrap: break-word;
 }
 
+/* This class is used for the mod name, below the levelshot */
 .modName
 {
 color:#EFEFEF;
@@ -138,6 +150,7 @@ width: 300px;
 word-wrap: break-word;
 }
 
+/* This class is used for the IP address, below the levelshot */
 .IPAddress
 {
 color: #EFEFEF;
@@ -150,6 +163,22 @@ width: 300px;
 word-wrap: break-word;
 }
 
+/* Used for the text on the "Could Not Connect" page */
+.couldNotConnectText
+{
+color:#EEEEEE;
+font-size:11pt;
+font-family: monospace;
+}
+
+
+/*
+RCON PAGE CLASSES
+RCON PAGE CLASSES
+*/
+
+
+/* This class is the overall appearance of the RCon window */
 .RConPage
 {
 background-color: #000000;
@@ -159,11 +188,20 @@ font-family: monospace;
 text-align: left;
 }
 
+/* This class is for the Command and Password labels */
 .RConPasswordCommand
 {
 font-family: inherit;
 }
 
+/* This class is for the text boxes where the user enters RCon data */
+.RConInput
+{
+background-color: inherit;
+color: #FFFFFF;
+}
+
+/* This class is for the text boxes where the user enters the RCON data */
 input[type=text], input[type=password]
 {
 padding: 4px 10px;
@@ -175,6 +213,7 @@ border-left-style: none;
 font-family: inherit;
 }
 
+/* This class is for the Send button */
 input[type=submit]
 {
 padding: 10px 10px;
@@ -185,12 +224,14 @@ color: #EEEEEE;
 font-family: inherit;
 }
 
+/* This class is for the server address and response text, just below the form */
 .RConServerAddressResponse
 {
 background-color: inherit;
 font-family: inherit;
 }
 
+/* This class is for the actual server response */
 .RConServerResponse
 {
 background-color: inherit;
@@ -198,6 +239,14 @@ font-family: inherit;
 color: #EEEEEE;
 }
 
+
+/*
+PARAM PAGE CLASSES
+PARAM PAGE CLASSES
+*/
+
+
+/* This class is the fonts and colors for the Param page */
 .cvars_page
 {
 background-color:#202020;
@@ -207,22 +256,7 @@ font-family: "Trebuchet MS";
 text-align:center;
 }
 
-.cvars_row1
-{
-height: 28px;
-background-color:#333333;
-text-align: center;
-font-size: 10pt;
-}
-
-.cvars_row2
-{
-height: 28px;
-background-color:#3F3F3F;
-text-align: center;
-font-size: 10pt;
-}
-
+/* This class is for the "Server Cvars" text at the top of the page */
 .CVarHeading
 {
 color:#EFEFEF;
@@ -231,6 +265,7 @@ font-weight:bold;
 text-align:center;
 }
 
+/* This class is for the server IP and port at the top of the page */
 .CVarServerAddress
 {
 color:#EFEFEF;
@@ -239,6 +274,7 @@ font-weight:bold;
 text-align:center;
 }
 
+/* This class is for the title row at the top of the CVar table */
 .cvars_titleRow
 {
 background-color:#383833;
@@ -248,6 +284,25 @@ text-align: center;
 vertical-align: middle;
 }
 
+/* This class determines the color of each odd row of the CVar table */
+.cvars_row1
+{
+height: 28px;
+background-color:#333333;
+text-align: center;
+font-size: 10pt;
+}
+
+/* This class determines the color of each even row of the CVar table */
+.cvars_row2
+{
+height: 28px;
+background-color:#3F3F3F;
+text-align: center;
+font-size: 10pt;
+}
+
+/* This class is for the individual table cells in the CVar table */
 .CVarCell
 {
 width: 270px;
@@ -257,39 +312,45 @@ padding-bottom: 10px;
 vertical-align: middle;
 }
 
+/* This class is for the "(Click to expand/collapse)" text on the expanding list */
 .expandCollapse
 {
 font-size: 7pt;
 }
 
-.heading
-{
-color:#EFEFEF;
-font-size:18pt;
-font-weight:bold;
-}
 
-.couldNotConnectText
+/*
+PARA TRACKER DYNAMIC SETUP PAGE CLASSES
+PARA TRACKER DYNAMIC SETUP PAGE CLASSES
+*/
+
+
+/* This class is used for the page formatting in ParaTrackerDynamic.php */
+.dynamicConfigPageStyle
 {
-color:#EEEEEE;
-font-size:11pt;
+background-color: #111111;
+font-size: 12pt;
 font-family: monospace;
+color: #EEEEEE;
 }
 
-.info
+/* This class is for the "Generate!" button on ParaTrackerDynamic.php */
+.dynamicFormButtonsStyle
 {
-color:#EFEFEF;
-font-size:9pt;
-font-family:monospace;
-line-height:90%;
+background-color: #292929;
+cursor: pointer;
+color: #EEEEEE;
+font-family: inherit;
+font-size: 12pt;
 }
-
 
 
 /*
-The following values are used for colorizing names.
-They are already accurate. Do not change them unless
-you have a very good reason!
+COLORIZER CLASSES
+COLORIZER CLASSES
+
+The following values are used for colorizing things like player names and the server name.
+They are already accurate. Do not change them unless you have a very good reason!
 */
 
 .color0
@@ -367,4 +428,28 @@ color: #FF4400;
 Default is #FFFFFF */
 {
 color: #FFFFFF;
+}
+
+
+/*
+GENERAL FORMATTING - SOME CLASSES MAY NOT BE USED
+GENERAL FORMATTING - SOME CLASSES MAY NOT BE USED
+*/
+
+
+/* No idea */
+.heading
+{
+color:#EFEFEF;
+font-size:18pt;
+font-weight:bold;
+}
+
+/* No idea if this is used any more */
+.info
+{
+color:#EFEFEF;
+font-size:9pt;
+font-family:monospace;
+line-height:90%;
 }

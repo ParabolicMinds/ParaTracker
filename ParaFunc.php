@@ -53,6 +53,11 @@ $dynamicTrackerEnabled = booleanValidator($dynamicTrackerEnabled, 0);
 
 if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
 {
+    //Terminate the script with an instruction page if no IP address was given!
+    if (!isset($_GET["ip"]))
+    {
+        dynamicInstructionsPage();
+    }
     $serverIPAddress = ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
     $serverPort = numericValidator($_GET["port"], 1, 65535, 29070);
     //We need to make sure the skin given is a valid value. If not, we just default to A.
@@ -82,7 +87,7 @@ $maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
 //Gamename can also be given dynamically, so let's check for that too.
 if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
 {
-    $gameName = stringValidator($_GET["game"], "", "Jedi Academy");
+    $gameName = stringValidator(rawurldecode($_GET["game"]), "", "Jedi Academy");
 }
 else
 {
@@ -173,13 +178,6 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
     $lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt"), "", "", "0");
 
 
-    if ($serverIPAddress == "Invalid")
-    {
-        displayError("Invalid IP address detected! Cannot continue.<br />Check the IP address in ParaConfig.php.");
-    }
-    else
-    {
-
         if ($lastRefreshTime + $floodProtectTimeout < time())
         {
             //Prevent users from aborting the page! This will reduce load on both the game server and the web server
@@ -197,8 +195,6 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
 
         }
 
-    }
-
 }
 
 function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
@@ -215,6 +211,7 @@ function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodPr
 	}
 	fclose($fp);
 
+// $s = file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt");  //Debug line
 
 	if(strlen($s) > $maximumServerInfoSize)
 	{
@@ -545,8 +542,8 @@ $javascriptFunctions = "";
 	                document.getElementById("levelshotPreload").className = "levelshotFrame levelshot" + shot;
 					document.getElementById("topLayerFade").style.opacity = 1;
 					opac = 1;
-					count=0;
-					mode=1;
+					count = 0;
+					mode = 1;
 					timer = setTimeout("fadelevelshot()", ' . 1000 * $levelshotDisplayTime . ');
 				}
 				else
@@ -559,8 +556,8 @@ $javascriptFunctions = "";
 			else
 			{
 			//A levelshot has finished its transition, so reset everything
-				count=0;
-				mode=0;
+				count = 0;
+				mode = 0;
 				shot++;
 				if(shot > maxLevelshots) shot = 1;
 				//Now, re-execute the script to start fading a new levelshot!
@@ -604,34 +601,37 @@ file_put_contents("info/" . $dynamicIPAddressPath . "levelshotJavascriptAndCSS.t
 
 function paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner)
 {
-		$output = '<script type="text/javascript">function param_window()
+		$output = '<script type="text/javascript">
+		function param_window()
 		{
-		paramWindow = window.open("info/' . $dynamicIPAddressPath . 'param.html", "paramWindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=600,height=700");
-';
+		paramWindow = window.open("info/' . $dynamicIPAddressPath . 'param.html", "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700';
 
-			if ($newWindowSnapToCorner == "1")
+		if ($newWindowSnapToCorner == "1")
 			{
-			$output .= 'paramWindow.moveTo(0, 0);';
+			$output .= ',left=0,top=0';
 			}
 
-		$output .= '}
+		$output .= '");
+}
 ';
 
 		if ($RConEnable == 1)
 		{
 		$output .= 'function rcon_window()
 		{
-		rconWindow = window.open("RCon.php", "rconWindow", "location=0,titlebar=0,menubar=0,status=0,titlebar=0,scrollbars=1,width=780,height=375");
-';
+		rconWindow = window.open("RCon.php", "rconWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375';
 
-			if ($newWindowSnapToCorner == "1")
-			{
-			$output .= 'rconWindow.moveTo(0, 0);';
-			}
-			
-		$output .= '}
-</script>';
+		if ($newWindowSnapToCorner == "1")
+		{
+		    $output .= ',left=0,top=0';
 		}
+
+		$output .= '");
+		}';
+
+		}
+$output .= '</script>';
+
 file_put_contents("info/" . $dynamicIPAddressPath . "rconParamScript.txt", $output);
 }
 
@@ -794,7 +794,7 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 {
     if($input == "" && $dynamicTrackerEnabled == "0")
     {
-        displayError('Invalid IP address! ' . $input . '<br />Please add an IP Address and port to ParaConfig.php</h3>');
+        displayError('Invalid IP address! ' . stringValidator($input) . '<br />Please add an IP Address and port to ParaConfig.php</h3>');
     }
 
     //Remove whitespace
@@ -803,15 +803,14 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
     //Use a PHP function to check validity
     if (!filter_var($input,FILTER_VALIDATE_IP) && $input != "localhost")
     {
-        If($dynamicTrackerEnabled == “1”)
+        If($dynamicTrackerEnabled == "1")
         {
-            displayError('Invalid IP address! ' . $input . '<br />Check the IP address and try again.</h3>');
+            displayError('Invalid IP address! ' . stringValidator($input) . '<br />Check the IP address and try again.</h3>');
         }
         else
         {
-            displayError('Invalid IP address! ' . $input . '<br />Check the IP address in ParaConfig.php</h3>');
+            displayError('Invalid IP address! ' . stringValidator($input) . '<br />Check the IP address in ParaConfig.php</h3>');
         }
-        exit();
     }
 return $input;
 }
@@ -942,6 +941,77 @@ function colorize($string)
         return $colorized_string . "</span>";
 }
 
+function dynamicInstructionsPage()
+{
+    $urlWithoutParameters = explode('?', $_SERVER["REQUEST_URI"], 2);
+    $currentURL = $_SERVER['HTTP_HOST'] . $urlWithoutParameters[0];
+    echo '--><!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
+    <link rel="stylesheet" href="ParaStyle.css" type="text/css" />
+    <title>ParaTracker - The Ultimate Quake III Server Tracker</title>
+    <script src="ParaScript.js"></script></head><body class="dynamicConfigPage dynamicConfigPageStyle">
+
+    <h1>ParaTracker ' . versionNumber() . ' - Dynamic Mode</h1>
+    <p>Keep in mind that anyone can see and use this page and<br />the dynamic tracker, at the expense of your bandwidth.<br />Use at your own risk!</p>
+    <h3>Also note that ParaConfig.php settings still apply!</h3><h6>So, for instance, if you want to enable RCon, or change levelshot options, it must be changed in ParaConfig.php, by the server owner.</h6>
+
+    <form>
+    <p>Current page URL:<br /><input type="text" size="80" id="currentURL" value="' . $currentURL . '" readonly /></p>
+    <br />
+    <h3>Enter the appropriate data below to get a URL you can use for ParaTracker Dynamic:</h3>
+
+    <p>Server IP Address: <input type="text" size="46" onclick="clearOutputFields()" onchange="clearOutputFields()" id="IPAddress" value="" /></p>
+    <p>Server port number: <input type="text" size="15" onclick="clearOutputFields()" onchange="clearOutputFields()" id="PortNumber" value="29070" /></p>
+    <p>Game name: <input type="text" size="40" onclick="clearOutputFields()" onchange="clearOutputFields()" id="GameName" value="Jedi Academy" /></p>
+    <p>Skin:<br />
+    <input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-A" value="A" checked>A (675 x 300)<br />';
+
+    if(file_exists("ParaTrackerB.php"))
+    {
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-B" value="B">B (000 x 000)<br />';
+    }
+    if(file_exists("ParaTrackerC.php"))
+    {
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-C" value="C">C (000 x 000)<br />';
+    }
+    if(file_exists("ParaTrackerD.php"))
+    {
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-D" value="D">D (000 x 000)<br />';
+    }
+    if(file_exists("ParaTrackerE.php"))
+    {
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onclick="clearOutputFields()" id="SkinID-E" value="E">E (000 x 000)<br />';
+    }
+    if(file_exists("ParaTrackerF.php"))
+    {
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-F" value="F">F (000 x 000)<br />';
+    }
+    if(file_exists("ParaTrackerG.php"))
+    {
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-G" value="G">G (000 x 000)<br />';
+    }
+    if(file_exists("ParaTrackerH.php"))
+    {
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-H" value="H">H (000 x 000)</p>';
+    }
+    echo '<p><button type="button" class="dynamicFormButtons dynamicFormButtonsStyle" onclick="createURL()"> Generate! </button></p>
+    <p>Direct link:<br /><textarea rows="3" cols="120" id="finalURL" readonly></textarea></p>
+    <p>HTML code to insert on a web page:<br /><textarea rows="4" cols="120" id="finalURLHTML" readonly></textarea></p>
+
+    </form>
+
+    <div id="paraTrackerTestFrame" class="collapsedFrame" ><h2>Sample Tracker:</h2>
+    <div id="paraTrackerTestFrameContent" class="paraTrackerTestFrame" ></div></div>
+
+    <h6>Trademark&#8482; Pen Pineapple Apple Pen, no backwards reserved. The use of this product will not cavse any damnification to your vehicle.</h6>
+    </body>
+    </html>';
+    exit();
+}
+
 function sendRecieveRConCommand($serverIPAddress, $serverPort, $dynamicIPAddressPath, $connectionTimeout, $RConEnable, $RConFloodProtect, $RConPassword, $RConCommand, $RConLogSize)
 {
 $serverResponse = "";
@@ -1000,8 +1070,6 @@ if ($RConPassword != "" && $RConCommand != "")
     //Trim off the PHP tags and comment markers at the beginning and end of the file
     $RConLog2 = substr($RConLog2, 183, count($RConLog2) - 8);
 
-    echo " " . $RConLog2 . " ";  //Debug line
-    
     //If there are too many lines, truncate them
     $RConLogArray = explode("\n", $RConLog2);
     $RConLogArray = array_slice($RConLogArray, 0, $RConLogSize);
@@ -1046,8 +1114,8 @@ $configBuffer = '<?php
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
 
-// If you are not sure what you are doing, just change the IP address and port to match
-// your game server, and let the default settings take care of the rest.
+// If this file ever breaks and you have no idea what is wrong, just delete it.
+// When ParaTracker is run, it will write a new one.
 
 // If you find any exploits in the code, please bring them to my attention immediately!
 // Thank you and enjoy!
