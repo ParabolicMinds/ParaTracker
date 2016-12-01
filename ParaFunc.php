@@ -103,7 +103,7 @@ $noPlayersOnlineMessage = stringValidator($noPlayersOnlineMessage, "", "No playe
 $enableAutoRefresh = booleanValidator($enableAutoRefresh, 1);
 //Have to validate this one twice to make sure it isn't lower than the floodprotect limit
 $autoRefreshTimer = numericValidator($autoRefreshTimer, 10, 300, 30);
-$autoRefreshTimer = numericValidator($autoRefreshTimer, $floodProtectTimeout, 300, 30);
+$autoRefreshTimer = intval(numericValidator($autoRefreshTimer, $floodProtectTimeout, 300, 30));
 $maximumServerInfoSize = numericValidator($maximumServerInfoSize, 2000, 50000, 4000);
 
 $RConEnable = booleanValidator($RConEnable, 0);
@@ -128,6 +128,9 @@ checkDirectoryExistence($dynamicIPAddressPath, "logs/");
 
 //And now let's check to make sure we have access to the file system to write all the files we need. 
 checkForMissingFiles($dynamicIPAddressPath);
+
+//This needs to run every time the tracker is run. Otherwise the "No connection" pages will be missing the counter
+autoRefreshScript($dynamicIPAddressPath, $enableAutoRefresh, $autoRefreshTimer);
 
 function checkForMissingFiles($dynamicIPAddressPath)
 {
@@ -170,7 +173,6 @@ function checkDirectoryExistence($dirname, $dynamicIPAddressPath)
 {
     if (!file_exists($dynamicIPAddressPath . $dirname))
     {
-    echo "  " . $dynamicIPAddressPath . "  " . $dirname . "  ";
         mkdir($dynamicIPAddressPath . $dirname);
     }
     if (!file_exists($dynamicIPAddressPath . $dirname))
@@ -195,7 +197,10 @@ function checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder)
         {
             if(strtolower($directoryList[$i]) == $levelshotFolder)
             {
-                rename($directoryList[$i], strtolower($directoryList[$i]));
+                if(rename("images/levelshots/" . $directoryList[$i], "images/levelshots/" . strtolower($directoryList[$i])) == false)
+                {
+                    echo ' Could not rename directory ' . $directoryList[$i] . '! Levelshots will not work. Continuing without them.';
+                }
                 $exit = "1";
             }
         }
@@ -221,14 +226,14 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
             ignore_user_abort(true);
 
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
-            
+
             doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
-            
+
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", time());
 
             //Allow users to abort the page again.
             ignore_user_abort(false);
-            
+
             //Update gamename.txt
 		    //If someone loads a dynamic tracker with the same IP and port number, and the wrong
             //game name, we don't want it to affect other users.
@@ -308,8 +313,6 @@ file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 		$levelshotBuffer = $levelshotBufferArray[0];
 		$levelshotCount = $levelshotBufferArray[1];
 
-		autoRefreshScript($dynamicIPAddressPath, $enableAutoRefresh, $autoRefreshTimer);
-
 		levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotFolder);
 
 		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner);
@@ -356,7 +359,14 @@ $player_array = "";
 		}
 
 
-		file_put_contents('info/' . $dynamicIPaddressPath . 'sv_hostname.txt', colorize($cvars_hash["sv_hostname"]));
+		if(isset($cvars_hash["sv_hostname"]))
+		{
+		    file_put_contents('info/' . $dynamicIPaddressPath . 'sv_hostname.txt', colorize($cvars_hash["sv_hostname"]));
+		}
+		else
+		{
+		    file_put_contents('info/' . $dynamicIPaddressPath . 'sv_hostname.txt', colorize($cvars_hash["hostname"]));
+		}
 		file_put_contents('info/' . $dynamicIPaddressPath . 'sv_maxclients.txt', $cvars_hash["sv_maxclients"]);
 		file_put_contents('info/' . $dynamicIPaddressPath . 'g_gametype.txt', $cvars_hash["g_gametype"]);
 		file_put_contents('info/' . $dynamicIPaddressPath . 'modname.txt', colorize($cvars_hash["gamename"]));
@@ -567,9 +577,37 @@ function autoRefreshScript($dynamicIPAddressPath, $enableAutoRefresh, $autoRefre
 $output = "";
     if($enableAutoRefresh == "1")
     {
-        $output .= '
-<script type="text/javascript">
-        pageReloadTimer = setTimeout("pageReload()", ' . ($autoRefreshTimer * 1000) . ');
+        $output .= '<script type="text/javascript">
+
+ 		var refreshTimer = "' . $autoRefreshTimer . '";
+ 		var refreshCancelled = "0";
+ 		var replaceStuff = "";
+
+ 		replaceStuff = document.getElementById("refreshTimerDiv").className;
+ 		document.getElementById("refreshTimerDiv").className = replaceStuff.replace("hiddenTimer", "");
+		document.getElementById("refreshTimerDiv").innerHTML = refreshTimer;
+
+		pageReloadTimer = setTimeout("refreshTick()", 1000);
+
+ 		function refreshTick()
+ 		{
+
+ 		    if(refreshCancelled == "0")
+ 		    {
+ 		        if(refreshTimer > 0)
+ 		        {
+ 		            refreshTimer--;
+					document.getElementById("refreshTimerDiv").innerHTML = refreshTimer;
+ 		            pageReloadTimer = setTimeout("refreshTick()", 1000);
+ 		        }
+ 		        else
+ 		        {
+					document.getElementById("refreshTimerDiv").innerHTML = "...";
+ 		            pageReload();
+ 		        }
+ 		    }
+ 		}
+
         </script>
 ';
     }
@@ -662,6 +700,7 @@ file_put_contents("info/" . $dynamicIPAddressPath . "levelshotJavascriptAndCSS.t
 function paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner)
 {
 		$output = '<script type="text/javascript">
+
 		function param_window()
 		{
 		paramWindow = window.open("info/' . $dynamicIPAddressPath . 'param.html", "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700';
@@ -825,8 +864,6 @@ function stringValidator($input, $maxLength, $defaultValue)
         //{ and } are dangerous because they could allow javascript to be added as well.
         //Also removing equals signs for the same reason.
         //Double quotes are being removed as well.
-        //Periods are being removed because they could be used along with slashes to
-        //navigate away from the web page to other things.
         //Also removing colons to prevent http:// and stuff like that from getting through.
         //I know this is a bit over-protective, but safety first.
         $input = str_replace("<", "&lt;", $input);
@@ -834,9 +871,9 @@ function stringValidator($input, $maxLength, $defaultValue)
         $input = str_replace("{", "&#123;", $input);
         $input = str_replace("}", "&#125;", $input);
         $input = str_replace("=", "&#61;", $input);
-//        $input = str_replace("'", "&#39;", $input); //Removing these will break the levelshot path for any game with an apostrophe in the name
+//        $input = str_replace("'", "&#39;", $input);  //Removing these will break the levelshot path for any game with an apostrophe in the name
         $input = str_replace("\"", "&quot;", $input);
-        $input = str_replace(".", "&#46;", $input);
+//        $input = str_replace(".", "&#46;", $input);  //Commented this out, because it breaks the IP address validator, which results in blank trackers
         $input = str_replace(":", "&#58;", $input);
         $input = str_replace("?", "&#63;", $input);
         //Also, do not allow the termination of a comment block
@@ -859,20 +896,28 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 
     //Remove whitespace
     $input = trim($input);
- 
+
     //Use a PHP function to check validity
-    if (!filter_var($input,FILTER_VALIDATE_IP) && $input != "localhost")
+    if (!filter_var($input, FILTER_VALIDATE_IP) && $input != "localhost")
     {
-        //getbyhostname returns the input string on failure
+        //getbyhostname returns the input string on failure. So, to test if this is a 
         if(gethostbyname($input) == $input)
         {
-            If($dynamicTrackerEnabled == "1")
+            //DNS test failed. Just error out.
+            displayError('Invalid domain name! ' . stringValidator($input, "", "") . '<br />Check the address and try again.</h3>');
+        }
+        else
+        {
+            if(gethostbyname($input) == $input)
             {
-                displayError('Invalid IP address! ' . stringValidator($input) . '<br />Check the IP address and try again.</h3>');
-            }
-            else
-            {
-                displayError('Invalid IP address! ' . stringValidator($input) . '<br />Check the IP address in ParaConfig.php</h3>');
+                If($dynamicTrackerEnabled == "1")
+                {
+                    displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Check the IP address and try again.</h3>');
+                }
+                else
+                {
+                    displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Check the IP address in ParaConfig.php</h3>');
+                }
             }
         }
     }
@@ -1028,7 +1073,7 @@ function dynamicInstructionsPage()
     <h3>Enter the appropriate data below to get a URL you can use for ParaTracker Dynamic:</h3>
 
     <p>Server IP Address: <input type="text" size="46" onclick="clearOutputFields()" onchange="clearOutputFields()" id="IPAddress" value="" /></p>
-    <p>Server port number: <input type="text" size="15" onclick="clearOutputFields()" onchange="clearOutputFields()" id="PortNumber" value="29070" /></p>';
+    <p>Server port number: <input type="text" size="15" onclick="clearOutputFields()" onchange="clearOutputFields()" id="PortNumber" value="" /></p>';
 
 
 echo 'Game name: <select id="GameNameDropdown" name="Game" onclick="clearOutputFields()" onchange="checkForOtherValue()">';

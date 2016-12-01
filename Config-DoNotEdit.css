@@ -111,11 +111,33 @@ overflow: hidden;
 .trackerLogoSpacer
 {
 width: 45px;
-height: 160px;
+height: 225px;
 float: left;
 overflow: hidden;
 background: url("images/tracker/ParaTrackerLogoSideways.png") no-repeat 14px 51px;
 user-select: none;
+}
+
+/* This class aligns the reload timer */
+.timerSpacer
+{
+width: 45px;
+height: 185px;
+float: left;
+overflow: hidden;
+}
+
+/* This class is for the reload timer */
+.reloadTimerA
+{
+cursor: pointer;
+width: 40px;
+height: 40px;
+line-height: 40px;
+text-align: center;
+float: left;
+overflow: hidden;
+background-image: url("images/tracker/refreshTimeTab.png");
 }
 
 /* Container for the data on the left side */
@@ -143,7 +165,7 @@ background: url(images/tracker/reconnect_h.png) no-repeat -99999px -99999px;
 {
 width: 321px;
 height: 164px;
-overflow: auto;
+overflow-y: scroll;
 border-spacing: 0px;
 }
 
@@ -412,15 +434,65 @@ height: 225px;
 overflow: hidden;
 }
 
+/* This class is a wrapper for the entire left side contents of the tracker */
+.trackerLogoRConParamTimerWrapper
+{
+width: 45px;
+height: 225px;
+float: left;
+overflow: hidden;
+user-select: none;
+}
+
 /* This class adds a space on the left side as well as the ParaTracker logo */
 .trackerLogoSpacerB
 {
 width: 45px;
-height: 160px;
+height: 175px;
 float: left;
 overflow: hidden;
-background: url("images/tracker/ParaTrackerLogoSideways.png") no-repeat 14px 51px;
+background: url("images/tracker/ParaTracker-Logo-extra-Small-sideways.png") no-repeat 20px 40px;
 user-select: none;
+}
+
+/* This class moves the RCon and Param buttons lower on the left side of the tracker */
+.ParamRConSpacerB
+{
+height: 175px;
+width: 15px;
+float: left;
+overflow: hidden;
+}
+
+/* This class moves the RCon and Param buttons lower on the left side of the tracker */
+.ParamRConSpacer2B
+{
+height: 97px;
+width: 20px;
+float: left;
+overflow: hidden;
+}
+
+/* This class is a spacer between the param button and the timer */
+.paramTimerSpacerB
+{
+height: 9px;
+width: 45px;
+float: left;
+overflow: hidden;
+}
+
+/* This class is for the reload timer */
+.reloadTimerB
+{
+cursor: pointer;
+width: 40px;
+height: 40px;
+line-height: 40px;
+text-align: center;
+float: left;
+overflow: hidden;
+background-image: url("images/tracker/refreshTimeTab.png");
 }
 
 /* This class is a container for all data on the left side of the tracker */
@@ -453,10 +525,74 @@ float: left;
 .gameNameWrapperB
 {
 width: 246px;
-height: 17px;
+height: 20px;
 overflow: hidden;
 float: left;
 }
+
+/* This wrapper goes around the game name, RCon and Param buttons */
+.gamenameSizeB
+{
+width: 246px;
+height: 20px;
+overflow: hidden;
+float: left;
+}
+
+/* This wrapper goes around the RCon and Param buttons */
+.RConParamB
+{
+width: 20px;
+height: 38px;
+overflow: hidden;
+float: left;
+}
+
+/* This class is the RCon button */
+.RConB
+{
+width: 20px;
+height: 38px;
+cursor:pointer;
+background-image: url("images/tracker/rcon_small_rotated.png");
+}
+
+/* This class is the hover image for the RCon button */
+.RConB:hover
+{background-image: url("images/tracker/rcon_small_rotated_h.png");
+}
+
+/* This class is the Param button */
+.ParamB
+{
+width: 20px;
+height: 38px;
+cursor:pointer;
+background-image: url("images/tracker/param_small_rotated.png");
+}
+
+/* This class is the hover image for the RCon button */
+.ParamB:hover
+{
+background-image: url("images/tracker/param_small_rotated_h.png");
+}
+
+/* This class is the Reconnect button */
+.reconnectButtonB
+{
+width: 170px;
+height: 45px;
+cursor:pointer;
+background-image: url("images/tracker/reconnect.png");
+}
+
+/* This class is the hover image for the Reconnect button */
+.reconnectButtonB:hover
+{
+background-image: url("images/tracker/reconnect_h.png");
+}
+
+
 
 /* This wrapper is for the Name Score and Ping column headers */
 .nameScorePingB
@@ -499,8 +635,8 @@ float: left;
 .playerListB
 {
 width: 246px;
-height: 117px;
-overflow: auto;
+height: 114px;
+overflow-y: scroll;
 float: left;
 }
 
@@ -756,6 +892,12 @@ a
 {
 color: inherit;
 text-decoration: none;
+}
+
+/* This class is used to hide the refresh timer on page load */
+.hiddenTimer
+{
+display: none;
 }
 
 /* Part of the old levelshot code. Probably not used any more */

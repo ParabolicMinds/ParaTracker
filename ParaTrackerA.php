@@ -36,7 +36,6 @@ if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_
 //Server dump detected - connection assumed successful! Rendering a normal page.
 
 $output = htmlDeclarations("ParaTracker - The Ultimate Quake III Server Tracker", "");
-$output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "levelshotJavascriptAndCSS.txt");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "rconParamScript.txt");
 
@@ -55,10 +54,15 @@ $output .= '">
 
 
 <div class="trackerLogoSpacer">
-&nbsp;
-</div>
+<div class="timerSpacer"></div>
 
-<div class="dataFrame">
+<div class="reloadTimerOpacityA reloadTimerA reloadTimerTextA hiddenTimer" id="refreshTimerDiv" onclick="toggleReload()">
+</div>
+</div>';
+$output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
+
+
+$output .= '<div class="dataFrame">
 
 <div class="serverFrameSpacer"></div>
 <div class="serverFrame">
@@ -189,11 +193,16 @@ $output .= 'NoBG';
 $output .= '">';
 
 
-echo '<div class="trackerLogoSpacer">
-&nbsp;
-</div>
+$output .= '<div class="trackerLogoSpacer">
+<div class="timerSpacer"></div>
 
-<div class="dataFrame">
+<div class="reloadTimerOpacityA reloadTimerA reloadTimerTextA hiddenTimer" id="refreshTimerDiv" onclick="toggleReload()">
+</div>
+</div>';
+$output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
+
+
+$output .= '<div class="dataFrame">
 <div class="serverFrameSpacer"></div>
 <div class="couldNotConnectFrame">
 <div class="couldNotConnectText">

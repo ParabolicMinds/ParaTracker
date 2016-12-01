@@ -27,6 +27,7 @@
 // it will display a message telling the user to check config.php before running.
 $serverIPAddress = "212.224.101.83";
 
+
 // Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
 // The default port number for Jedi Outcast is 28070.
 // If an invalid entry is given, this value will default to 29070.
@@ -131,10 +132,11 @@ $noPlayersOnlineMessage = "No players online.";
 // limits how often ParaTracker will contact the server.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Enabled by default.
-$enableAutoRefresh = "0";
+$enableAutoRefresh = "1";
 
 // This value determines how many seconds ParaTracker waits between refreshes.
 // This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
+// Decimals are invalid and will be rounded.
 // It also cannot be higher than 300 seconds.
 // Default is 30 seconds.
 $autoRefreshTimer = "30";

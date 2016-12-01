@@ -29,6 +29,21 @@ this next line is the place to add it. */
 background-image: url("");
 }
 
+/* This class sets the opacity of the reload timer */
+.reloadTimerOpacityA
+{
+opacity: 0.25;
+}
+
+/* This class is for the text in the timer, at the left */
+.reloadTimerTextA
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family: monospace;
+font-weight:bold;
+}
+
 /* This is the server name, shown at the top of the tracker */
 .serverName
 {
@@ -191,6 +206,21 @@ background-color: rgba(0, 0, 0, 1);
 /* If you want a background image on the tracker,
 this next line is the place to add it. */
 background-image: url("");
+}
+
+/* This class sets the opacity of the reload timer */
+.reloadTimerOpacityB
+{
+opacity: 0.25;
+}
+
+/* This class is for the text in the timer, at the left */
+.reloadTimerTextB
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family: monospace;
+font-weight:bold;
 }
 
 /* This is the server name, shown at the top of the tracker */
@@ -528,17 +558,17 @@ color: #FFFFFF;
 }
 
 .color8
-/* Gray
-Default is #8A8A8A */
-{
-color: #8A8A8A;
-}
-
-.color9
 /* Orange
 Default is #FF4400 */
 {
 color: #FF4400;
+}
+
+.color9
+/* Gray
+Default is #8A8A8A */
+{
+color: #8A8A8A;
 }
 
 .color?

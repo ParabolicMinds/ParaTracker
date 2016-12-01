@@ -3,6 +3,21 @@ function pageReload()
     window.location.reload(true);
 }
 
+function toggleReload()
+{
+    if(refreshCancelled == "1")
+    {
+        refreshCancelled = "0";
+        pageReloadTimer = setTimeout("refreshTick()", 1000);
+
+    }
+    else
+    {
+        refreshCancelled = "1";
+    }
+    document.getElementById("refreshTimerDiv").className = "hiddenTimer";
+}
+
 function disableRConForm()
 {
     document.getElementById("commandTextField").readOnly = true; 
@@ -173,5 +188,5 @@ function clearOutputFields()
     document.getElementById("finalURL").value = "";
     document.getElementById("finalURLHTML").value = "";
     document.getElementById("paraTrackerTestFrameContent").innerHTML = "";
-    document.getElementById("paraTrackerTestFrame").className = "collapsedFrame";
+//    document.getElementById("paraTrackerTestFrame").className = "collapsedFrame";  //I see no reason to remove the frame, it just scrolls the page up for no reason and is annoying.
 }
