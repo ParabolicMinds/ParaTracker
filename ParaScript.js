@@ -99,8 +99,8 @@ function createURL()
         if(document.getElementById("SkinID-B").checked)
         {
             radioButton += "B";
-            width = "0";
-            height = "0";
+            width = "600";
+            height = "225";
         }
     }
     if(document.getElementById("SkinID-A"))
@@ -120,19 +120,27 @@ function createURL()
     outputURL += radioButton;
     
     outputURL += "&game=";
-    if(document.getElementById("GameName").value == "")
+
+    if(document.getElementById("GameNameDropdown").value == "other")
     {
-        outputURL += "Jedi Academy";
+        if(document.getElementById("GameName").value == "")
+        {
+            outputURL += "Jedi Academy";
+        }
+        else
+        {
+        outputURL += document.getElementById("GameName").value;
+        }
     }
     else
     {
-    outputURL += document.getElementById("GameName").value;
+    outputURL += document.getElementById("GameNameDropdown").value;
     }
+
 
     outputURL= encodeURI(outputURL);
 
     document.getElementById("finalURL").value = outputURL;
-//    document.getElementById("testURL").disabled = false;
 
     outputURL = '<object id="ParaTracker" type="text/html" data="' + outputURL + '" width="' + width + '" height="' + height + '" ></object>';
     document.getElementById("finalURLHTML").value = outputURL;
@@ -141,6 +149,18 @@ function createURL()
     document.getElementById("paraTrackerTestFrame").className = "expandedFrame";
 }    
 return false;
+}
+
+function checkForOtherValue()
+{
+    if(document.getElementById("GameNameDropdown").value == "other")
+    {
+        document.getElementById("hideGameNameWhenUnnecessary").className = "expandedFrame";
+    }
+    else
+    {
+        document.getElementById("hideGameNameWhenUnnecessary").className = "collapsedFrame";
+    }
 }
 
 function testURL()
@@ -152,7 +172,6 @@ function clearOutputFields()
 {
     document.getElementById("finalURL").value = "";
     document.getElementById("finalURLHTML").value = "";
-//    document.getElementById("testURL").disabled = true;
     document.getElementById("paraTrackerTestFrameContent").innerHTML = "";
     document.getElementById("paraTrackerTestFrame").className = "collapsedFrame";
 }

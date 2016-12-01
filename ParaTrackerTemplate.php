@@ -38,7 +38,7 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
 checkTimeDelay($connectionTimeout, $refreshTimeout, $dynamicIPAddressPath);
 
 //Do an update
-checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
 
 
 if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt") != "")
@@ -54,14 +54,16 @@ $output .= file_get_contents("info/" . $dynamicIPAddressPath . "rconParamScript.
 
 
 $output .= '</head>
-<body class="ParaTrackerPage">';
+<body class="ParaTrackerPage">
+<div class="TrackerFrameBNoBG BackgroundColorImageA">
+<div class="TrackerFrameB';
 
-/*
 if ($disableFrameBorder == 1)
 {
 $output .= 'NoBG';
 }
-*/
+
+$output .= '">';
 
 
 $output .= '</body>
@@ -87,15 +89,16 @@ reconnectTimer = setTimeout("makeReconnectButtonVisible()", ' . ($floodProtectTi
 </head><body class="ParaTrackerPage">
 
 
-<div class="TrackerFrameNoBG BackgroundColorImage">
-<div class="TrackerFrame';
+<div class="TrackerFrameANoBG BackgroundColorImageA">
+<div class="TrackerFrameA';
 
-/*
 if ($disableFrameBorder == 1)
 {
 $output .= 'NoBG';
 }
-*/
+
+$output .= '">';
+
 
 $output .= '<div id="reconnectButton" class="reconnectButton hide" onclick="pageReload();"></div>';
 

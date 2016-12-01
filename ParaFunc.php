@@ -93,6 +93,11 @@ else
 {
     $gameName = stringValidator($gameName, "", "Jedi Academy");
 }
+//Generate a levelshot path
+$levelshotFolder = $gameName;
+//Check to make sure the folder exists, and convert the string and directory name to lowercase
+$levelshotFolder = checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder);
+
 $noPlayersOnlineMessage = stringValidator($noPlayersOnlineMessage, "", "No players online.");
 
 $enableAutoRefresh = booleanValidator($enableAutoRefresh, 1);
@@ -132,6 +137,8 @@ function checkForMissingFiles($dynamicIPAddressPath)
     checkFileExistence("gamename.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("levelshotJavascriptAndCSS.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("mapname.txt", "info/" . $dynamicIPAddressPath);
+    checkFileExistence("mapname_raw.txt", "info/" . $dynamicIPAddressPath);
+    checkFileExistence("modname.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("param.html", "info/" . $dynamicIPAddressPath);
     checkFileExistence("playerCount.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("playerList.txt", "info/" . $dynamicIPAddressPath);
@@ -172,7 +179,36 @@ function checkDirectoryExistence($dirname, $dynamicIPAddressPath)
     }
 }
 
-function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder)
+{
+    $levelshotFolder = strtolower($levelshotFolder);
+
+    //We need to convert any matching directory name to lowercase
+    if(!file_exists("images/levelshots/" . $levelshotFolder))
+    {
+
+        $exit = "0";
+        $directoryList = scandir("images/levelshots/");
+
+        //Loop through the array of stuff listed, and see if there's anything that matches the given game name
+        for($i = 2; $i < count($directoryList) && $exit == "0"; $i++)
+        {
+            if(strtolower($directoryList[$i]) == $levelshotFolder)
+            {
+                rename($directoryList[$i], strtolower($directoryList[$i]));
+                $exit = "1";
+            }
+        }
+    }
+
+
+    //If we cannot find a match, then we will just leave it be, and the levelshot code will fall back on the placeholder image
+
+    $levelshotFolder = "images/levelshots/" . $levelshotFolder . "/";
+    return $levelshotFolder;
+}
+
+function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
 
     $lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt"), "", "", "0");
@@ -186,18 +222,39 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
 
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
             
-            doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+            doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
             
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", time());
 
             //Allow users to abort the page again.
             ignore_user_abort(false);
+            
+            //Update gamename.txt
+		    //If someone loads a dynamic tracker with the same IP and port number, and the wrong
+            //game name, we don't want it to affect other users.
+		    file_put_contents("info/" . $dynamicIPAddressPath . "gamename.txt", $gameName);
 
         }
+        else
+        {
+            //Even if it isn't time to update, we need to check if the gameName has changed from what is in the text file.
+            //If it has, we must rewrite the levelshot code.
+            if (file_get_contents("info/" . $dynamicIPAddressPath . "gamename.txt") != $gameName)
+            {
+                $levelshotBufferArray = levelshotfinder(file_get_contents("info/" . $dynamicIPAddressPath . "mapname_raw.txt"), $maximumLevelshots, $fadeLevelshots, $levelshotFolder);
+                $levelshotBuffer = $levelshotBufferArray[0];
+                $levelshotCount = $levelshotBufferArray[1];
 
+		        levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotFolder);
+
+		        //Update gamename.txt
+		        file_put_contents("info/" . $dynamicIPAddressPath . "gamename.txt", $gameName);
+
+            }
+        }
 }
 
-function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
     //On with the good stuff!
 	$fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, $connectionTimeout);
@@ -218,7 +275,7 @@ function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodPr
 	    displayError('Received too much data!<br />' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.');
 	}
 
-//This file is used for determining if the server connection was successful
+//This file is used for determining if the server connection was successful, plus it's good for debugging
 file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 
 	if($errstr == "")
@@ -247,13 +304,13 @@ file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 		file_put_contents("info/" . $dynamicIPAddressPath . "playerCount.txt", $player_count);
 
 		//The following function detects how many levelshots exist on the server, and passes a buffer of information back, the final count of levelshots, and whether they fade or not
-		$levelshotBufferArray = levelshotfinder($cvars_hash["mapname"], $maximumLevelshots, $fadeLevelshots);
+		$levelshotBufferArray = levelshotfinder($cvars_hash["mapname"], $maximumLevelshots, $fadeLevelshots, $levelshotFolder);
 		$levelshotBuffer = $levelshotBufferArray[0];
 		$levelshotCount = $levelshotBufferArray[1];
 
 		autoRefreshScript($dynamicIPAddressPath, $enableAutoRefresh, $autoRefreshTimer);
 
-		levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime);
+		levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotFolder);
 
 		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner);
 
@@ -266,6 +323,7 @@ file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 
 function dataParser($s, $dynamicIPaddressPath)
 {
+$player_array = "";
 //Split the info first, then we'll loop through and remove any dangerous characters
 		$sections = preg_split('_[' . chr(0x0A) . ']_', $s);
 		$cvars_array = preg_split('_[\\\]_', $sections[1]);
@@ -301,8 +359,10 @@ function dataParser($s, $dynamicIPaddressPath)
 		file_put_contents('info/' . $dynamicIPaddressPath . 'sv_hostname.txt', colorize($cvars_hash["sv_hostname"]));
 		file_put_contents('info/' . $dynamicIPaddressPath . 'sv_maxclients.txt', $cvars_hash["sv_maxclients"]);
 		file_put_contents('info/' . $dynamicIPaddressPath . 'g_gametype.txt', $cvars_hash["g_gametype"]);
-		file_put_contents('info/' . $dynamicIPaddressPath . 'gamename.txt', colorize($cvars_hash["gamename"]));
+		file_put_contents('info/' . $dynamicIPaddressPath . 'modname.txt', colorize($cvars_hash["gamename"]));
 		file_put_contents('info/' . $dynamicIPaddressPath . 'mapname.txt', colorize($cvars_hash["mapname"]));
+		//This line is needed for Dynamic Paratracker to use levelshots correctly
+		file_put_contents('info/' . $dynamicIPaddressPath . 'mapname_raw.txt', $cvars_hash["mapname"]);
 
 		return(array($cvar_array_single, $cvars_hash, $player_array, $playerParseCount));
 }
@@ -354,7 +414,7 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_ar
 function playerList($dynamicIPAddressPath, $player_array, $playerParseCount, $noPlayersOnlineMessage)
 {
 
-		$playerListbuffer = '<div class="playerTable">';
+		$playerListbuffer = '';
 		$player_count = 0;
 
 		//FIXME: Doesn't work
@@ -400,14 +460,14 @@ function playerList($dynamicIPAddressPath, $player_array, $playerParseCount, $no
 		{
 			$playerListbuffer .= '<div class="noPlayersOnline">&nbsp;' . $noPlayersOnlineMessage . '</div>';
 		}
-		$playerListbuffer .= '<div></div></div>';
+		$playerListbuffer .= '<div></div>';
 		$buf3='';
 		file_put_contents('info/' . $dynamicIPAddressPath . 'playerList.txt', $playerListbuffer);
 
 		return $player_count;
 }
 
-function levelshotFinder($mapName, $maximumLevelshots, $fadeLevelshots)
+function levelshotFinder($mapName, $maximumLevelshots, $fadeLevelshots, $levelshotFolder)
 {
 		$levelshotBuffer = '';
 
@@ -421,25 +481,25 @@ function levelshotFinder($mapName, $maximumLevelshots, $fadeLevelshots)
 		    $foundLevelshot = 0;
 
 		    //Check for a PNG first
-		    if(file_exists('images/levelshots/' . $mapName . '_' . $levelshotIndex . '.png'))
+		    if(file_exists($levelshotFolder . $mapName . '_' . $levelshotIndex . '.png'))
 		    {
-		        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '_' . $levelshotIndex . '.png");background-size: 300px 225px;background-repeat: no-repeat;}';
+		        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("' . $levelshotFolder . $mapName . '_' . $levelshotIndex . '.png");background-size: 300px 225px;background-repeat: no-repeat;}';
         		$foundLevelshot = 1;
 		    }
 		    else
 		    {
 		    //Failed to find a PNG, so let's check for a JPG
-		        if(file_exists('images/levelshots/' . $mapName . '_' . $levelshotIndex . '.jpg'))
+		        if(file_exists($levelshotFolder . $mapName . '_' . $levelshotIndex . '.jpg'))
 		        {
-		            $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '_' . $levelshotIndex . '.jpg");background-size: 300px 225px;background-repeat: no-repeat;}';
+		            $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("' . $levelshotFolder . $mapName . '_' . $levelshotIndex . '.jpg");background-size: 300px 225px;background-repeat: no-repeat;}';
 		            $foundLevelshot = 1;
 		        }
 		        else
 		        {
 		            //Also failed to find a JPG, so let's check for a GIF
-		            if(file_exists('images/levelshots/' . $mapName . '_' . $levelshotIndex . '.gif'))
+		            if(file_exists($levelshotFolder . $mapName . '_' . $levelshotIndex . '.gif'))
 		            {
-		                $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '_' . $levelshotIndex . '.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("' . $levelshotFolder . $mapName . '_' . $levelshotIndex . '.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
 		                $foundLevelshot = 1;
 		            }
 		            else
@@ -451,23 +511,23 @@ function levelshotFinder($mapName, $maximumLevelshots, $fadeLevelshots)
 		                if ($levelshotCount == 0)
 		                {
 		                //Checking for a PNG again:
-		                	if(file_exists('images/levelshots/' . $mapName . $levelshotIndex . '.png'))
+		                	if(file_exists($levelshotFolder . $mapName . $levelshotIndex . '.png'))
 		            		{
-		                        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '.png");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("' . $levelshotFolder . $mapName . '.png");background-size: 300px 225px;background-repeat: no-repeat;}';
         				    }
         				    else
         				    {
         				        //And checking for a JPG again:
-		                	    if(file_exists('images/levelshots/' . $mapName . $levelshotIndex . '.jpg'))
+		                	    if(file_exists($levelshotFolder . $mapName . $levelshotIndex . '.jpg'))
 		                	    {
-		                	        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '.jpg");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                	        $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("' . $levelshotFolder . $mapName . '.jpg");background-size: 300px 225px;background-repeat: no-repeat;}';
 		                	    }
 		                	    else
 		                	    {
 		                	        //Lastly...checking for a GIF.
-		                	        if(file_exists('images/levelshots/' . $mapName . $levelshotIndex . '.gif'))
+		                	        if(file_exists($levelshotFolder . $mapName . $levelshotIndex . '.gif'))
 		                	        {
-		                                $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("images/levelshots/' . $mapName . '.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
+		                                $levelshotBuffer .= '.levelshot' . $levelshotIndex . '{background: url("' . $levelshotFolder . $mapName . '.gif");background-size: 300px 225px;background-repeat: no-repeat;}';
 		                	        }
 		                	        else
 		                	        {
@@ -516,7 +576,7 @@ $output = "";
 file_put_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt", $output);
 }
 
-function levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime)
+function levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotFolder)
 {
 $javascriptFunctions = "";
 
@@ -764,7 +824,7 @@ function stringValidator($input, $maxLength, $defaultValue)
         //< and > are dangerous because they could add HTML to the tracker page.
         //{ and } are dangerous because they could allow javascript to be added as well.
         //Also removing equals signs for the same reason.
-        //Single quotes and double quotes are being removed as well.
+        //Double quotes are being removed as well.
         //Periods are being removed because they could be used along with slashes to
         //navigate away from the web page to other things.
         //Also removing colons to prevent http:// and stuff like that from getting through.
@@ -774,7 +834,7 @@ function stringValidator($input, $maxLength, $defaultValue)
         $input = str_replace("{", "&#123;", $input);
         $input = str_replace("}", "&#125;", $input);
         $input = str_replace("=", "&#61;", $input);
-        $input = str_replace("'", "&#39;", $input);
+//        $input = str_replace("'", "&#39;", $input); //Removing these will break the levelshot path for any game with an apostrophe in the name
         $input = str_replace("\"", "&quot;", $input);
         $input = str_replace(".", "&#46;", $input);
         $input = str_replace(":", "&#58;", $input);
@@ -803,15 +863,20 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
     //Use a PHP function to check validity
     if (!filter_var($input,FILTER_VALIDATE_IP) && $input != "localhost")
     {
-        If($dynamicTrackerEnabled == "1")
+        //getbyhostname returns the input string on failure
+        if(gethostbyname($input) == $input)
         {
-            displayError('Invalid IP address! ' . stringValidator($input) . '<br />Check the IP address and try again.</h3>');
-        }
-        else
-        {
-            displayError('Invalid IP address! ' . stringValidator($input) . '<br />Check the IP address in ParaConfig.php</h3>');
+            If($dynamicTrackerEnabled == "1")
+            {
+                displayError('Invalid IP address! ' . stringValidator($input) . '<br />Check the IP address and try again.</h3>');
+            }
+            else
+            {
+                displayError('Invalid IP address! ' . stringValidator($input) . '<br />Check the IP address in ParaConfig.php</h3>');
+            }
         }
     }
+
 return $input;
 }
 
@@ -955,8 +1020,7 @@ function dynamicInstructionsPage()
     <script src="ParaScript.js"></script></head><body class="dynamicConfigPage dynamicConfigPageStyle">
 
     <h1>ParaTracker ' . versionNumber() . ' - Dynamic Mode</h1>
-    <p>Keep in mind that anyone can see and use this page and<br />the dynamic tracker, at the expense of your bandwidth.<br />Use at your own risk!</p>
-    <h3>Also note that ParaConfig.php settings still apply!</h3><h6>So, for instance, if you want to enable RCon, or change levelshot options, it must be changed in ParaConfig.php, by the server owner.</h6>
+    <h3>ParaConfig.php settings still apply!</h3><h6>So, for instance, if you want to enable RCon, or change levelshot options, it must be changed in ParaConfig.php, by the server owner.</h6>
 
     <form>
     <p>Current page URL:<br /><input type="text" size="80" id="currentURL" value="' . $currentURL . '" readonly /></p>
@@ -964,18 +1028,51 @@ function dynamicInstructionsPage()
     <h3>Enter the appropriate data below to get a URL you can use for ParaTracker Dynamic:</h3>
 
     <p>Server IP Address: <input type="text" size="46" onclick="clearOutputFields()" onchange="clearOutputFields()" id="IPAddress" value="" /></p>
-    <p>Server port number: <input type="text" size="15" onclick="clearOutputFields()" onchange="clearOutputFields()" id="PortNumber" value="29070" /></p>
-    <p>Game name: <input type="text" size="40" onclick="clearOutputFields()" onchange="clearOutputFields()" id="GameName" value="Jedi Academy" /></p>
-    <p>Skin:<br />
+    <p>Server port number: <input type="text" size="15" onclick="clearOutputFields()" onchange="clearOutputFields()" id="PortNumber" value="29070" /></p>';
+
+
+echo 'Game name: <select id="GameNameDropdown" name="Game" onclick="clearOutputFields()" onchange="checkForOtherValue()">';
+
+    $directoryList = scandir("images/levelshots/");
+
+    //Loop through the array of stuff listed, and see if there's anything that matches the given game name
+    //We start counting at 2 because the first two values are ".." and "..."
+    for($i = 2; $i < count($directoryList); $i++)
+    {
+        echo '<option value="' . $directoryList[$i] . '">' . ucwords($directoryList[$i]) . '</option>' . "\n";
+    }
+    
+    echo '<option value="other">Other... (Levelshots unavailable on this server)</option>
+    </select>';
+
+
+echo '<div class="gameNameContainer"><div id="hideGameNameWhenUnnecessary" ';
+if(count($directoryList) > 2)
+{
+    echo 'class="collapsedFrame"';
+}
+else
+{
+    echo 'class="expandedFrame"';
+}
+
+echo '>
+<br />Enter game name: <input type="text" size="40" onclick="clearOutputFields()" onchange="clearOutputFields()" id="GameName" value="" />
+</div></div>';
+
+
+
+
+echo '<p>Skin:<br />
     <input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-A" value="A" checked>A (675 x 300)<br />';
 
     if(file_exists("ParaTrackerB.php"))
     {
-        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-B" value="B">B (000 x 000)<br />';
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-B" value="B">B (600 x 225)<br />';
     }
     if(file_exists("ParaTrackerC.php"))
     {
-        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-C" value="C">C (000 x 000)<br />';
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-C" value="C">C (600 x 225)<br />';
     }
     if(file_exists("ParaTrackerD.php"))
     {
@@ -1006,7 +1103,7 @@ function dynamicInstructionsPage()
     <div id="paraTrackerTestFrame" class="collapsedFrame" ><h2>Sample Tracker:</h2>
     <div id="paraTrackerTestFrameContent" class="paraTrackerTestFrame" ></div></div>
 
-    <h6>Trademark&#8482; Pen Pineapple Apple Pen, no backwards reserved. The use of this product will not cavse any damnification to your vehicle.</h6>
+    <h6>Trademark&#8482; Pen Pineapple Apple Pen, no rights deserved. The use of this product will not cavse any damnification to your vehicle.</h6>
     </body>
     </html>';
     exit();
@@ -1077,7 +1174,7 @@ if ($RConPassword != "" && $RConCommand != "")
     $RConLog2 = implode("\n", $RConLogArray);
 
     //Assemble the new log entry.
-    $RConLog = date(DATE_RFC2822) . "  IP Address: " . $_SERVER['REMOTE_ADDR'] . "  Command: " . $_POST["command"] . "  Response: " . $newRConLogEntry . $RConLog2;
+    $RConLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  Command: " . $_POST["command"] . "  Response: " . $newRConLogEntry . $RConLog2;
 
     //Check for exploits before writing the new entry to the log. The command hasn't been validated yet, so this *must* happen a second time
 	$RConLog = str_replace("<?", 'EXPLOIT REMOVED ', $RConLog);
@@ -1219,7 +1316,9 @@ $maximumLevelshots = "20";
 // This is the name of the game being tracked; I.E. Jedi Academy, Jedi Outcast, Call Of Duty 4, etc.
 // It is displayed underneath the server name in the top left corner of the tracker.
 // For future-proofing, this value is left to you, the user.
-// Default is "Jedi Academy."
+// The levelshots derive their directory from this value, so make sure it is correct! For instance,
+// a value of "Jedi Academy" means ParaTracker will look for levelshots in "images/levelshots/jedi academy"
+// Default is "Jedi Academy"
 $gameName = "Jedi Academy";
 
 // No Players Online Message

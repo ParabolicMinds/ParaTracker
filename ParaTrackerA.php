@@ -28,7 +28,7 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
 checkTimeDelay($connectionTimeout, $refreshTimeout, $dynamicIPAddressPath);
 
 //Do an update
-checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
 
 
 if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt") != "")
@@ -43,8 +43,8 @@ $output .= file_get_contents("info/" . $dynamicIPAddressPath . "rconParamScript.
 
 $output .= '</head>
 <body class="ParaTrackerPage">
-<div class="TrackerFrameNoBG BackgroundColorImage">
-<div class="TrackerFrame';
+<div class="TrackerFrameANoBG BackgroundColorImageA">
+<div class="TrackerFrameA';
 
 if ($disableFrameBorder == 1)
 {
@@ -73,11 +73,13 @@ $output .= '">
 </div>
 
 <div class="nameScorePing nameScorePingSize">
-<div class="playerName playerNameSize">Name</div><div class="playerScore playerScoreSize">&nbsp;Score</div><div class="playerPing playerPingSize">&nbsp;Ping</div>
+<div class="playerName playerNameSize">Name</div><div class="playerScore playerScoreSize">Score</div><div class="playerPing playerPingSize">Ping</div>
 </div>
 
-<div class="playerList">' . file_get_contents("info/" . $dynamicIPAddressPath . "playerList.txt") . '
-
+<div class="playerList">
+<div class="playerTable">
+' . file_get_contents("info/" . $dynamicIPAddressPath . "playerList.txt") . '
+</div>
 </div>
 
 <div class="rconParamSpacer"></div>
@@ -127,7 +129,7 @@ $output .= '">
 
 if ($disableFrameBorder == 0)
 {
-    $output .= '<img src="images/tracker/corner-tr.gif" width="300" height="225" alt="" />';
+    $output .= '<img src="images/tracker/corner-tr.png" width="300" height="225" alt="" />';
 }
 
 $output .= '</div>
@@ -141,7 +143,7 @@ $output .= '</div>
 <div class="matchData"><div class="mapName"><table class="noPadding1"><tr><td>&nbsp;Map: <span class="color7">' . file_get_contents("info/" . $dynamicIPAddressPath . "mapname.txt") . '</span></td></tr></table></div>
 <div class="gametype"><table class="noPadding1"><tr><td>&nbsp;Gametype: ' . $gametypes[file_get_contents("info/" . $dynamicIPAddressPath . "g_gametype.txt")] . '</td></tr></table></div>
 <br />
-<div class="modName"><table class="noPadding1"><tr><td>&nbsp;Mod Name: ' . file_get_contents("info/" . $dynamicIPAddressPath . "gamename.txt") . '</td></tr></table></div>
+<div class="modName"><table class="noPadding1"><tr><td>&nbsp;Mod Name: ' . file_get_contents("info/" . $dynamicIPAddressPath . "modname.txt") . '</td></tr></table></div>
 <br />
 <div class="IPAddress"><table class="noPadding2"><tr><td>&nbsp;Server IP: ' . $serverIPAddress . ':' . $serverPort . '</td><td class="blinkingCursor"></td></tr></table>
 
@@ -176,18 +178,18 @@ reconnectTimer = setTimeout("makeReconnectButtonVisible()", ' . ($floodProtectTi
 </head><body class="ParaTrackerPage">
 
 
-<div class="TrackerFrameNoBG BackgroundColorImage">
-<div class="TrackerFrame';
+<div class="TrackerFrameANoBG BackgroundColorImageA">
+<div class="TrackerFrameA';
 
 if ($disableFrameBorder == 1)
 {
 $output .= 'NoBG';
 }
 
-$output .= '">
+$output .= '">';
 
 
-<div class="trackerLogoSpacer">
+echo '<div class="trackerLogoSpacer">
 &nbsp;
 </div>
 

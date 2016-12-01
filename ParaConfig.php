@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 ///////////////////////////////
 // ParaTracker Configuration //
 ///////////////////////////////
@@ -25,12 +25,12 @@
 // This is the IP Address of the server. Do not include the port number!
 // By default, and for security, this value is empty. If ParaTracker is launched without a value here,
 // it will display a message telling the user to check config.php before running.
-$serverIPAddress = "";
+$serverIPAddress = "212.224.101.83";
 
 // Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
 // The default port number for Jedi Outcast is 28070.
 // If an invalid entry is given, this value will default to 29070.
-$serverPort = "";
+$serverPort = "29070";
 
 // This variable limits how many seconds are required between each snapshot of the server.
 // This prevents high traffic on the tracker from bogging down the game server it is tracking.
@@ -116,7 +116,9 @@ $maximumLevelshots = "20";
 // This is the name of the game being tracked; I.E. Jedi Academy, Jedi Outcast, Call Of Duty 4, etc.
 // It is displayed underneath the server name in the top left corner of the tracker.
 // For future-proofing, this value is left to you, the user.
-// Default is "Jedi Academy."
+// The levelshots derive their directory from this value, so make sure it is correct! For instance,
+// a value of "Jedi Academy" means ParaTracker will look for levelshots in "images/levelshots/jedi academy"
+// Default is "Jedi Academy"
 $gameName = "Jedi Academy";
 
 // No Players Online Message
@@ -129,7 +131,7 @@ $noPlayersOnlineMessage = "No players online.";
 // limits how often ParaTracker will contact the server.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Enabled by default.
-$enableAutoRefresh = "1";
+$enableAutoRefresh = "0";
 
 // This value determines how many seconds ParaTracker waits between refreshes.
 // This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
@@ -145,14 +147,14 @@ $maximumServerInfoSize = "4000";
 
 // This next setting enables "Dynamic" ParaTracker. Clients can load "ParaTrackerDynamic.php" and give
 // an IP address, port number and visual theme ID in the URL, and ParaTracker will connect to that server.
-// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=A"
+// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=A&game=Jedi%20Academy"
 // DO *NOT*, I REPEAT, DO *NOT* ENABLE THIS FEATURE UNLESS YOU WANT PEOPLE USING YOUR WEBSITE TO TRACK THEIR SERVERS.
 // Also, DO NOT run ParaTracker in this mode without isolating it in its own webroot first - the consequences
-// can be grave if there is a security hole!
+// can be grave if there is a security hole that I have not yet found!
 // If you do not understand what this feature is, DO NOT enable it.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default.
-$dynamicTrackerEnabled = "0";
+$dynamicTrackerEnabled = "1";
 
 
 // RCON SETTINGS
@@ -161,7 +163,7 @@ $dynamicTrackerEnabled = "0";
 // This value will enable or disable RCon.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default for security.
-$RConEnable = "0";
+$RConEnable = "1";
 
 // This value sets the maximum number of characters ParaTracker will send to the server.
 // If the command or password is any larger than this, the command will not be sent.

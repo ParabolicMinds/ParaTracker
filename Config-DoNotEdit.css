@@ -22,8 +22,9 @@ you will find it in ParaConfig.php
 /* This line removes the margin and padding around the edge of the page, so ParaTracker will sit flush in whatever containing element it has */
 .ParaTrackerPage
 {    
-    margin: 0px;
-    padding: 0px;
+margin: 0px;
+padding: 0px;
+white-space: nowrap;
 }
 
 
@@ -45,6 +46,13 @@ text-align: center;
 padding: 10px 10px;
 border: 1px;
 cursor: pointer;
+}
+
+/* This class is used to contain the "game name" text field on ParaTrackerDynamic.php */
+.gameNameContainer
+{
+height: 56px;
+margin: 0px 0px;
 }
 
 /* This class is used for the test frame on ParaTrackerDynamic.php */
@@ -78,21 +86,21 @@ SKIN A CLASSES
 
 
 /* This is the full-size tracker frame, with the metal border */
-.TrackerFrame
+.TrackerFrameA
 {
 /*
 If you want to remove the metal frame around the tracker, DO NOT remove it here!
 Instead, there is an option for it in ParaConfig.php. Remove it there, as
 it will also correct some other things that are affected by the removal.
 */
-background-image: url("images/tracker/Tracker_Background.png");
+background-image: url("images/tracker/Skin_A_Background.png");
 width: 675px;
 height: 300px;
 overflow: hidden;
 }
 
 /* This is the full-size tracker frame, without the metal border */
-.TrackerFrameNoBG
+.TrackerFrameANoBG
 {
 width: 675px;
 height: 300px;
@@ -177,45 +185,10 @@ padding-left: 5px;
 }
 
 /* Used for the player list */
-.playerTable
+.playerTableA
 {
 width: 300px;
 border-spacing: 0px;
-}
-
-/* This class sets the attributes of each row of the player table */
-.playerRowSize
-{
-vertical-align: middle;
-padding-top: 6px;
-padding-bottom: 6px;
-padding-left: 5px;
-padding-right: 5px;
-overflow: hidden;
-}
-
-/* This class sets the attributes of the player name column */
-.playerNameSize
-{
-width: 180px;
-display: inline-table;
-overflow: hidden;
-}
-
-/* This class sets the attributes of the player score column */
-.playerScoreSize
-{
-width: 50px;
-display: inline-table;
-overflow: hidden;
-}
-
-/* This class sets the attributes of the player ping column */
-.playerPingSize
-{
-width: 50px;
-display: inline-table;
-overflow: hidden;
 }
 
 /* This class inserts a space between the player table and the data below */
@@ -364,7 +337,7 @@ user-select: none;
 /* This is the corner of the frame image that goes between levelshots */
 .levelshotCorner
 {
-background-image: url("images/tracker/corner-tr.gif");
+background-image: url("images/tracker/corner-tr.png");
 }
 
 /* This is the space between the levelshots and the data below */
@@ -409,6 +382,208 @@ width: 4px;
 background: url("images/tracker/blinker1.gif") no-repeat;
 user-select: none;
 }
+
+
+/*
+SKIN B CLASSES
+SKIN B CLASSES
+*/
+
+
+/* This is the full-size tracker frame, with the metal border */
+.TrackerFrameB
+{
+/*
+If you want to remove the metal frame around the tracker, DO NOT remove it here!
+Instead, there is an option for it in ParaConfig.php. Remove it there, as
+it will also correct some other things that are affected by the removal.
+*/
+background-image: url("images/tracker/Skin_B_Background.png");
+width: 600px;
+height: 225px;
+overflow: hidden;
+}
+
+/* This is the full-size tracker frame, without the metal border */
+.TrackerFrameBNoBG
+{
+width: 600px;
+height: 225px;
+overflow: hidden;
+}
+
+/* This class adds a space on the left side as well as the ParaTracker logo */
+.trackerLogoSpacerB
+{
+width: 45px;
+height: 160px;
+float: left;
+overflow: hidden;
+background: url("images/tracker/ParaTrackerLogoSideways.png") no-repeat 14px 51px;
+user-select: none;
+}
+
+/* This class is a container for all data on the left side of the tracker */
+.dataFrameB
+{
+width: 246px;
+height: 225px;
+float: left;
+}
+
+/* Space at the top, above the server name */
+.serverFrameSpacerB
+{
+width: 246px;
+height: 7px;
+overflow: hidden;
+float: left;
+}
+
+/* Server name and game name container */
+.serverFrameB
+{
+width: 246px;
+height: 20px;
+overflow: hidden;
+float: left;
+}
+
+/* This wrapper is around the game name, directly under the server name */
+.gameNameWrapperB
+{
+width: 246px;
+height: 17px;
+overflow: hidden;
+float: left;
+}
+
+/* This wrapper is for the Name Score and Ping column headers */
+.nameScorePingB
+{
+width: 230px;
+height: 14px;
+overflow: hidden;
+float: left;
+padding-left: 5px;
+}
+
+/* This is the size of the player name column header */
+.playerNameHeaderB
+{
+width: 63%;
+height: 14px;
+overflow: hidden;
+float: left;
+}
+
+/* This is the size of the player score column header */
+.playerScoreHeaderB
+{
+width: 20%;
+height: 14px;
+overflow: hidden;
+float: left;
+}
+
+/* This is the size of the player ping column header */
+.playerPingheaderB
+{
+width: 17%;
+height: 14px;
+overflow: hidden;
+float: left;
+}
+
+/* This wrapper is for the player list */
+.playerListB
+{
+width: 246px;
+height: 117px;
+overflow: auto;
+float: left;
+}
+
+/* Space at the top, above the server name */
+.playerListDataSpacerB
+{
+width: 246px;
+height: 7px;
+overflow: hidden;
+float: left;
+}
+
+/* This is used as a container for the data at the bottom left side */
+.bottomLeftDataWrapperB
+{
+height: 36px;
+width: 246px;
+overflow: hidden;
+float: left;
+}
+
+/* This class is a container for the mapname and modname */
+.dataRowB
+{
+height: 12px;
+width: 246px;
+overflow: hidden;
+float: left;
+}
+
+/* This class sets the spacing of the mapname and modname */
+.mapnameGametypeBSize
+{
+height: 12px;
+width: 123px;
+overflow: hidden;
+float: left;
+}
+
+/* This class is for the blinking cursor at the end of the IP address */
+.blinkingCursorB
+{
+width: 4px;
+background: url("images/tracker/blinker1.gif") no-repeat 1px;
+user-select: none;
+display: inline;
+}
+
+
+/* This class is a spacer between the data and the levelshot */
+.dataLevelshotSpacerB
+{
+width: 9px;
+height: 225px;
+float: left;
+}
+
+/* This class is a wrapper for the levelshots */
+.levelshotFrameWrapperB
+{
+width: 300px;
+height: 225px;
+overflow: hidden;
+float: left;
+}
+
+/* This is another container for the levelshots, except that it contains the frame visual and disables selecting it */
+.levelshotFrameB
+{
+height: 225px;
+width: 300px;
+overflow: hidden;
+float: left;
+user-select: none;
+}
+
+/* This is the corner of the frame image that goes between levelshots */
+.levelshotCornerB
+{
+background-image: url("images/tracker/Tracker_Skin_B_Side_Frame.png");
+}
+
+
 
 
 /*
@@ -525,6 +700,49 @@ display: none;
 {
 cursor:pointer;
 }
+
+
+/*
+PLAYER LIST CLASSES
+PLAYER LIST CLASSES
+*/
+
+
+/* This class sets the attributes of each row of the player table */
+.playerRowSize
+{
+vertical-align: middle;
+padding-top: 6px;
+padding-bottom: 6px;
+padding-left: 5px;
+padding-right: 5px;
+overflow: hidden;
+}
+
+/* This class sets the attributes of the player name column */
+.playerNameSize
+{
+width: 60%;
+display: inline-table;
+overflow: hidden;
+}
+
+/* This class sets the attributes of the player score column */
+.playerScoreSize
+{
+width: 20%;
+display: inline-table;
+overflow: hidden;
+}
+
+/* This class sets the attributes of the player ping column */
+.playerPingSize
+{
+width: 20%;
+display: inline-table;
+overflow: hidden;
+}
+
 
 
 /*
