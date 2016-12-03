@@ -1170,8 +1170,6 @@ if ($RConPassword != "" && $RConCommand != "")
 		if($s != "")
 		{
 		    $serverResponse = $s;
-checkFileExistence("RConResponse.txt", "info/");
-file_put_contents("info/RConResponse.txt", $s);
 		    //Check for exploits in the response that might trigger some PHP code
 			$serverResponse = str_replace("<?", 'EXPLOIT REMOVED ', $serverResponse);
 			$serverResponse = str_replace("?>", 'EXPLOIT REMOVED ', $serverResponse);
