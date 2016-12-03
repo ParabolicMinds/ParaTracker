@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 ///////////////////////////////
 // ParaTracker Configuration //
 ///////////////////////////////
@@ -25,13 +25,13 @@
 // This is the IP Address of the server. Do not include the port number!
 // By default, and for security, this value is empty. If ParaTracker is launched without a value here,
 // it will display a message telling the user to check config.php before running.
-$serverIPAddress = "212.224.101.83";
+$serverIPAddress = "";
 
 
 // Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
 // The default port number for Jedi Outcast is 28070.
 // If an invalid entry is given, this value will default to 29070.
-$serverPort = "29070";
+$serverPort = "";
 
 // This variable limits how many seconds are required between each snapshot of the server.
 // This prevents high traffic on the tracker from bogging down the game server it is tracking.
@@ -102,8 +102,8 @@ $levelshotTransitionTime = ".5";
 // and lower values are choppier. Values between 10 and 30 are good. A value of 1 will
 // disable the fading and give a "slide show" feel.
 // Any value below 1 is forbidden. Values above 60 are also forbidden.
-// Default is 20 FPS.
-$levelshotFPS = "20";
+// Default is 30 FPS.
+$levelshotFPS = "30";
 
 // The following value is the maximum number of levelshots that can be used. Keep in mind that
 // more levelshots is not always better. Minimum is 1, maximum is 99.
@@ -158,6 +158,13 @@ $maximumServerInfoSize = "4000";
 // Disabled by default.
 $dynamicTrackerEnabled = "1";
 
+// The following setting is a personal message that will be displayed on ParaTrackerDynamic.php when a user is setting
+// up ParaTracker for their own use. By default, this is simply a link to our GitHub, where you can download the program
+// for free. The point is to encourage as many people as possible to run the software themselves, and not to rely on Dynamic
+// mode too much.
+// Default is: "ParaTracker is free, open-source software! Download your own at http://github.com/ParabolicMinds/ParaTracker"
+$personalDynamicTrackerMessage = "ParaTracker is free, open-source software! Download your own at http://github.com/ParabolicMinds/ParaTracker";
+
 
 // RCON SETTINGS
 // RCON SETTINGS
@@ -165,7 +172,7 @@ $dynamicTrackerEnabled = "1";
 // This value will enable or disable RCon.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default for security.
-$RConEnable = "1";
+$RConEnable = "0";
 
 // This value sets the maximum number of characters ParaTracker will send to the server.
 // If the command or password is any larger than this, the command will not be sent.
@@ -193,7 +200,7 @@ $RConLogSize = "1000";
 // This value is boolean. When the RCon and PARAM buttons are clicked, the popup
 // window will snap to the top left corner of the screen by default. When this
 // variable is set to any value other than Yes or 1, the behavior is disabled.
-// Does not appear to work correctly in Chrome.
+// Does not appear to work correctly in Google Chrome.
 // Default is 0.
 $newWindowSnapToCorner = "0";
 

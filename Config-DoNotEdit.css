@@ -34,6 +34,20 @@ PARA TRACKER DYNAMIC SETUP PAGE CLASSES
 */
 
 
+/* This class sets the width of the page */
+.dynamicPageContainer
+{
+width: 100%;
+text-align: center;
+}
+
+.dynamicPageWidth
+{
+width: 1050px;
+display: inline-block;
+}
+
+
 /* This class is used for the page formatting in ParaTrackerDynamic.php */
 .dynamicConfigPage
 {
@@ -380,6 +394,45 @@ overflow: hidden;
 float: left;
 }
 
+/* This class is the container for the map name, below the levelshot */
+.mapName
+{
+overflow: hidden;
+height: 20px;
+width: 300px;
+float: left;
+word-wrap: break-word;
+}
+
+/* This class is the container for the gametype, below the levelshot */
+.gametype
+{
+overflow: hidden;
+height: 20px;
+width: 150px;
+float: left;
+word-wrap: break-word;
+}
+
+/* This class is the container for the mod name, below the levelshot */
+.modName
+{
+overflow: hidden;
+float: left;
+height: 20px;
+width: 150px;
+word-wrap: break-word;
+}
+
+/* This class is the container for the IP address, below the levelshot */
+.IPAddress
+{
+overflow: hidden;
+float: left;
+height: 20px;
+width: 300px;
+word-wrap: break-word;
+}
 
 /* This class removes padding from the game data */
 .noPadding1
@@ -482,6 +535,14 @@ float: left;
 overflow: hidden;
 }
 
+/* This class spaces the reconnect button away from the left side */
+.reconnectSpacerB
+{
+width: 85px;
+height:24px;
+float: left;
+}
+
 /* This class is for the reload timer */
 .reloadTimerB
 {
@@ -500,6 +561,14 @@ background-image: url("images/tracker/refreshTimeTab.png");
 {
 width: 246px;
 height: 225px;
+float: left;
+}
+
+/* This class is a container for the "No connection" message */
+.noConnectionFrameB
+{
+width: 246px;
+height: 188px;
 float: left;
 }
 
@@ -577,19 +646,31 @@ background-image: url("images/tracker/param_small_rotated.png");
 background-image: url("images/tracker/param_small_rotated_h.png");
 }
 
-/* This class is the Reconnect button */
-.reconnectButtonB
+/* This class affects the placement of the reconnect button */
+.reconnectButtonWrapperB
 {
 width: 170px;
 height: 45px;
+line-height: 45px;
+float: left;
+text-align:center;
+vertical-align: middle;
+}
+
+/* This class is the Reconnect button */
+.reconnectButtonB
+{
+width: 76px;
+height: 20px;
 cursor:pointer;
-background-image: url("images/tracker/reconnect.png");
+float: left;
+background-image: url("images/tracker/reconnect_small.png");
 }
 
 /* This class is the hover image for the Reconnect button */
 .reconnectButtonB:hover
 {
-background-image: url("images/tracker/reconnect_h.png");
+background-image: url("images/tracker/reconnect_small_h.png");
 }
 
 
@@ -668,7 +749,7 @@ float: left;
 }
 
 /* This class sets the spacing of the mapname and modname */
-.mapnameGametypeBSize
+.modnameGametypeBSize
 {
 height: 12px;
 width: 123px;
@@ -762,7 +843,19 @@ text-align: left;
 /* This class sets the size of the container that displays the server's response. */
 .RConServerResponseFrame
 {
-width: 690px;
+width: 740px;
+}
+
+/* This class sets the size of the container that displays the server's response. */
+.RConServerResponseScroll
+{
+width: 740px;
+height: 215px;
+/*
+Not sure if I should use this next line or not. It kind of ruins the already barely-existing feel of using a command prompt...
+overflow-y: scroll;
+*/
+overflow-wrap: break-word;
 }
 
 
@@ -779,10 +872,21 @@ width: 540px;
 margin: 0 auto 0 auto;
 }
 
-/* This class sets the width of the table elements */
-.Width270
+/* This class sets the width of the Name column */
+.nameColumnWidth
 {
-width: 270px;
+width: 250px;
+overflow-wrap: break-word;
+}
+
+/* This class sets the width of the Name column */
+.valueColumnWidth
+{
+padding-top: 6px;
+padding-bottom: 6px;
+width: 290px;
+display: block;
+overflow-wrap: break-word;
 }
 
 /* This class sets the padding and size of the CVar table */
@@ -859,23 +963,23 @@ overflow: hidden;
 .playerNameSize
 {
 width: 60%;
-display: inline-table;
+display: inline-block;
 overflow: hidden;
 }
 
 /* This class sets the attributes of the player score column */
 .playerScoreSize
 {
-width: 20%;
-display: inline-table;
+width: 21%;
+display: inline-block;
 overflow: hidden;
 }
 
 /* This class sets the attributes of the player ping column */
 .playerPingSize
 {
-width: 20%;
-display: inline-table;
+width: 19%;
+display: inline-block;
 overflow: hidden;
 }
 

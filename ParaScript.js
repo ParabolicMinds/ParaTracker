@@ -1,3 +1,22 @@
+function bitValueClick(cvarName)
+{
+    if (document.getElementById(cvarName).className == "collapsedList")
+    {
+        document.getElementById(cvarName).className = "expandedList"
+    }
+    else
+    {
+        document.getElementById(cvarName).className = "collapsedList"
+    }
+}
+
+function makeReconnectButtonVisible()
+{
+    var replaceReconnectClass = "";
+    replaceReconnectClass = document.getElementById("reconnectButton").className;
+ 	document.getElementById("reconnectButton").className = replaceReconnectClass.replace("hide", "");
+}
+
 function pageReload()
 {
     window.location.reload(true);
@@ -9,11 +28,14 @@ function toggleReload()
     {
         refreshCancelled = "0";
         pageReloadTimer = setTimeout("refreshTick()", 1000);
-
     }
     else
     {
         refreshCancelled = "1";
+        if(refreshTimer == "0")
+        {
+            window.stop();
+        }
     }
     document.getElementById("refreshTimerDiv").className = "hiddenTimer";
 }

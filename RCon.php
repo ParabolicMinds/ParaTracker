@@ -60,7 +60,7 @@ else
     <input id="submitButton" type="submit" value=" Send " />
     </div>
     </form>
-    <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . $serverIPAddress . ":" . $serverPort . '<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse">';
+    <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . $serverIPAddress . ":" . $serverPort . '<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse RConServerResponseScroll">';
 
     if(strlen($RConCommand) > $RConMaximumMessageSize)
     {

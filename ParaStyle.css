@@ -132,11 +132,6 @@ text-align: center;
 color:#EEEEEE;
 font-size:9pt;
 font-family:monospace;
-overflow: hidden;
-height: 20px;
-width: 150px;
-float: left;
-word-wrap: break-word;
 }
 
 /* This class is used for the gametype, below the levelshot */
@@ -145,11 +140,6 @@ word-wrap: break-word;
 color:#EFEFEF;
 font-size:9pt;
 font-family:monospace;
-overflow: hidden;
-height: 20px;
-width: 150px;
-float: left;
-word-wrap: break-word;
 }
 
 /* This class is used for the mod name, below the levelshot */
@@ -158,11 +148,6 @@ word-wrap: break-word;
 color:#EFEFEF;
 font-size:9pt;
 font-family:monospace;
-overflow: hidden;
-float: left;
-height: 20px;
-width: 300px;
-word-wrap: break-word;
 }
 
 /* This class is used for the IP address, below the levelshot */
@@ -171,11 +156,6 @@ word-wrap: break-word;
 color: #EFEFEF;
 font-size: 9pt;
 font-family: monospace;
-overflow: hidden;
-float: left;
-height: 20px;
-width: 300px;
-word-wrap: break-word;
 }
 
 /* Used for the text on the "Could Not Connect" page */
@@ -221,6 +201,15 @@ color:#EFEFEF;
 font-size:14pt;
 font-family: monospace;
 font-weight:bold;
+}
+
+/* This class is for the text when a server could not be reached */
+.noConnectionFrameB
+{
+color:#EFEFEF;
+font-size:10pt;
+font-family: monospace;
+text-align: center;
 }
 
 /* This is the server name, shown at the top of the tracker */
@@ -397,7 +386,7 @@ PARAM PAGE CLASSES
 /* This class is the fonts and colors for the Param page */
 .cvars_page
 {
-background-color:#202020;
+background-color:#111111;
 color:#EFEFEF;
 font-size:8pt;
 font-family: "Trebuchet MS";

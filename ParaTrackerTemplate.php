@@ -34,11 +34,8 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
 }
 
 
-//Check the time delay between refreshes. Make sure we wait if need be
-checkTimeDelay($connectionTimeout, $refreshTimeout, $dynamicIPAddressPath);
-
-//Do an update
-checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+//Check to see if an update needs done, and do it
+checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
 
 
 if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt") != "")
@@ -80,10 +77,6 @@ else
 $output =  htmlDeclarations("ParaTracker - Could Not Connect To Server", "");
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
 $output .= '<script type="text/javascript">
-function makeReconnectButtonVisible()
-{
-	document.getElementById("reconnectButton").className = "reconnectButton";
-}
 reconnectTimer = setTimeout("makeReconnectButtonVisible()", ' . ($floodProtectTimeout * 1000 + 100) . ');
 </script>
 </head><body class="ParaTrackerPage">
@@ -104,7 +97,6 @@ $output .= '<div id="reconnectButton" class="reconnectButton hide" onclick="page
 
 $output .= '</body></html>';
 
-file_put_contents('info/' . $dynamicIPAddressPath . 'param.html', "");
 }
 
 echo "-->";

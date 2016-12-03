@@ -1,14 +1,20 @@
 ﻿<?php
 
-if (!isset($safeToExecuteParaFunc))
-{
-    displayError("ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerA.php or ParaTrackerDynamic.php instead.");
-}
-
 function versionNumber()
 {
     //Return a string of the version number
-    return("1.0 RC");
+    //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
+    Return("1.1");
+}
+ 
+//If this file is executed directly, then echoing this value here will display the version number before exiting.
+//If the file is executed from one of the skin files, then this will end up in an HTML comment and will not be visible.
+//Either way, the version number will be visible.
+echo " ParaTracker " . versionNumber() . " ";
+ 
+if (!isset($safeToExecuteParaFunc))
+{
+    displayError("ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerA.php or ParaTrackerDynamic.php instead.");
 }
 
 if (file_exists("ParaConfig.php"))
@@ -49,14 +55,14 @@ if (!isset($dynamicTrackerCalledFromCorrectFile))
 //and what to do about it.
 $dynamicTrackerCalledFromCorrectFile = booleanValidator($dynamicTrackerCalledFromCorrectFile, 0);
 $dynamicTrackerEnabled = booleanValidator($dynamicTrackerEnabled, 0);
-
+$personalDynamicTrackerMessage = stringValidator($personalDynamicTrackerMessage, "", "");
 
 if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
 {
     //Terminate the script with an instruction page if no IP address was given!
     if (!isset($_GET["ip"]))
     {
-        dynamicInstructionsPage();
+        dynamicInstructionsPage($personalDynamicTrackerMessage);
     }
     $serverIPAddress = ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
     $serverPort = numericValidator($_GET["port"], 1, 65535, 29070);
@@ -81,7 +87,7 @@ $disableFrameBorder = booleanValidator($disableFrameBorder, 0);
 $fadeLevelshots = booleanValidator($fadeLevelshots, 1);
 $levelshotDisplayTime = numericValidator($levelshotDisplayTime, 1, 15, 3);
 $levelshotTransitionTime = numericValidator($levelshotTransitionTime, 0.1, 5, 0.5);
-$levelshotFPS = numericValidator($levelshotFPS, 1, 60, 20);
+$levelshotFPS = numericValidator($levelshotFPS, 1, 60, 30);
 $maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
 
 //Gamename can also be given dynamically, so let's check for that too.
@@ -123,6 +129,8 @@ $dynamicIPAddressPath = $serverIPAddress . "-" . $serverPort . "/";
 checkDirectoryExistence("info/", "");
 checkDirectoryExistence($dynamicIPAddressPath, "info/");
 
+checkDirectoryExistence("images/levelshots", "");
+
 checkDirectoryExistence("logs/", "");
 checkDirectoryExistence($dynamicIPAddressPath, "logs/");
 
@@ -134,7 +142,6 @@ autoRefreshScript($dynamicIPAddressPath, $enableAutoRefresh, $autoRefreshTimer);
 
 function checkForMissingFiles($dynamicIPAddressPath)
 {
-    $output = "0";
     checkFileExistence("connectionErrorMessage.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("g_gametype.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("gamename.txt", "info/" . $dynamicIPAddressPath);
@@ -153,7 +160,6 @@ function checkForMissingFiles($dynamicIPAddressPath)
     checkFileExistence("sv_hostname.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("sv_maxclients.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("time.txt", "info/" . $dynamicIPAddressPath);
-    return $output;
 }
 
 function checkFileExistence($filename, $dynamicIPAddressPath)
@@ -166,7 +172,6 @@ function checkFileExistence($filename, $dynamicIPAddressPath)
             displayError("Failed to create file " . $dynamicIPAddressPath . $filename . "!<br />Make sure ParaTracker has file system access, and that the disk is not full!");
         }
     }
-    return 1;
 }
 
 function checkDirectoryExistence($dirname, $dynamicIPAddressPath)
@@ -213,8 +218,11 @@ function checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder)
     return $levelshotFolder;
 }
 
-function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
 {
+
+    //Check the time delay between refreshes. Make sure we wait if need be
+    checkTimeDelay($connectionTimeout, $refreshTimeout, $dynamicIPAddressPath);
 
     $lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt"), "", "", "0");
 
@@ -273,19 +281,21 @@ function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodPr
 	}
 	fclose($fp);
 
-// $s = file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt");  //Debug line
+	//Before we start, wipe out the parameter list. That way, if we encounter an error later, the list does not remain
+    file_put_contents('info/' . $dynamicIPAddressPath . 'param.html', "");
 
 	if(strlen($s) > $maximumServerInfoSize)
 	{
 	    displayError('Received too much data!<br />' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.');
 	}
 
-//This file is used for determining if the server connection was successful, plus it's good for debugging
-file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
+	//This file is used for determining if the server connection was successful, plus it's good for debugging
+	file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 
-	if($errstr == "")
+	if($errstr == "" && $s == "")
 	{
 	    $errstr = "No response in " . $connectionTimeout . " seconds.";
+	    echo "No response in " . $connectionTimeout . " seconds.";
 	}
 	file_put_contents("info/" . $dynamicIPAddressPath . "connectionErrorMessage.txt", stringValidator($errstr, "", ""));
 
@@ -321,7 +331,6 @@ file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags, $parseTimer);
 
 	}
-
 }
 
 function dataParser($s, $dynamicIPaddressPath)
@@ -383,15 +392,13 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_ar
 		<body class="cvars_page">
 		<span class="CVarHeading">Server Cvars</span><br />
 		<span class="CVarServerAddress">' . $serverIPAddress . ":" . $serverPort . '</span><br /><br />
-		<table class="FullSizeCenter"><tr><td><table><tr class="cvars_titleRow cvars_titleRowSize"><td class="Width270">Name</td><td class="Width270">Value</td></tr>' . "\n";
+		<table class="FullSizeCenter"><tr><td><table><tr class="cvars_titleRow cvars_titleRowSize"><td class="nameColumnWidth">Name</td><td class="valueColumnWidth">Value</td></tr>' . "\n";
 		$c = 1;
-		
-		
 
 		foreach($cvar_array_single as $cvar)
 		{
-			$buf .= '<tr class="cvars_row' . $c . '"><td>' . $cvar['name'] . '</td><td>';
-			if ((($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
+			$buf .= '<tr class="cvars_row' . $c . '"><td class="nameColumnWidth">' . $cvar['name'] . '</td><td class="valueColumnWidth">';
+			if ((($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'hostname') || ($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
 			{
 				$buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
 			}
@@ -427,38 +434,20 @@ function playerList($dynamicIPAddressPath, $player_array, $playerParseCount, $no
 		$playerListbuffer = '';
 		$player_count = 0;
 
-		//FIXME: Doesn't work
-		$playerNameCharacterLimit = 40;
-
 		if($playerParseCount > 0)
 		{
+		    //Sort by ping first in descending order, to move bots to the bottom
+			$player_array = array_sort($player_array, "ping", false);
+			//Now, sort by score. If a bot has a higher score than a player, they will be on top. But at least real players are more visible this way
 			$player_array = array_sort($player_array, "score", true);
+
 			$c = 1;
 			foreach($player_array as &$player)
 			{
 				$player_name = str_replace(array("\n", "\r"), '', $player["name"]);
-				if (strlen($player_name) > $playerNameCharacterLimit)
-				{
-					$l = 0;
-					for($k = 0; ($l < $playerNameCharacterLimit) && ($k < strlen($player_name)); $k++)
-					{
-						if(($player_name[$k] == '^') && (strpos("0123456789", $player_name[$k+1]) != FALSE))
-						{
-							$k++;
-						}
-						else
-						{
-							$l++;
-						}
-					}
-				}
-				else
-				{
-					$k = $playerNameCharacterLimit;
-				}
 				$player_count++;
 				$playerListbuffer .= "\n" . '
-<div class="playerRow' . $c . ' playerRowSize"><div class="playerName playerNameSize">'. colorize(substr($player_name,0,$k));
+<div class="playerRow' . $c . ' playerRowSize"><div class="playerName playerNameSize">'. colorize($player_name);
 				$playerListbuffer .= '</div>' . "\n" . '
 <div class="playerScore playerScoreSize">' . $player["score"] . '</div><div class="playerPing playerPingSize">' . $player["ping"] . '</div></div>';
 				$c++;
@@ -748,7 +737,7 @@ else
 }
 
 $i = 0;
-$sleepTimer = "0.15";
+$sleepTimer = "0.15"; //This variable sets the number of seconds PHP will wait before checking to see if anything has changed.
 
 while ($lastRefreshTime == "wait" && $i < ($connectionTimeout + $refreshTimeout))
 {
@@ -762,7 +751,7 @@ while ($lastRefreshTime == "wait" && $i < ($connectionTimeout + $refreshTimeout)
 
 function array_sort($a, $subkey, $direction)
 {
-        foreach($a as $k=>$v)
+        foreach($a as $k => $v)
         {
                 $b[$k] = strtolower($v[$subkey]);
         }
@@ -897,6 +886,12 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
     //Remove whitespace
     $input = trim($input);
 
+    //If no IP was given, we need to make sure the client knows to check ParaConfig.php
+    if($input == "")
+    {
+        displayError("No server address specified in ParaConfig.php!");
+    }
+
     //Use a PHP function to check validity
     if (!filter_var($input, FILTER_VALIDATE_IP) && $input != "localhost")
     {
@@ -967,26 +962,13 @@ function displayError($errorMessage)
 
 function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
 {
-            $output = '<script type="text/javascript">
-            function ' . $cvarName . 'Click()
-            {
-                if (document.getElementById("' . $cvarName . '").className == "collapsedList")
-                {
-                    document.getElementById("' . $cvarName . '").className = "expandedList"
-                }
-                else
-                {
-                    document.getElementById("' . $cvarName . '").className = "collapsedList"
-                }
-            }
-            </script>';
 
             $toBeExploded = "";
-            $output .= '<div class="CVarExpandList" onclick="' . $cvarName . 'Click()"><b>' . $cvarValue . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i>';
+             $output = '<div class="CVarExpandList" onclick="bitValueClick(' . "'" . $cvarName . "'" .  ')"><b>' . $cvarValue . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i>';
 
             $index = count($arrayList);
 
-            if ($index <= 0)
+            if ($index < 1)
             {
                 $output .= '<div id="' . $cvarName . '" class="collapsedList"><br /><i>None</i></div>';
             }
@@ -1012,18 +994,18 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
     sort($iBlewItUp);
     $iBlewItUp = implode("<br />", $iBlewItUp);
 
-    $output .= '<div id="' . $cvarName . '" class="collapsedList"><i>' . $iBlewItUp . '</i></div></div>';
+    $output .= '<div id="' . $cvarName .  '" class="collapsedList"><i>' . $iBlewItUp . '</i></div></div>';
 
     return $output;
 }
 
 function htmlDeclarations($pageTitle, $filePath)
 {
-    $pageTitle = stringValidator($pageTitle, "", "ParaTracker");
+    $pageTitle = stringValidator($pageTitle, "", "ParaTracker - The Ultimate Quake III Server Tracker");
     $output = '<!DOCTYPE html>
     <html lang="en">
     <head>
-    <meta charset="utf-8"/>
+    <meta charset="Windows-1252">
     <link rel="stylesheet" href="' . $filePath . 'Config-DoNotEdit.css" type="text/css" />
     <link rel="stylesheet" href="' . $filePath . 'ParaStyle.css" type="text/css" />
     <title>' . $pageTitle . '</title>
@@ -1051,21 +1033,19 @@ function colorize($string)
         return $colorized_string . "</span>";
 }
 
-function dynamicInstructionsPage()
+function dynamicInstructionsPage($personalDynamicTrackerMessage)
 {
     $urlWithoutParameters = explode('?', $_SERVER["REQUEST_URI"], 2);
     $currentURL = $_SERVER['HTTP_HOST'] . $urlWithoutParameters[0];
-    echo '--><!DOCTYPE html>
-    <html lang="en">
-    <head>
-    <meta charset="utf-8"/>
-    <link rel="stylesheet" href="Config-DoNotEdit.css" type="text/css" />
-    <link rel="stylesheet" href="ParaStyle.css" type="text/css" />
-    <title>ParaTracker - The Ultimate Quake III Server Tracker</title>
-    <script src="ParaScript.js"></script></head><body class="dynamicConfigPage dynamicConfigPageStyle">
 
-    <h1>ParaTracker ' . versionNumber() . ' - Dynamic Mode</h1>
-    <h3>ParaConfig.php settings still apply!</h3><h6>So, for instance, if you want to enable RCon, or change levelshot options, it must be changed in ParaConfig.php, by the server owner.</h6>
+    $output = htmlDeclarations("", "");
+    
+    echo '-->' . $output . '</head><body class="dynamicConfigPage dynamicConfigPageStyle">
+';
+
+    echo '<div class="dynamicPageContainer"><div class="dynamicPageWidth"><h1>ParaTracker ' . versionNumber() . ' - Dynamic Mode</h1>
+    <i>' . $personalDynamicTrackerMessage . '</i>
+    <h3>ParaConfig.php settings still apply!</h3><h6>So, for instance, if you want to enable RCon, or change levelshot options, it must be changed in ParaConfig.php, by the server owner.<br />For a full set of options, you can and should host your own ParaTracker.</h6>
 
     <form>
     <p>Current page URL:<br /><input type="text" size="80" id="currentURL" value="' . $currentURL . '" readonly /></p>
@@ -1084,7 +1064,14 @@ echo 'Game name: <select id="GameNameDropdown" name="Game" onclick="clearOutputF
     //We start counting at 2 because the first two values are ".." and "..."
     for($i = 2; $i < count($directoryList); $i++)
     {
-        echo '<option value="' . $directoryList[$i] . '">' . ucwords($directoryList[$i]) . '</option>' . "\n";
+        //DO NOT make the directory list value lowercase here! It will make all dynamic game names appear in lowercase on the tracker
+        echo '<option value="' . ucwords(strtolower($directoryList[$i])) . '" ';
+        //If the levelshots for JA are present, let's set it as the default game
+        if(strtolower($directoryList[$i]) == "jedi academy")
+        {
+            echo 'selected="selected"' ;
+        }
+        echo '>' . ucwords(strtolower($directoryList[$i])) . '</option>' . "\n";
     }
     
     echo '<option value="other">Other... (Levelshots unavailable on this server)</option>
@@ -1121,23 +1108,23 @@ echo '<p>Skin:<br />
     }
     if(file_exists("ParaTrackerD.php"))
     {
-        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-D" value="D">D (000 x 000)<br />';
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-D" value="D">D (100 x 100)<br />';
     }
     if(file_exists("ParaTrackerE.php"))
     {
-        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onclick="clearOutputFields()" id="SkinID-E" value="E">E (000 x 000)<br />';
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onclick="clearOutputFields()" id="SkinID-E" value="E">E (100 x 100)<br />';
     }
     if(file_exists("ParaTrackerF.php"))
     {
-        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-F" value="F">F (000 x 000)<br />';
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-F" value="F">F (100 x 100)<br />';
     }
     if(file_exists("ParaTrackerG.php"))
     {
-        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-G" value="G">G (000 x 000)<br />';
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-G" value="G">G (100 x 100)<br />';
     }
     if(file_exists("ParaTrackerH.php"))
     {
-        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-H" value="H">H (000 x 000)</p>';
+        echo '<input type="radio" name="skinID" onclick="clearOutputFields()" onchange="clearOutputFields()" id="SkinID-H" value="H">H (100 x 100)</p>';
     }
     echo '<p><button type="button" class="dynamicFormButtons dynamicFormButtonsStyle" onclick="createURL()"> Generate! </button></p>
     <p>Direct link:<br /><textarea rows="3" cols="120" id="finalURL" readonly></textarea></p>
@@ -1149,7 +1136,12 @@ echo '<p>Skin:<br />
     <div id="paraTrackerTestFrameContent" class="paraTrackerTestFrame" ></div></div>
 
     <h6>Trademark&#8482; Pen Pineapple Apple Pen, no rights deserved. The use of this product will not cavse any damnification to your vehicle.</h6>
-    </body>
+    <h6><p>
+WE COMPLY WITH ALL LAWS AND REGULATIONS REGARDING THE USE OF LAWS AND REGULATIONS. WE PROMISE THAT THIS THING IS A THING. THIS THING COLLECTS INFORMATION. THIS INFORMATION IS THEN USED TO MAKE MISINFORMATION. THIS MISINFORMATION IS THEN SOLD TO THE MOST NONEXISTENT BIDDER. BY READING THIS, YOU AGREE. CLICK NEXT TO CONTINUE. OTHERWISE, CONTINUE ANYWAY AND SEE IF WE CARE. WOULD YOU LIKE TO SET PARATRACKER AS YOUR HOME PAGE? TOO BAD, WE DID IT ALREADY. WE ALSO INSTALLED A BROWSER TOOLBAR WITHOUT ASKING, BECAUSE TOOLBARS ARE COOL AND SO ARE WE.
+</p>
+</h6>
+<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />Nope, nothing here. Promise.
+    </div></div></body>
     </html>';
     exit();
 }
@@ -1178,23 +1170,25 @@ if ($RConPassword != "" && $RConCommand != "")
 		if($s != "")
 		{
 		    $serverResponse = $s;
-
+checkFileExistence("RConResponse.txt", "info/");
+file_put_contents("info/RConResponse.txt", $s);
 		    //Check for exploits in the response that might trigger some PHP code
 			$serverResponse = str_replace("<?", 'EXPLOIT REMOVED ', $serverResponse);
 			$serverResponse = str_replace("?>", 'EXPLOIT REMOVED ', $serverResponse);
 			$serverResponse = str_replace("*/", 'EXPLOIT REMOVED ', $serverResponse);
 
 			//Replace line breaks with spaces for the RCon log only
-			$newRConLogEntry = str_replace("\n", ' ', $serverResponse);
-
-			//Remove line breaks completely for the web page
-			$serverResponse = str_replace("\n", '', $serverResponse);
+			$newRConLogEntry = str_replace(chr(0x0A), '\n', $serverResponse);
 
 		    //Validate the rest!
 		    $serverResponse = stringValidator($serverResponse, "", "");
-			$serverResponse = str_replace(chr(0x20), ' ', $serverResponse);
-			$serverResponse = str_replace(chr(255) . chr(255) . chr(255) . chr(255) . 'print', '', $serverResponse);
-			$serverResponse = str_replace(chr(0x0A), '', $serverResponse);
+
+		    //Now we format the remaining data in a readable fashion
+			$serverResponse = str_replace(str_repeat(chr(255),4) . 'print', '', $serverResponse);
+			$serverResponse = str_replace(chr(0x0A), '<br />', $serverResponse);
+			//This next line apparently replaces spaces with....spaces? Not sure who added that but I'm commenting it out
+			//$serverResponse = str_replace(chr(0x20), ' ', $serverResponse);
+
 		}
 		else
 		{
@@ -1247,7 +1241,7 @@ $configBuffer = '<?php
 ///////////////////////////////
 // ParaTracker Configuration //
 ///////////////////////////////
- 
+
 // This is the config file for ParaTracker.
 // The only visual setting found here is the frame border.
 // If you want to edit fonts and colors,
@@ -1271,6 +1265,7 @@ $configBuffer = '<?php
 // By default, and for security, this value is empty. If ParaTracker is launched without a value here,
 // it will display a message telling the user to check config.php before running.
 $serverIPAddress = "";
+
 
 // Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
 // The default port number for Jedi Outcast is 28070.
@@ -1346,8 +1341,8 @@ $levelshotTransitionTime = ".5";
 // and lower values are choppier. Values between 10 and 30 are good. A value of 1 will
 // disable the fading and give a "slide show" feel.
 // Any value below 1 is forbidden. Values above 60 are also forbidden.
-// Default is 20 FPS.
-$levelshotFPS = "20";
+// Default is 30 FPS.
+$levelshotFPS = "30";
 
 // The following value is the maximum number of levelshots that can be used. Keep in mind that
 // more levelshots is not always better. Minimum is 1, maximum is 99.
@@ -1380,6 +1375,7 @@ $enableAutoRefresh = "1";
 
 // This value determines how many seconds ParaTracker waits between refreshes.
 // This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
+// Decimals are invalid and will be rounded.
 // It also cannot be higher than 300 seconds.
 // Default is 30 seconds.
 $autoRefreshTimer = "30";
@@ -1399,7 +1395,14 @@ $maximumServerInfoSize = "4000";
 // If you do not understand what this feature is, DO NOT enable it.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default.
-$dynamicTrackerEnabled = "0";
+$dynamicTrackerEnabled = "1";
+
+// The following setting is a personal message that will be displayed on ParaTrackerDynamic.php when a user is setting
+// up ParaTracker for their own use. By default, this is simply a link to our GitHub, where you can download the program
+// for free. The point is to encourage as many people as possible to run the software themselves, and not to rely on Dynamic
+// mode too much.
+// Default is: "ParaTracker is free, open-source software! Download your own at http://github.com/ParabolicMinds/ParaTracker"
+$personalDynamicTrackerMessage = "ParaTracker is free, open-source software! Download your own at http://github.com/ParabolicMinds/ParaTracker";
 
 
 // RCON SETTINGS
@@ -1436,6 +1439,7 @@ $RConLogSize = "1000";
 // This value is boolean. When the RCon and PARAM buttons are clicked, the popup
 // window will snap to the top left corner of the screen by default. When this
 // variable is set to any value other than Yes or 1, the behavior is disabled.
+// Does not appear to work correctly in Google Chrome.
 // Default is 0.
 $newWindowSnapToCorner = "0";
 

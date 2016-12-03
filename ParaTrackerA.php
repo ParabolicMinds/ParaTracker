@@ -24,11 +24,8 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
 }
 
 
-//Check the time delay between refreshes. Make sure we wait if need be
-checkTimeDelay($connectionTimeout, $refreshTimeout, $dynamicIPAddressPath);
-
-//Do an update
-checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+//Check to see if an update needs done, and do it
+checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
 
 
 if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt") != "")
@@ -56,7 +53,7 @@ $output .= '">
 <div class="trackerLogoSpacer">
 <div class="timerSpacer"></div>
 
-<div class="reloadTimerOpacityA reloadTimerA reloadTimerTextA hiddenTimer" id="refreshTimerDiv" onclick="toggleReload()">
+<div class="reloadTimerOpacityA reloadTimerA reloadTimerTextA hiddenTimer" title="Click to cancel auto-refresh" id="refreshTimerDiv" onclick="toggleReload()">
 </div>
 </div>';
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
@@ -144,12 +141,13 @@ $output .= '</div>
 
 <div class="levelshotSpacer"></div>
 
-<div class="matchData"><div class="mapName"><table class="noPadding1"><tr><td>&nbsp;Map: <span class="color7">' . file_get_contents("info/" . $dynamicIPAddressPath . "mapname.txt") . '</span></td></tr></table></div>
-<div class="gametype"><table class="noPadding1"><tr><td>&nbsp;Gametype: ' . $gametypes[file_get_contents("info/" . $dynamicIPAddressPath . "g_gametype.txt")] . '</td></tr></table></div>
+<div class="matchData"><div class="mapName mapnameSize"><table class="noPadding1"><tr><td>&nbsp;Map: <span class="color7">' . file_get_contents("info/" . $dynamicIPAddressPath . "mapname.txt") . '</span></td></tr></table></div>
+
 <br />
-<div class="modName"><table class="noPadding1"><tr><td>&nbsp;Mod Name: ' . file_get_contents("info/" . $dynamicIPAddressPath . "modname.txt") . '</td></tr></table></div>
+<div class="modName modnameSize"><table class="noPadding1"><tr><td>&nbsp;Mod Name: ' . file_get_contents("info/" . $dynamicIPAddressPath . "modname.txt") . '</td></tr></table></div>
+<div class="gametype gametypeSize"><table class="noPadding1"><tr><td>&nbsp;Gametype: ' . $gametypes[file_get_contents("info/" . $dynamicIPAddressPath . "g_gametype.txt")] . '</td></tr></table></div>
 <br />
-<div class="IPAddress"><table class="noPadding2"><tr><td>&nbsp;Server IP: ' . $serverIPAddress . ':' . $serverPort . '</td><td class="blinkingCursor"></td></tr></table>
+<div class="IPAddress IPAddressSize"><table class="noPadding2"><tr><td>&nbsp;Server IP: ' . $serverIPAddress . ':' . $serverPort . '</td><td class="blinkingCursor"></td></tr></table>
 
 
 </div>
@@ -196,7 +194,7 @@ $output .= '">';
 $output .= '<div class="trackerLogoSpacer">
 <div class="timerSpacer"></div>
 
-<div class="reloadTimerOpacityA reloadTimerA reloadTimerTextA hiddenTimer" id="refreshTimerDiv" onclick="toggleReload()">
+<div class="reloadTimerOpacityA reloadTimerA reloadTimerTextA hiddenTimer" title="Click to cancel auto-refresh" id="refreshTimerDiv" onclick="toggleReload()">
 </div>
 </div>';
 $output .= file_get_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt");
@@ -221,7 +219,6 @@ $output .= '<div class="dataFrame">
 $output .= '
 </body></html>';
 
-file_put_contents('info/' . $dynamicIPAddressPath . 'param.html', "");
 }
 
 echo "-->";

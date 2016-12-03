@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ParaTracker - Readme</title>
+<script type="text/javascript">
+function expandCollapse(divName)
+{
+    if(document.getElementById(divName).className == "hidden")
+    {
+        document.getElementById(divName).className = "shown";
+    }
+    else
+    {
+        document.getElementById(divName).className = "hidden";
+    }
+}
+
+</script>
+
+<style>
+
+body
+{
+font-family: monospace;
+text-align: center;
+background-color: #000000;
+color: #FFFFFF;
+font-size: 12pt;
+}
+
+.italic
+{
+font-style: italic;
+}
+
+.width60
+{
+width: 60%;
+}
+
+.width55
+{
+width: 55%;
+}
+
+.width50
+{
+width: 50%;
+}
+
+.width45
+{
+width: 45%;
+}
+
+.width40
+{
+width: 40%;
+}
+
+.width35
+{
+width: 35%;
+}
+
+.width30
+{
+width: 30%;
+}
+
+.width25
+{
+width: 25%;
+}
+
+.width20
+{
+width: 20%;
+}
+
+.date
+{
+color: #FF0000;
+font-weight: bold;
+font-size: 14pt;
+}
+
+.centerPage
+{
+width: 100%;
+text-align: center;
+}
+
+.pageWidth
+{
+width: 1030px;
+display: inline-block;
+}
+
+.cursor
+{
+cursor: pointer;
+}
+
+.hidden
+{
+display: none;
+}
+
+.shown
+{
+display: inline;
+}
+
+.red
+{
+color: #FF0000;
+}
+
+.green
+{
+color: #00FF00;
+}
+
+.blue
+{
+color: #3355FF;
+font-weight: bold;
+}
+
+.pink
+{
+color: #FF00FF;
+}
+
+.gray
+{
+color: #777777;
+}
+
+.orange
+{
+color: #FF8800;
+}
+
+</style>
+</head>
+<body>
+<div class="centerPage">
+<div class="pageWidth">
+
+<h2>
+*******************************************************
+<br /><br />
+&nbsp;&nbsp;<span class="red">Para</span><span class="gray">Tracker</span> - The Ultimate Quake III Server Tracker
+<br /><br />
+*******************************************************
+</h2>
+
+<h3>Title: ParaTracker 1.1</h3>
+
+<h3>Authors: Parabolic Mind - <span class="green">NA</span><span class="pink">B6</span><span class="blue">22</span>, <span class="blue">Phazmatis</span>, <span class="red">Cagelight</span></h3>
+
+<h3>Date released: 12/3/2016</h3>
+
+<p class="italic">Click on a category below to expand it</p>
+
+<hr class="width60" />
+
+<div onclick="expandCollapse('description')" class="cursor">
+<h3>DESCRIPTION:</h3>
+</div>
+<div id="description" class="hidden">
+<p>
+ParaTracker is a server tracker created for Jedi Academy, but it can also track most other Quake III games.<br />
+Jedi Outcast and Tremulous are also supported by default. All you have to do is put ParaTracker on your web server, make sure it has permission to read and write files and directories, then configure it with the IP address, port, and the title of the game running on your server.
+</p>
+<p>
+ParaTracker has two modes: <span class="red">Static</span> and <span class="blue">Dynamic</span>.
+</p>
+<p>
+<span class="red">Static</span> mode runs directly from the settings in <span class="green">ParaConfig.php</span>, and none of the options<br />
+can be changed by the end user.</p>
+<p>
+<span class="blue">Dynamic</span> mode loads all the settings from <span class="green">ParaConfig.php</span>, but it accepts an IP address, port number, skin ID, and game name from the end user. This enables other people to use ParaTracker on their own website, without installing it. This mode is a little risky and should be used with caution.
+</p>
+</div>
+
+<hr class="width55" />
+
+<div onclick="expandCollapse('installationInstructions')" class="cursor">
+<h3>INSTALLATION INSTRUCTIONS:</h3>
+</div>
+<div id="installationInstructions" class="hidden">
+<p>You must have PHP on your web server to use ParaTracker, your web host must allow outgoing connections, and ParaTracker must have permission to read and write files and directories.</p>
+
+<p>To install ParaTracker, just copy all the files from this folder onto your own web server,<br />
+and make sure it has enough free space after installation to write files.<br />
+For <span class="red">static</span> mode (Only tracking one server, which is the default), you should only need about 20 MB of space.<br />
+If you are running in <span class="blue">dynamic</span> mode, make sure there are several hundred MB of space available, as every server that is tracked will cause a new folder to be created and filled with data.</p>
+</div>
+
+<hr class="width50" />
+
+<div onclick="expandCollapse('howToUse')" class="cursor">
+<h3>HOW TO USE PARATRACKER:</h3>
+</div>
+<div id="howToUse" class="hidden">
+
+<p>After installing ParaTracker, open <span class="green">ParaConfig.php</span> in a text editor. Set the IP address and port of your server, as well
+as any other parameters that you feel like changing.</p>
+
+<p>There are comments throughout the file that explain each feature. RCon is available, but is disabled
+by default for security. <span class="blue">Dynamic</span> mode, which enables the user to input their own IP
+address and port, is also disabled by default, because it enables other users to use your
+website's bandwidth, as well as being a security risk. <strong>DO NOT</strong> enable <span class="blue">dynamic</span> mode unless ParaTracker
+is isolated in it's own webroot, as any security holes in ParaTracker could give someone root access
+to your web server.</p>
+
+<h3>If you mess something up in <span class="green">ParaConfig.php</span> and you can't figure it out, delete the file and load <span class="green">ParaTrackerA.php</span> in your browser. A default file will be generated for you, and you can start over.</h3>
+
+<p>To use ParaTracker in <span class="red">static</span> mode (Running strictly with options from <span class="green">ParaConfig.php</span>), load one of the skin files
+on your web browser, like:
+<span class="green">ParaTrackerA.php</span>, <span class="green">ParaTrackerB.php</span>, <span class="green">ParaTrackerC.php</span>, <span class="green">ParaTrackerD.php</span>, and so on.</p>
+
+<p>To insert ParaTracker onto a web page in <span class="red">static</span> mode, add an <strong>&lt;object&gt;</strong> tag somewhere on your website that
+references the skin file you want to use, with the appropriate size and width settings. For instance:</p>
+
+<!--
+<object id="ParaTracker" type="text/html" data="http://www.nab622.com/ParaTracker/ParaTrackerA.php" width="675" height="300" ></object>
+-->
+
+<h3><span class="red">
+&lt;object id="ParaTracker" type="text/html" data="http://www.nab622.com/ParaTracker/<span class="green">ParaTrackerA.php</span>" width="<span class="green">675</span>" height="<span class="green">300</span>"&gt;&lt;/object&gt;
+</span></h3>
+
+<p>In the above sample, <span class="green">ParaTrackerA.php</span> means that it will load skin <span class="green">A</span>, and the <span class="green">width</span> and <span class="green">height</span> settings are set to match the size of the skin.<br />
+For skin <span class="green">B</span>, you would load <span class="green">ParaTrackerB.php</span>, and set the <span class="green">width</span> to <span class="red">600</span> and the <span class="green">height</span> to <span class="red">225</span>. <!-- For skin C, you would load <strong>ParaTrackerC.php</strong>, etc. -->
+</p>
+
+
+<p>To use ParaTracker in <span class="blue">dynamic</span> mode, you first have to enable it in <span class="green">ParaConfig.php</span>. Then, load up
+<span class="green">ParaTrackerDynamic.php</span> in your web browser. An instruction page will appear that will help you get started.
+Remember: other people can use this mode to track their game servers, using your web server as the medium.</p>
+
+
+<p>All RCon usage is logged in the logs/ folder. Inside the logs folder will be a folder named after the server
+IP address and port number of the server, and inside that folder will be <span class="green">RConLog.php</span>. For security reasons,
+you cannot load this file from a web browser - you must download it to your computer, and open it in a text editor.</p>
+</div>
+
+<hr class="width45" />
+
+<div onclick="expandCollapse('levelshots')" class="cursor">
+<h3>LEVELSHOTS:</h3>
+</div>
+<div id="levelshots" class="hidden">
+
+<p>
+ParaTracker will accept custom levelshots for any game it is able to track. It will automatically search for levelshots in a folder named after the game, so you can track many different games at once with only one copy of ParaTracker. The levelshots must be stored in:<br />
+<span class="red">/images/levelshots/&lt;GameName&gt;</span><br />
+So, if you were adding levelshots for <span class="blue">Jedi Academy</span>, you would put them in:<br />
+<span class="red">/images/levelshots/jedi academy</span><br />
+Note that ParaTracker will convert the <span class="blue">game directory</span> name to lowercase automatically, to ensure compatibility with Unix servers.</p>
+
+<p>Levelshots can be <span class="green">.png</span>, <span class="green">.jpg</span> or <span class="green">.gif</span> (And yes, you can animate the .gifs). ParaTracker will look for them in that order, and use whichever one it finds first. If you only have one levelshot, you can just name it after the map name, and ParaTracker will find it. If you have more than one levelshot, add a <span class="green">_1</span> to the end of the filename of the first one, <span class="green">_2</span> to the end of the second one, and so on.<br />
+So, if the map is <span class="red">mp/ffa3</span>, and you have 3 PNG levelshots, you would name them:<br />
+<span class="red">mp/ffa3</span><span class="green">_1</span><span class="red">.png</span>, <span class="red">mp/ffa3</span><span class="green">_2</span><span class="red">.png</span>, and <span class="red">mp/ffa3</span><span class="green">_3</span><span class="red">.png</span>.<br />
+By default, ParaTracker supports 20 levelshots, and can support up to 99 levelshots, but nobody will stick around to view that many, so you should keep it to a decent amount.</p>
+
+<p>ParaTracker can also use any resolution levelshot, but to keep the size reasonable and save on bandwidth, you should make them all the standard resolution of <span class="blue">300 x 225</span>.</p>
+</div>
+
+<hr class="width40" />
+
+<div onclick="expandCollapse('housekeeping')" class="cursor">
+<h3>HOUSEKEEPING:</h3>
+</div>
+<div id="housekeeping" class="hidden">
+
+<p>ParaTracker writes the server data it receives to several files and folders, and if it is loaded before the
+floodprotect time has elapsed, it will serve up the old data again. As long as the IP address and port number
+of the server do not change, the files will be overwritten with every refresh, and everything should be
+dandy. However, when ParaTracker runs in <span class="blue">dynamic</span> mode, it will make a new folder for every IP address
+the users attempt to use. For flood protection reasons, this has to exist, even though it causes a lot of
+extra files to be written.</p>
+
+<p>These files are very small; however, if they take up too much space, you can simply delete the entire <span class="green">info/</span>
+folder. ParaTracker will re-generate the necessary info the next time it runs.</p>
+
+<p>RCon logs are the same way. They shouldn't get very large, and you shouldn't delete them, but if the need
+should arise, just delete the entire <span class="green">logs/</span> folder, and new information will be generated the next time ParaTracker is run.</p>
+</div>
+
+<hr class="width35" />
+
+
+<div onclick="expandCollapse('bugs')" class="cursor">
+<h3>BUGS:</h3>
+</div>
+<div id="bugs" class="hidden">
+
+<p>Currently, there is a bug with error handling.<br />
+The error handling code was written with only one client in mind, not many.<br />
+I will look into this for a future update, but for now, it is shipping as-is,<br />
+because once ParaTracker is set up, there shouldn't be any problems.</p>
+
+<p>
+<a href="http://github.com/ParabolicMinds/ParaTracker" target="_blank">https://github.com/ParabolicMinds/ParaTracker</a>
+</p>
+</div>
+
+<hr class="width30" />
+
+
+<div onclick="expandCollapse('changelog')" class="cursor">
+<h3>CHANGELOG:</h3>
+</div>
+<div id="changelog" class="hidden">
+
+<p>
+<span class="date">12/3/2016</span> Released ParaTracker 1.1, which includes skins A and B.<br />Eight skins are intended total, and each skin will increase the version number by .1.
+</p>
+
+</div>
+
+<hr class="width25" />
+
+
+<div onclick="expandCollapse('credits')" class="cursor">
+<h3>CREDITS:</h3>
+</div>
+<div id="credits" class="hidden">
+
+<p>
+Good coding: <span class="blue">Phazmatis</span> and <span class="red">Cagelight</span><br />
+</p>
+<p>
+Bad coding: <span class="green">NA</span><span class="pink">B6</span><span class="blue">22</span>
+</p>
+<p>
+Tracker images: <span class="green">NA</span><span class="pink">B6</span><span class="blue">22</span> and <span class="red">Cagelight</span>
+</p>
+<p>
+Levelshots: <span class="green">NA</span><span class="pink">B6</span><span class="blue">22</span>, <span class="red">Cagelight</span>, and <span class="red">P</span>ommy<br />
+</p>
+<p>
+Testing: All developers, plus the folks at <span class="orange">jkhub.org</span>
+</p>
+
+</div>
+
+<hr class="width20" />
+
+<h4>LEGAL STUFF:</h4>
+<p>
+ParaTracker is released under the MIT license, which reads thus:
+</p>
+<p>
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+</p>
+<p>
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+</p>
+<p>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</p>
+
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<p>
+Nothing to see here, scroll back up.
+</p>
+
+</div></div></body></html>
