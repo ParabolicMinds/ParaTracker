@@ -563,6 +563,7 @@ background-image: url("images/tracker/refreshTimeTab.png");
 width: 246px;
 height: 225px;
 float: left;
+background: url("images/tracker/param_small_rotated_h.png") no-repeat -99999px -99999px;
 }
 
 /* This class is a container for the "No connection" message */
@@ -580,6 +581,7 @@ width: 246px;
 height: 7px;
 overflow: hidden;
 float: left;
+background: url("images/tracker/rcon_small_rotated_h.png") no-repeat -99999px -99999px;
 }
 
 /* Server name and game name container */
