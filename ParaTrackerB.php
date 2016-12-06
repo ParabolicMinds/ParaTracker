@@ -26,7 +26,7 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
 
 
 //Check to see if an update needs done, and do it
-checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner);
 
 
 if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt") != "")
@@ -118,7 +118,7 @@ $output .= '
 </div>
 <div class="dataRowB">
 <div class="modnameB modnameGametypeBSize">Modname: ' . file_get_contents("info/" . $dynamicIPAddressPath . "modname.txt") . '</div>
-<div class="gametypeB modnameGametypeBSize">Gametype: ' . $gametypes[file_get_contents("info/" . $dynamicIPAddressPath . "g_gametype.txt")] . '</div>
+<div class="gametypeB modnameGametypeBSize">Gametype: ' . file_get_contents("info/" . $dynamicIPAddressPath . "gametype.txt") . '</div>
 </div>
 <div class="dataRowB">
 <div class="IPandPortB">IP: ' . $serverIPAddress . ':' . $serverPort . '<div class="blinkingCursorB">&nbsp;</div>

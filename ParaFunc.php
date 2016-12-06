@@ -4,9 +4,14 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    Return("1.1");
+    Return("1.1.1");
 }
- 
+
+//This is here to suppress error messages
+$dynamicIPAddressPath = "";
+$lastRefreshTime = "";
+$floodProtectTimeout = "";
+
 //If this file is executed directly, then echoing this value here will display the version number before exiting.
 //If the file is executed from one of the skin files, then this will end up in an HTML comment and will not be visible.
 //Either way, the version number will be visible.
@@ -14,7 +19,7 @@ echo " ParaTracker " . versionNumber() . " ";
  
 if (!isset($safeToExecuteParaFunc))
 {
-    displayError("ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerA.php or ParaTrackerDynamic.php instead.");
+    displayError("ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerA.php or ParaTrackerDynamic.php instead.", $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
 }
 
 if (file_exists("ParaConfig.php"))
@@ -26,11 +31,11 @@ else
     writeNewConfigFile();
     if (file_exists("ParaConfig.php"))
     {
-        displayError("ParaConfig.php not found! A default config file has been written to disk.<br />Please add an IP Address and port to it.");
+        displayError("ParaConfig.php not found! A default config file has been written to disk.<br />Please add an IP Address and port to it.", $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
     }
     else
     {
-        displayError("ParaConfig.php not found! Attempted to write a default config file, but failed!<br />Make sure ParaTracker has file system access, and that the disk is not full!");
+        displayError("ParaConfig.php not found! Attempted to write a default config file, but failed!<br />Make sure ParaTracker has file system access, and that the disk is not full!", $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
     }
 }
 
@@ -123,7 +128,8 @@ $RConLogSize = numericValidator($RConLogSize, 100, 100000, 1000);
 $newWindowSnapToCorner = booleanValidator($newWindowSnapToCorner, 0);
 
 //The IP address has already been validated, so we can use it for a directory name
-$dynamicIPAddressPath = $serverIPAddress . "-" . $serverPort . "/";
+//Make sure we convert the path to lowercase when creating folders for it, or else the flood protection could be bypassed!
+$dynamicIPAddressPath = strtolower($serverIPAddress . "-" . $serverPort . "/");
 
 //Add some checks to make sure we have directories for the stuff
 checkDirectoryExistence("info/", "");
@@ -142,8 +148,10 @@ autoRefreshScript($dynamicIPAddressPath, $enableAutoRefresh, $autoRefreshTimer);
 
 function checkForMissingFiles($dynamicIPAddressPath)
 {
+    checkFileExistence("BitFlags.php", "");
     checkFileExistence("connectionErrorMessage.txt", "info/" . $dynamicIPAddressPath);
-    checkFileExistence("g_gametype.txt", "info/" . $dynamicIPAddressPath);
+    checkFileExistence("errorMessage.txt", "info/" . $dynamicIPAddressPath);
+    checkFileExistence("gametype.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("gamename.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("levelshotJavascriptAndCSS.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("mapname.txt", "info/" . $dynamicIPAddressPath);
@@ -169,7 +177,7 @@ function checkFileExistence($filename, $dynamicIPAddressPath)
         file_put_contents($dynamicIPAddressPath . $filename, "");
         if (!file_exists($dynamicIPAddressPath . $filename))
         {
-            displayError("Failed to create file " . $dynamicIPAddressPath . $filename . "!<br />Make sure ParaTracker has file system access, and that the disk is not full!");
+            displayError("Failed to create file " . $dynamicIPAddressPath . $filename . "!<br />Make sure ParaTracker has file system access, and that the disk is not full!", $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
         }
     }
 }
@@ -182,7 +190,7 @@ function checkDirectoryExistence($dirname, $dynamicIPAddressPath)
     }
     if (!file_exists($dynamicIPAddressPath . $dirname))
     {
-        displayError("Failed to create directory " . $dynamicIPAddressPath . $dirname . " in ParaTracker folder!<br />Cannot continue without file system access!");
+        displayError("Failed to create directory " . $dynamicIPAddressPath . $dirname . " in ParaTracker folder!<br />Cannot continue without file system access!", $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
     }
 }
 
@@ -218,7 +226,7 @@ function checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder)
     return $levelshotFolder;
 }
 
-function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner)
 {
 
     //Check the time delay between refreshes. Make sure we wait if need be
@@ -229,67 +237,83 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
 
         if ($lastRefreshTime + $floodProtectTimeout < time())
         {
+
             //Prevent users from aborting the page! This will reduce load on both the game server and the web server
             //by forcing the refresh to finish.
             ignore_user_abort(true);
 
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
 
-            doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags);
+            //Remove any lingering error messages. We will write a new one later if we encounter another error.
+            file_put_contents("info/" . $dynamicIPAddressPath . "errorMessage.txt", "");
+
+            doUpdate("0", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner);
 
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", time());
+
+		    //If someone loads a dynamic tracker with the same IP and port number, and the wrong
+            //game name, we don't want it to look wrong to other users. So we'll write the game name to a special file,
+            //and if the tracker is re-run with the wrong one, we'll re-parse the server dump accordingly.
+            file_put_contents("info/" . $dynamicIPAddressPath . "gamename.txt", $gameName);
 
             //Allow users to abort the page again.
             ignore_user_abort(false);
 
-            //Update gamename.txt
-		    //If someone loads a dynamic tracker with the same IP and port number, and the wrong
-            //game name, we don't want it to affect other users.
-		    file_put_contents("info/" . $dynamicIPAddressPath . "gamename.txt", $gameName);
-
         }
         else
         {
-            //Even if it isn't time to update, we need to check if the gameName has changed from what is in the text file.
-            //If it has, we must rewrite the levelshot code.
+            //Even if it isn't time to update, we have a little more work to do.
+            //First, did ParaTracker terminate with an error last time?
+            $printErrorMessage = trim(file_get_contents("info/" . $dynamicIPAddressPath . "errorMessage.txt"));
+            if($printErrorMessage != "")
+            {
+                //ParaTracker terminated with an error last time. Display it and the remaining time before the next refresh!
+                echo $printErrorMessage . "<br />" . ($lastRefreshTime + $floodProtectTimeout - time()) . " seconds before next attempt.";
+            }
+
+            //Next we need to check if the gameName has changed from what is in the text file.
+            //If it has, we must re-parse the serverDump accordingly.
             if (file_get_contents("info/" . $dynamicIPAddressPath . "gamename.txt") != $gameName)
             {
-                $levelshotBufferArray = levelshotfinder(file_get_contents("info/" . $dynamicIPAddressPath . "mapname_raw.txt"), $maximumLevelshots, $fadeLevelshots, $levelshotFolder);
-                $levelshotBuffer = $levelshotBufferArray[0];
-                $levelshotCount = $levelshotBufferArray[1];
+                //Save the old refresh time so we can put it back afterward
+                $oldRefreshTime = file_get_contents("info/" . $dynamicIPAddressPath . "time.txt");
+                file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
 
-		        levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotFolder);
+                doUpdate("1", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner);
 
-		        //Update gamename.txt
-		        file_put_contents("info/" . $dynamicIPAddressPath . "gamename.txt", $gameName);
+                //Put the old refresh time back into time.txt
+                file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", $oldRefreshTime);
 
             }
         }
 }
 
-function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dmflags, $forcePowerFlags, $weaponFlags)
+function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner)
 {
-    //On with the good stuff!
-	$fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, $connectionTimeout);
-	fwrite($fp, str_repeat(chr(255),4) . "getstatus\n");
-	$s='';
-	stream_set_timeout($fp, $connectionTimeout);
-
-	while (false !== ($char = fgetc($fp)))
-	{
-		$s .= $char;
-	}
-	fclose($fp);
-
 	//Before we start, wipe out the parameter list. That way, if we encounter an error later, the list does not remain
     file_put_contents('info/' . $dynamicIPAddressPath . 'param.html', "");
 
-	if(strlen($s) > $maximumServerInfoSize)
-	{
-	    displayError('Received too much data!<br />' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.');
-	}
+    if($useOldServerDump != "1")
+    {
+        //On with the good stuff!
+        $fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, $connectionTimeout);
+        fwrite($fp, str_repeat(chr(255),4) . "getstatus\n");
+        $s='';
+        stream_set_timeout($fp, $connectionTimeout);
 
-	//This file is used for determining if the server connection was successful, plus it's good for debugging
+        while (false !== ($char = fgetc($fp)))
+        {
+		    $s .= $char;
+		}
+        fclose($fp);
+
+
+        if(strlen($s) > $maximumServerInfoSize)
+        {
+	        displayError('Received too much data!<br />' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.', $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
+	        }
+
+	//This file is used for determining if the server connection was successful and regenerating dynamic content, plus it's good for debugging
 	file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
 
 	if($errstr == "" && $s == "")
@@ -298,6 +322,12 @@ function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodPr
 	    echo "No response in " . $connectionTimeout . " seconds.";
 	}
 	file_put_contents("info/" . $dynamicIPAddressPath . "connectionErrorMessage.txt", stringValidator($errstr, "", ""));
+
+    }
+    else
+    {
+        $s = file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt");
+	}
 
 	if(strlen($s))
 	{
@@ -328,7 +358,7 @@ function doUpdate($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodPr
 		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner);
 
 		//This has to be last, because the timer will output on this page
-		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags, $parseTimer);
+		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameName, $cvar_array_single, $parseTimer);
 
 	}
 }
@@ -377,7 +407,6 @@ $player_array = "";
 		    file_put_contents('info/' . $dynamicIPaddressPath . 'sv_hostname.txt', colorize($cvars_hash["hostname"]));
 		}
 		file_put_contents('info/' . $dynamicIPaddressPath . 'sv_maxclients.txt', $cvars_hash["sv_maxclients"]);
-		file_put_contents('info/' . $dynamicIPaddressPath . 'g_gametype.txt', $cvars_hash["g_gametype"]);
 		file_put_contents('info/' . $dynamicIPaddressPath . 'modname.txt', colorize($cvars_hash["gamename"]));
 		file_put_contents('info/' . $dynamicIPaddressPath . 'mapname.txt', colorize($cvars_hash["mapname"]));
 		//This line is needed for Dynamic Paratracker to use levelshots correctly
@@ -386,7 +415,7 @@ $player_array = "";
 		return(array($cvar_array_single, $cvars_hash, $player_array, $playerParseCount));
 }
 
-function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_array_single, $dmflags, $forcePowerFlags, $weaponFlags, $parseTimer)
+function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameName, $cvar_array_single, $parseTimer)
 {
 		$buf = '</head>
 		<body class="cvars_page">
@@ -395,29 +424,85 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $cvar_ar
 		<table class="FullSizeCenter"><tr><td><table><tr class="cvars_titleRow cvars_titleRowSize"><td class="nameColumnWidth">Name</td><td class="valueColumnWidth">Value</td></tr>' . "\n";
 		$c = 1;
 
+		//BitFlags.php must be included here.
+		if(file_exists("BitFlags.php"))
+		{
+		$safeToExecuteBitFlags = "1";
+		include('BitFlags.php');
+		}
+		else
+		{
+		    //Lack of BitFlags.php is not a fatal error. Just echo a warning and ignore.
+		    echo " Could not find BitFlags.php! This error is not fatal, but ParaTracker cannot parse gametypes or bitflags. ";
+		}
+
+		//We'll need a new copy of game name to toy with for this part
+		//Pull out invalid characters and make it lowercase
+		$bitFlagGameName = preg_replace("/[^a-z0-9]/", "", strtolower($gameName));
+
+		if(function_exists($bitFlagGameName) && is_callable($bitFlagGameName))
+		{
+		    //Remove the index
+		    $bitFlagsData = $bitFlagGameName();
+		    $bitFlagsIndex = array_shift($bitFlagsData);
+		    
+		    //Remove the gametype array, as it is not a bitflag
+		    $gametypeCVarName = strtolower(array_shift($bitFlagsIndex));
+		    $gametypeArray = array_shift($bitFlagsData);
+		    
+		    //Parse the arrays into variables named after the CVars
+		    for($i = 0; $i < count($bitFlagsData); $i++)
+		    {
+		        $$bitFlagsIndex[$i] = $bitFlagsData[$i];
+		    }
+		}
+		else
+		{
+		    if(!is_callable($bitFlagGameName))
+		    {
+		        echo " Could not load bit flag data for " . $gameName . " due to an invalid function name! This error is not fatal, but ParaTracker cannot parse gametypes or bitflags. Contact the ParaTracker team with the game name, as this is a bug that must be fixed. ";
+		    }
+		    else
+		    {
+		        echo " Could not find bit flag data for " . $gameName . "! This error is not fatal, but ParaTracker cannot parse gametypes or bitflags. ";
+		    }
+        }
+
 		foreach($cvar_array_single as $cvar)
 		{
 			$buf .= '<tr class="cvars_row' . $c . '"><td class="nameColumnWidth">' . $cvar['name'] . '</td><td class="valueColumnWidth">';
+
 			if ((($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'hostname') || ($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
 			{
 				$buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
 			}
-		    //Check for flags, and if they are present let's sort them into something useful...
-			elseif ($cvar['name'] == 'dmflags')
-			{
-			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $dmflags);
-			}
-			elseif ($cvar['name'] == 'g_weaponDisable')
-			{
-			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $weaponFlags);
-			}
-			elseif ($cvar['name'] == 'g_forcePowerDisable')
-			{
-			    $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $forcePowerFlags);
-			}
 			else
 			{
-			$buf .= $cvar['value'];
+			    //We need to check for the bitflag variables here, and calculate them if there is a match
+			    $foundMatch = 0;
+			    for($i = 0; $i < count($bitFlagsIndex) && $foundMatch == 0; $i++)
+			    {
+			        $cvar['name'] = strtolower($cvar['name']);
+
+			        if($cvar['name'] == strtolower($bitFlagsIndex[$i]))
+			        {
+			            $foundMatch = 1;
+			            $buf .= bitvalueCalculator($cvar['name'], $cvar['value'], $$bitFlagsIndex[$i]);
+			        }
+			        else
+			        {
+			            if($cvar['name'] == $gametypeCVarName)
+			            {
+			                $buf .= $cvar['value'] . ' (<b>' . $gametypeArray[$cvar['value']] . '</b>)';
+			                file_put_contents('info/' . $dynamicIPAddressPath . 'gametype.txt', $gametypeArray[$cvar['value']]);
+			                $foundMatch = 1;
+			            }
+			        }
+			    }
+			    if($foundMatch == 0)
+			    {
+			        $buf .= $cvar['value'];
+			    }
 			}
 			$buf .= '</td></tr>' . "\n";
 			$c++;
@@ -878,28 +963,33 @@ return $input;
 
 function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 {
-    if($input == "" && $dynamicTrackerEnabled == "0")
-    {
-        displayError('Invalid IP address! ' . stringValidator($input) . '<br />Please add an IP Address and port to ParaConfig.php</h3>');
-    }
-
     //Remove whitespace
     $input = trim($input);
 
-    //If no IP was given, we need to make sure the client knows to check ParaConfig.php
+    //Check to see if an address was supplied
     if($input == "")
     {
-        displayError("No server address specified in ParaConfig.php!");
+        //No address. Are we running in dynamic mode?
+        if($dynamicTrackerEnabled == "0")
+        {
+            //We are in static mode, so ParaConfic.php is the problem
+            displayError("No server address specified in ParaConfig.php!", $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
+        }
+        else
+        {
+            //We are in Dynamic mode, so the user did not give an address
+            displayError('Invalid IP address! ' . stringValidator($input) . '<br />Please add an IP Address and port to ParaConfig.php</h3>', $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
+        }
     }
 
     //Use a PHP function to check validity
     if (!filter_var($input, FILTER_VALIDATE_IP) && $input != "localhost")
     {
-        //getbyhostname returns the input string on failure. So, to test if this is a 
+        //getbyhostname returns the input string on failure. So, to test if this is a failure, we test it against itself
         if(gethostbyname($input) == $input)
         {
             //DNS test failed. Just error out.
-            displayError('Invalid domain name! ' . stringValidator($input, "", "") . '<br />Check the address and try again.</h3>');
+            displayError('Invalid domain name! ' . stringValidator($input, "", "") . '<br />Check the address and try again.</h3>', $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
         }
         else
         {
@@ -907,11 +997,11 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
             {
                 If($dynamicTrackerEnabled == "1")
                 {
-                    displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Check the IP address and try again.</h3>');
+                    displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Check the IP address and try again.</h3>', $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
                 }
                 else
                 {
-                    displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Check the IP address in ParaConfig.php</h3>');
+                    displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Check the IP address in ParaConfig.php</h3>', $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
                 }
             }
         }
@@ -939,7 +1029,7 @@ function skinValidator($paraTrackerSkin)
     {
         if(!file_exists("ParaTrackerA.php"))
         {
-            displayError("Invalid skin specified!<br />Default skin could not be found!");
+            displayError("Invalid skin specified!<br />Default skin could not be found!", $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
         }
         else
         {
@@ -950,13 +1040,25 @@ function skinValidator($paraTrackerSkin)
     return $paraTrackerSkin;
 }
 
-function displayError($errorMessage)
+function displayError($errorMessage, $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout)
 {
     if(trim($errorMessage) == "")
     {
         $errorMessage = "An unknown error has occurred!<br />ParaTracker must terminate.";
     }
-    echo '<!-- --><h3 class="errorMessage">' . $errorMessage . '</h3>';
+    $errorMessage = '<!-- --><h3 class="errorMessage">' . $errorMessage . '</h3>';
+
+    //Error detected and ParaTracker is terminating. Check to see if we have a file path and refresh time data.
+    if($dynamicIPAddressPath != "" && $lastRefreshTime != "" && $floodProtectTimeout != "")
+    {
+        //We have a file path! Write the error message to a file, update both of the refresh timers, and terminate!
+        file_put_contents("info/" . $dynamicIPAddressPath . "errorMessage.txt", $errorMessage);
+        file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", time());
+        file_put_contents("info/" . $dynamicIPAddressPath . "RConTime.txt", time());
+    }
+    //If no file path was given, flood protection will not be necessary, as ParaTracker never had a chance to contact the server.
+    //so it is safe to terminate regardless of whether there was a file path or not.
+    echo $errorMessage;
     exit();
 }
 
@@ -975,7 +1077,7 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
             elseif ($cvarValue >= pow(2, $index))
             {
                 //Miscount detected! Array does not have enough values
-                $output .= "<br />Miscount detected! Not enough values in the array for " . $cvarName . ". Check ParaConfig.php and add the missing values!";
+                $output .= "<br />Miscount detected! Not enough values in the array for " . $cvarName . ". Check BitFlags.php and add the missing values!";
             }
             else
             {
@@ -1008,6 +1110,14 @@ function htmlDeclarations($pageTitle, $filePath)
     <meta charset="Windows-1252">
     <link rel="stylesheet" href="' . $filePath . 'Config-DoNotEdit.css" type="text/css" />
     <link rel="stylesheet" href="' . $filePath . 'ParaStyle.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaSkinA.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaSkinB.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaSkinC.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaSkinD.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaSkinE.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaSkinF.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaSkinG.css" type="text/css" />
+    <link rel="stylesheet" href="' . $filePath . 'ParaSkinH.css" type="text/css" />
     <title>' . $pageTitle . '</title>
     <script src="' . $filePath . 'ParaScript.js"></script>';
     return $output;
@@ -1242,14 +1352,14 @@ $configBuffer = '<?php
 
 // This is the config file for ParaTracker.
 // The only visual setting found here is the frame border.
-// If you want to edit fonts and colors,
-// they are found in ParaStyle.css, not here.
+// If you want to edit fonts and colors, they are found
+// in ParaStyle.css and the ParaSkin.css files, not here.
 
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
 
 // If this file ever breaks and you have no idea what is wrong, just delete it.
-// When ParaTracker is run, it will write a new one.
+// When ParaTracker is run, it will write a new one for you.
 
 // If you find any exploits in the code, please bring them to my attention immediately!
 // Thank you and enjoy!
@@ -1257,7 +1367,6 @@ $configBuffer = '<?php
 
 // NETWORK SETTINGS
 // NETWORK SETTINGS
-
 
 // This is the IP Address of the server. Do not include the port number!
 // By default, and for security, this value is empty. If ParaTracker is launched without a value here,
@@ -1440,75 +1549,6 @@ $RConLogSize = "1000";
 // Does not appear to work correctly in Google Chrome.
 // Default is 0.
 $newWindowSnapToCorner = "0";
-
-
-// GAMETYPE NAMES
-// GAMETYPE NAMES
-
-// The following is an array of gametypes. These are used when ParaTracker
-// tries to identify a gametype. The array is listed with gametype 1 in the
-// first value, gametype 2 in the second value, and so on. If you do not know
-// what this is, do not change it, as ParaTracker cannot correct this if it
-// is broken. The default value is:
-// $gametypes = array("FFA", "", "", "Duel", "Power Duel", "", "Team FFA", "Siege", "CTF");
-
-$gametypes = array("FFA", "", "", "Duel", "Power Duel", "", "Team FFA", "Siege", "CTF");
-
-
-// DMFLAGS
-// DMFLAGS
-
-// The following is an array used to determine what the dmflags parameter controls.
-// dmflags is a bit value, and each value in this array is entered in numeric order,
-// from the lowest value to the highest. The only reason it is in the config file is
-// in case ParaTracker is being used by some other game than Jedi Academy, so that you,
-// the user, can change it to match whatever game you like.
-// The first value is for dmflags 1, the second value is for dmflags 2, the third is for
-// dmflags 4, the fourth is dmflags 8, the fifth is dmflags 16, and so on.
-// Blank values should be indicated by two double-quotes. ParaTracker will ignore them.
-// If you do not know what this is, do not change it, as ParaTracker cannot correct this
-// if it is broken. The default value is:
-// $dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
-
-$dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
-
-
-// WEAPON FLAGS
-// WEAPON FLAGS
-
-// The following is an array used to determine what the g_weaponDisable parameter controls.
-// g_weaponDisable is a bit value, and each value in this array is entered in numeric order,
-// from the lowest value to the highest. The only reason it is in the config file is
-// in case ParaTracker is being used by some other game than Jedi Academy, so that you,
-// the user, can change it to match whatever game you like.
-// The first value is for g_weaponDisable 1, the second value is for g_weaponDisable 2, the
-// third is for g_weaponDisable 4, the fourth is g_weaponDisable 8, the fifth is
-// g_weaponDisable 16, and so on.
-// Blank values should be indicated by two double-quotes. ParaTracker will ignore them.
-// If you do not know what this is, do not change it, as ParaTracker cannot correct this
-// if it is broken. The default value is:
-// $weaponFlags = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "FC1 Flechette", "Rocket Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
-
-$weaponFlags = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "Golan Arms FC1 Flechette", "Merr-Sonn Portable Missile Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
-
-
-// FORCE POWER FLAGS
-// FORCE POWER FLAGS
-
-// The following is an array used to determine what the g_forcePowerDisable parameter controls.
-// g_forcePowerDisable is a bit value, and each value in this array is entered in numeric order,
-// from the lowest value to the highest. The only reason it is in the config file is
-// in case ParaTracker is being used by some other game than Jedi Academy, so that you,
-// the user, can change it to match whatever game you like.
-// The first value is for g_forcePowerDisable 1, the second value is for g_forcePowerDisable 2, the
-// third is for g_forcePowerDisable 4, the fourth is g_forcePowerDisable 8, the fifth is
-// g_forcePowerDisable 16, and so on.
-// Blank values should be indicated by two double-quotes. ParaTracker will ignore them.
-// If you do not know what this is, do not change it, as ParaTracker cannot correct this
-// if it is broken. The default value is:
-// $forcePowerFlags = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", "Grip", "Lightning", "Rage", "Protect", "Absorb", "Team Heal", "Team Force", "Drain", "Sight", "Saber Offense", "Saber Defense", "Saber Throw");
-
-$forcePowerFlags = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", "Grip", "Lightning", "Rage", "Protect", "Absorb", "Team Heal", "Team Force", "Drain", "Sight", "Saber Offense", "Saber Defense", "Saber Throw");
 
 
 // End of config file
