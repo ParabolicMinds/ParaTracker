@@ -1,0 +1,150 @@
+/*
+This file contains all the fonts and color styles for
+ParaTracker Skin B.
+Edit it however you see fit.
+
+If you are looking for the tracker configuration,
+you will find it in ParaConfig.php
+*/
+
+
+
+/*
+SKIN B CLASSES
+SKIN B CLASSES
+*/
+
+.BackgroundColorImageB
+{
+
+/* This next line is the background color of the tracker.
+The numbers are given in RGBA, which is Red, Green, Blue, and Alpha.
+All values are 0 to 255, except alpha which is 0 to 1.
+0 is transparent, 1 is solid.
+Default is: background-color: rgba(0, 0, 0, 1);
+*/
+background-color: rgba(0, 0, 0, 1);
+
+/* If you want a background image on the tracker,
+this next line is the place to add it. */
+background-image: url("");
+}
+
+/* This class sets the opacity of the reload timer */
+.reloadTimerOpacityB
+{
+opacity: 0.25;
+}
+
+/* This class is for the text in the timer, at the left */
+.reloadTimerTextB
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family: monospace;
+font-weight:bold;
+}
+
+/* This class is for the text when a server could not be reached */
+.noConnectionFrameB
+{
+color:#EFEFEF;
+font-size:10pt;
+font-family: monospace;
+text-align: center;
+}
+
+/* This is the server name, shown at the top of the tracker */
+.serverNameB
+{
+color:#EFEFEF;
+font-size:12pt;
+font-family:"Trebuchet MS";
+font-weight:bold;
+}
+
+/* This is the title of the game, underneath the server name */
+.gamenameB
+{
+color:#808080;
+font-size:8pt;
+font-family: verdana;
+font-style:italic;
+}
+
+/* This class is for the Name column header on the player list */
+.playerNameB
+{
+font-size:8pt;
+font-family: monospace;
+color: #FFFFBB;
+}
+
+/* This class is for the Score column header on the player list */
+.playerScoreB
+{
+font-size:8pt;
+font-family: monospace;
+color: #FFFFBB;
+}
+
+/* This class is for the Ping column header on the player list */
+.playerPingB
+{
+font-size:8pt;
+font-family: monospace;
+color: #FFFFBB;
+}
+
+/* This class is used to style the message when there are no players online */
+.noPlayersOnlineB
+{
+color: #FFFFFF;
+font-size:9pt;
+font-family: monospace;
+text-align: left;
+}
+
+/* This is the map name, in the bottom left data area. Colors may not apply, since map names are colorized */
+.mapnameB 
+{
+color: #FFFFFF;
+font-size: 8pt;
+font-family: monospace;
+vertical-align: middle;
+text-align: left;
+font-weight:bold;
+}
+
+/* This is the gametype, in the bottom left data area */
+.gametypeB 
+{
+color: #FFFFFF;
+font-size: 8pt;
+font-family: monospace;
+vertical-align: middle;
+text-align: left;
+font-weight:bold;
+}
+
+/* This is the mod name, in the bottom left data area */
+.modnameB 
+{
+color: #FFFFFF;
+font-size: 8pt;
+font-family: monospace;
+vertical-align: middle;
+text-align: left;
+font-weight:bold;
+}
+
+/* This is the mod name, in the bottom left data area */
+.IPandPortB 
+{
+color: #FFFFFF;
+font-size: 8pt;
+font-family: monospace;
+vertical-align: middle;
+text-align: left;
+font-weight:bold;
+}

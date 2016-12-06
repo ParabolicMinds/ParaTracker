@@ -1,0 +1,169 @@
+/*
+This file contains all the fonts and color styles for
+ParaTracker Skin A.
+Edit it however you see fit.
+
+If you are looking for the tracker configuration,
+you will find it in ParaConfig.php
+*/
+
+
+
+/*
+SKIN A CLASSES
+SKIN A CLASSES
+*/
+
+.BackgroundColorImageA
+{
+
+/* This next line is the background color of the tracker.
+The numbers are given in RGBA, which is Red, Green, Blue, and Alpha.
+All values are 0 to 255, except alpha which is 0 to 1.
+0 is transparent, 1 is solid.
+Default is: background-color: rgba(0, 0, 0, 1);
+*/
+background-color: rgba(0, 0, 0, 1);
+
+/* If you want a background image on the tracker,
+this next line is the place to add it. */
+background-image: url("");
+}
+
+/* This class sets the opacity of the reload timer */
+.reloadTimerOpacityA
+{
+opacity: 0.25;
+}
+
+/* This class is for the text in the timer, at the left */
+.reloadTimerTextA
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family: monospace;
+font-weight:bold;
+}
+
+/* This is the server name, shown at the top of the tracker */
+.serverName
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family:"Trebuchet MS";
+font-weight:bold;
+}
+
+/* This is the title of the game, shown just below the server name */
+.gameTitle
+{
+color:#808080;
+font-size:10pt;
+font-family: verdana;
+font-style:italic;
+}
+
+/* This is the color of the Name Score and Ping column headers for the player list */
+.nameScorePing
+{
+color:#FFFFBB;
+}
+
+/* This class is used for the odd rows in the player list */
+.playerRow1
+{
+background-color:#191919;
+font-family:monospace;
+color: #FFFFFF;
+}
+
+/* This class is used for the even rows in the player list */
+.playerRow2
+{
+background-color:#2a2a2a;
+font-family:monospace;
+color: #FFFFFF;
+}
+
+/* All player names use this class */
+.playerName
+{
+font-size:10pt;
+font-family: monospace;
+}
+
+/* All player scores use this class */
+.playerScore
+{
+font-size:10pt;
+font-family: monospace;
+text-align: center;
+}
+
+/* All player pings use this class */
+.playerPing
+{
+font-size:10pt;
+font-family: monospace;
+text-align: center;
+}
+
+/* This class is used to style the message when there are no players online */
+.noPlayersOnline
+{
+color: #FFFFFF;
+font-size:10pt;
+font-family: monospace;
+text-align: left;
+}
+
+/* This class is used for the player count, displayed on the bottom left */
+.playerCount
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family:arial;
+vertical-align: middle;
+text-align: center;
+}
+
+/* This class is used for the map name, below the levelshot */
+.mapName
+{
+color:#EEEEEE;
+font-size:9pt;
+font-family:monospace;
+}
+
+/* This class is used for the gametype, below the levelshot */
+.gametype
+{
+color:#EFEFEF;
+font-size:9pt;
+font-family:monospace;
+}
+
+/* This class is used for the mod name, below the levelshot */
+.modName
+{
+color:#EFEFEF;
+font-size:9pt;
+font-family:monospace;
+}
+
+/* This class is used for the IP address, below the levelshot */
+.IPAddress
+{
+color: #EFEFEF;
+font-size: 9pt;
+font-family: monospace;
+}
+
+/* Used for the text on the "Could Not Connect" page */
+.couldNotConnectText
+{
+color:#EEEEEE;
+font-size:11pt;
+font-family: monospace;
+}
+

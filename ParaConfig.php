@@ -5,14 +5,14 @@
 
 // This is the config file for ParaTracker.
 // The only visual setting found here is the frame border.
-// If you want to edit fonts and colors,
-// they are found in ParaStyle.css, not here.
+// If you want to edit fonts and colors, they are found
+// in ParaStyle.css and the ParaSkin.css files, not here.
 
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
 
 // If this file ever breaks and you have no idea what is wrong, just delete it.
-// When ParaTracker is run, it will write a new one.
+// When ParaTracker is run, it will write a new one for you.
 
 // If you find any exploits in the code, please bring them to my attention immediately!
 // Thank you and enjoy!
@@ -20,7 +20,6 @@
 
 // NETWORK SETTINGS
 // NETWORK SETTINGS
-
 
 // This is the IP Address of the server. Do not include the port number!
 // By default, and for security, this value is empty. If ParaTracker is launched without a value here,
@@ -203,75 +202,6 @@ $RConLogSize = "1000";
 // Does not appear to work correctly in Google Chrome.
 // Default is 0.
 $newWindowSnapToCorner = "0";
-
-
-// GAMETYPE NAMES
-// GAMETYPE NAMES
-
-// The following is an array of gametypes. These are used when ParaTracker
-// tries to identify a gametype. The array is listed with gametype 1 in the
-// first value, gametype 2 in the second value, and so on. If you do not know
-// what this is, do not change it, as ParaTracker cannot correct this if it
-// is broken. The default value is:
-// $gametypes = array("FFA", "", "", "Duel", "Power Duel", "", "Team FFA", "Siege", "CTF");
-
-$gametypes = array("FFA", "", "", "Duel", "Power Duel", "", "Team FFA", "Siege", "CTF");
-
-
-// DMFLAGS
-// DMFLAGS
-
-// The following is an array used to determine what the dmflags parameter controls.
-// dmflags is a bit value, and each value in this array is entered in numeric order,
-// from the lowest value to the highest. The only reason it is in the config file is
-// in case ParaTracker is being used by some other game than Jedi Academy, so that you,
-// the user, can change it to match whatever game you like.
-// The first value is for dmflags 1, the second value is for dmflags 2, the third is for
-// dmflags 4, the fourth is dmflags 8, the fifth is dmflags 16, and so on.
-// Blank values should be indicated by two double-quotes. ParaTracker will ignore them.
-// If you do not know what this is, do not change it, as ParaTracker cannot correct this
-// if it is broken. The default value is:
-// $dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
-
-$dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
-
-
-// WEAPON FLAGS
-// WEAPON FLAGS
-
-// The following is an array used to determine what the g_weaponDisable parameter controls.
-// g_weaponDisable is a bit value, and each value in this array is entered in numeric order,
-// from the lowest value to the highest. The only reason it is in the config file is
-// in case ParaTracker is being used by some other game than Jedi Academy, so that you,
-// the user, can change it to match whatever game you like.
-// The first value is for g_weaponDisable 1, the second value is for g_weaponDisable 2, the
-// third is for g_weaponDisable 4, the fourth is g_weaponDisable 8, the fifth is
-// g_weaponDisable 16, and so on.
-// Blank values should be indicated by two double-quotes. ParaTracker will ignore them.
-// If you do not know what this is, do not change it, as ParaTracker cannot correct this
-// if it is broken. The default value is:
-// $weaponFlags = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "FC1 Flechette", "Rocket Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
-
-$weaponFlags = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "Golan Arms FC1 Flechette", "Merr-Sonn Portable Missile Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
-
-
-// FORCE POWER FLAGS
-// FORCE POWER FLAGS
-
-// The following is an array used to determine what the g_forcePowerDisable parameter controls.
-// g_forcePowerDisable is a bit value, and each value in this array is entered in numeric order,
-// from the lowest value to the highest. The only reason it is in the config file is
-// in case ParaTracker is being used by some other game than Jedi Academy, so that you,
-// the user, can change it to match whatever game you like.
-// The first value is for g_forcePowerDisable 1, the second value is for g_forcePowerDisable 2, the
-// third is for g_forcePowerDisable 4, the fourth is g_forcePowerDisable 8, the fifth is
-// g_forcePowerDisable 16, and so on.
-// Blank values should be indicated by two double-quotes. ParaTracker will ignore them.
-// If you do not know what this is, do not change it, as ParaTracker cannot correct this
-// if it is broken. The default value is:
-// $forcePowerFlags = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", "Grip", "Lightning", "Rage", "Protect", "Absorb", "Team Heal", "Team Force", "Drain", "Sight", "Saber Offense", "Saber Defense", "Saber Throw");
-
-$forcePowerFlags = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", "Grip", "Lightning", "Rage", "Protect", "Absorb", "Team Heal", "Team Force", "Drain", "Sight", "Saber Offense", "Saber Defense", "Saber Throw");
 
 
 // End of config file
