@@ -256,7 +256,6 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
             ignore_user_abort(true);
 
             //Check to see if we were forced here. If so, change the refresh time value so that other users will wait for our refresh. This will prevent an accidental DOS of the server during high traffic.
-            echo " " . substr(trim(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt")), 0, 4) . " ";
             if(substr(trim(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt")), 0, 4) == "wait")
             {
                 file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait" . rand(0, getrandmax()));
