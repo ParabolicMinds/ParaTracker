@@ -489,7 +489,7 @@ overflow: hidden;
 }
 
 /* This class is a wrapper for the entire left side contents of the tracker */
-.trackerLogoRConParamTimerWrapper
+.trackerLogoRConParamTimerWrapperB
 {
 width: 45px;
 height: 225px;
@@ -755,9 +755,10 @@ float: left;
 .modnameGametypeBSize
 {
 height: 12px;
-width: 123px;
+width: 119px;
 overflow: hidden;
 float: left;
+padding-right: 4px;
 }
 
 /* This class is for the blinking cursor at the end of the IP address */
@@ -801,6 +802,352 @@ user-select: none;
 .levelshotCornerB
 {
 background-image: url("images/tracker/Tracker_Skin_B_Side_Frame.png");
+}
+
+
+
+/*
+SKIN C CLASSES
+SKIN C CLASSES
+*/
+
+
+/* This is the full-size tracker frame, with the metal border */
+.TrackerFrameC
+{
+/*
+If you want to remove the metal frame around the tracker, DO NOT remove it here!
+Instead, there is an option for it in ParaConfig.php. Remove it there, as
+it will also correct some other things that are affected by the removal.
+*/
+background-image: url("images/tracker/Skin_C_Background.png");
+width: 600px;
+height: 225px;
+overflow: hidden;
+}
+
+/* This is the full-size tracker frame, without the metal border */
+.TrackerFrameCNoBG
+{
+width: 600px;
+height: 225px;
+overflow: hidden;
+}
+
+/* This class is a wrapper for the entire left side contents of the tracker */
+.trackerLogoRConParamTimerWrapperC
+{
+width: 40px;
+height: 225px;
+float: left;
+overflow: hidden;
+user-select: none;
+}
+
+/* This class adds a space on the left side as well as the ParaTracker logo */
+.trackerLogoSpacerC
+{
+width: 40px;
+height: 175px;
+float: left;
+overflow: hidden;
+background: url("images/tracker/ParaTracker-Logo-extra-Small-sideways.png") no-repeat 15px 40px;
+user-select: none;
+}
+
+/* This class moves the RCon and Param buttons lower on the left side of the tracker */
+.ParamRConSpacerC
+{
+height: 175px;
+width: 10px;
+float: left;
+overflow: hidden;
+}
+
+/* This class moves the RCon and Param buttons lower on the left side of the tracker */
+.ParamRConSpacer2C
+{
+height: 97px;
+width: 20px;
+float: left;
+overflow: hidden;
+}
+
+/* This class is a spacer between the param button and the timer */
+.paramTimerSpacerC
+{
+height: 9px;
+width: 40px;
+float: left;
+overflow: hidden;
+}
+
+/* This class spaces the reconnect button away from the left side */
+.reconnectSpacerC
+{
+width: 85px;
+height:24px;
+float: left;
+}
+
+/* This class is for the reload timer */
+.reloadTimerC
+{
+cursor: pointer;
+width: 40px;
+height: 40px;
+line-height: 40px;
+text-align: center;
+float: right;
+overflow: hidden;
+background-image: url("images/tracker/refreshTimeTabReverse.png");
+}
+
+/* This class is a container for all data on the left side of the tracker */
+.dataFrameC
+{
+width: 246px;
+height: 225px;
+float: left;
+background: url("images/tracker/param_small_rotated_h.png") no-repeat -99999px -99999px;
+}
+
+/* This class is a container for the "No connection" message */
+.noConnectionFrameC
+{
+width: 246px;
+height: 188px;
+float: left;
+}
+
+/* Space at the top, above the server name */
+.serverFrameSpacerC
+{
+width: 246px;
+height: 7px;
+overflow: hidden;
+float: left;
+background: url("images/tracker/rcon_small_rotated_h.png") no-repeat -99999px -99999px;
+}
+
+/* Server name and game name container */
+.serverFrameC
+{
+width: 246px;
+height: 20px;
+overflow: hidden;
+float: left;
+}
+
+/* This wrapper is around the game name, directly under the server name */
+.gameNameWrapperC
+{
+width: 246px;
+height: 20px;
+overflow: hidden;
+float: left;
+}
+
+/* This wrapper goes around the game name, RCon and Param buttons */
+.gamenameSizeC
+{
+width: 246px;
+height: 20px;
+overflow: hidden;
+float: left;
+}
+
+/* This wrapper goes around the RCon and Param buttons */
+.RConParamC
+{
+width: 20px;
+height: 38px;
+overflow: hidden;
+float: left;
+}
+
+/* This class is the RCon button */
+.RConC
+{
+width: 20px;
+height: 38px;
+cursor:pointer;
+background-image: url("images/tracker/rcon_small_rotated.png");
+}
+
+/* This class is the hover image for the RCon button */
+.RConC:hover
+{background-image: url("images/tracker/rcon_small_rotated_h.png");
+}
+
+/* This class is the Param button */
+.ParamC
+{
+width: 20px;
+height: 38px;
+cursor:pointer;
+background-image: url("images/tracker/param_small_rotated.png");
+}
+
+/* This class is the hover image for the RCon button */
+.ParamC:hover
+{
+background-image: url("images/tracker/param_small_rotated_h.png");
+}
+
+/* This class affects the placement of the reconnect button */
+.reconnectButtonWrapperC
+{
+width: 170px;
+height: 45px;
+line-height: 45px;
+float: left;
+text-align:center;
+vertical-align: middle;
+}
+
+/* This class is the Reconnect button */
+.reconnectButtonC
+{
+width: 76px;
+height: 20px;
+cursor:pointer;
+float: left;
+background-image: url("images/tracker/reconnect_small.png");
+}
+
+/* This class is the hover image for the Reconnect button */
+.reconnectButtonC:hover
+{
+background-image: url("images/tracker/reconnect_small_h.png");
+}
+
+
+
+/* This wrapper is for the Name Score and Ping column headers */
+.nameScorePingC
+{
+width: 230px;
+height: 14px;
+overflow: hidden;
+float: left;
+padding-left: 5px;
+}
+
+/* This is the size of the player name column header */
+.playerNameHeaderC
+{
+width: 63%;
+height: 14px;
+overflow: hidden;
+float: left;
+}
+
+/* This is the size of the player score column header */
+.playerScoreHeaderC
+{
+width: 20%;
+height: 14px;
+overflow: hidden;
+float: left;
+}
+
+/* This is the size of the player ping column header */
+.playerPingheaderC
+{
+width: 17%;
+height: 14px;
+overflow: hidden;
+float: left;
+}
+
+/* This wrapper is for the player list */
+.playerListC
+{
+width: 246px;
+height: 114px;
+overflow-y: scroll;
+float: left;
+}
+
+/* Space at the top, above the server name */
+.playerListDataSpacerC
+{
+width: 246px;
+height: 7px;
+overflow: hidden;
+float: left;
+}
+
+/* This is used as a container for the data at the bottom left side */
+.bottomLeftDataWrapperC
+{
+height: 36px;
+width: 246px;
+overflow: hidden;
+float: left;
+}
+
+/* This class is a container for the mapname and modname */
+.dataRowC
+{
+height: 12px;
+width: 246px;
+overflow: hidden;
+float: left;
+}
+
+/* This class sets the spacing of the mapname and modname */
+.modnameGametypeCSize
+{
+height: 12px;
+width: 119px;
+overflow: hidden;
+float: left;
+padding-right: 4px;
+}
+
+/* This class is for the blinking cursor at the end of the IP address */
+.blinkingCursorC
+{
+width: 4px;
+background: url("images/tracker/blinker1.gif") no-repeat 1px;
+user-select: none;
+display: inline;
+}
+
+
+/* This class is a spacer between the data and the levelshot */
+.dataLevelshotSpacerC
+{
+width: 14px;
+height: 225px;
+float: left;
+}
+
+/* This class is a wrapper for the levelshots */
+.levelshotFrameWrapperC
+{
+width: 300px;
+height: 225px;
+overflow: hidden;
+float: left;
+}
+
+/* This is another container for the levelshots, except that it contains the frame visual and disables selecting it */
+.levelshotFrameC
+{
+height: 225px;
+width: 300px;
+overflow: hidden;
+float: left;
+user-select: none;
+}
+
+/* This is the corner of the frame image that goes between levelshots */
+.levelshotCornerC
+{
+background-image: url("images/tracker/Tracker_Skin_C_Side_Frame.png");
 }
 
 

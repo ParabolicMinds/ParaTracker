@@ -1,10 +1,22 @@
 ﻿<?php
+/*
+
+ParaTracker is released under the MIT license, which reads thus:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
 
 function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    Return("1.1.1");
+    Return("ParaTracker 1.2");
 }
 
 //This is here to suppress error messages
@@ -15,7 +27,7 @@ $floodProtectTimeout = "";
 //If this file is executed directly, then echoing this value here will display the version number before exiting.
 //If the file is executed from one of the skin files, then this will end up in an HTML comment and will not be visible.
 //Either way, the version number will be visible.
-echo " ParaTracker " . versionNumber() . " ";
+echo " " . versionNumber() . " ";
  
 if (!isset($safeToExecuteParaFunc))
 {
@@ -45,17 +57,19 @@ if (!isset($dynamicTrackerCalledFromCorrectFile))
     $dynamicTrackerCalledFromCorrectFile = "0";
 }
 
-//Before we go any further, let's validate ALL input from the config file!
-//To validate booleans:
-//$variableName = booleanValidator($variableName, defaultValue);
+/*
+Before we go any further, let's validate ALL input from the config file!
+To validate booleans:
+$variableName = booleanValidator($variableName, defaultValue);
 
-//To evaluate numeric values:
-//$variableName = numericValidator($variableName, minValue, maxValue, defaultValue);
+To evaluate numeric values:
+$variableName = numericValidator($variableName, minValue, maxValue, defaultValue);
 
-//To evaluate strings:
-//$variableName = stringValidator($variableName, maxLength, defaultValue);
+To evaluate strings:
+$variableName = stringValidator($variableName, maxLength, defaultValue);
+*/
 
-//These two values MUST be evaluated first, because they are used in the IP address validation.
+//These values MUST be evaluated first, because they are used in the IP address validation.
 //ParaTrackerDynamic.php calls this same file, so we need to be sure which file is calling,
 //and what to do about it.
 $dynamicTrackerCalledFromCorrectFile = booleanValidator($dynamicTrackerCalledFromCorrectFile, 0);
@@ -73,6 +87,7 @@ if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
     $serverPort = numericValidator($_GET["port"], 1, 65535, 29070);
     //We need to make sure the skin given is a valid value. If not, we just default to A.
     $paraTrackerSkin = skinValidator($_GET["skin"]);
+echo " " . $serverIPAddress . ":" . $serverPort . " "; //Debug line
 }
 else
 {
@@ -157,7 +172,7 @@ function checkForMissingFiles($dynamicIPAddressPath)
     checkFileExistence("mapname.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("mapname_raw.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("modname.txt", "info/" . $dynamicIPAddressPath);
-    checkFileExistence("param.html", "info/" . $dynamicIPAddressPath);
+    checkFileExistence("param.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("playerCount.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("playerList.txt", "info/" . $dynamicIPAddressPath);
     checkFileExistence("rconParamScript.txt", "info/" . $dynamicIPAddressPath);
@@ -226,14 +241,13 @@ function checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder)
     return $levelshotFolder;
 }
 
-function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner)
+function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled)
 {
 
-    //Check the time delay between refreshes. Make sure we wait if need be
+    //Check to see if a refresh is already in progress, and if it is, wait a reasonable amount of time for it to finish
     checkTimeDelay($connectionTimeout, $refreshTimeout, $dynamicIPAddressPath);
 
     $lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt"), "", "", "0");
-
 
         if ($lastRefreshTime + $floodProtectTimeout < time())
         {
@@ -247,7 +261,7 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
             //Remove any lingering error messages. We will write a new one later if we encounter another error.
             file_put_contents("info/" . $dynamicIPAddressPath . "errorMessage.txt", "");
 
-            doUpdate("0", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner);
+            doUpdate("0", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled);
 
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", time());
 
@@ -268,7 +282,9 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
             if($printErrorMessage != "")
             {
                 //ParaTracker terminated with an error last time. Display it and the remaining time before the next refresh!
-                echo $printErrorMessage . "<br />" . ($lastRefreshTime + $floodProtectTimeout - time()) . " seconds before next attempt.";
+                //DO NOT use the DisplayError function, as it will reset the error timeout!
+                echo "-->" . $printErrorMessage . "<br />" . ($lastRefreshTime + $floodProtectTimeout - time()) . " seconds before next attempt.";
+                exit();
             }
 
             //Next we need to check if the gameName has changed from what is in the text file.
@@ -279,7 +295,7 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
                 $oldRefreshTime = file_get_contents("info/" . $dynamicIPAddressPath . "time.txt");
                 file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
 
-                doUpdate("1", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner);
+                doUpdate("1", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled);
 
                 //Put the old refresh time back into time.txt
                 file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", $oldRefreshTime);
@@ -288,10 +304,10 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
         }
 }
 
-function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner)
+function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner,  $dynamicTrackerEnabled)
 {
 	//Before we start, wipe out the parameter list. That way, if we encounter an error later, the list does not remain
-    file_put_contents('info/' . $dynamicIPAddressPath . 'param.html', "");
+    file_put_contents('info/' . $dynamicIPAddressPath . 'param.txt', "");
 
     if($useOldServerDump != "1")
     {
@@ -355,7 +371,7 @@ function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAd
 
 		levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotFolder);
 
-		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner);
+		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner, $serverIPAddress, $serverPort, $dynamicTrackerEnabled);
 
 		//This has to be last, because the timer will output on this page
 		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameName, $cvar_array_single, $parseTimer);
@@ -508,9 +524,9 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameNam
 			$c++;
 			if($c > 2) $c = 1;
 		}
-		$buf .= '</table></td></tr></table><h4 class="center">ParaTracker version ' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5></body></html>';
-		$buf = htmlDeclarations($cvar['name'] . "CVars", "../../") . $buf;
-		file_put_contents('info/' . $dynamicIPAddressPath . 'param.html', $buf);
+		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5></body></html>';
+		$buf = htmlDeclarations("Server CVars", "") . $buf;
+		file_put_contents('info/' . $dynamicIPAddressPath . 'param.txt', $buf);
 }
 
 function playerList($dynamicIPAddressPath, $player_array, $playerParseCount, $noPlayersOnlineMessage)
@@ -771,18 +787,25 @@ $javascriptFunctions .= '//--></script>
 file_put_contents("info/" . $dynamicIPAddressPath . "levelshotJavascriptAndCSS.txt", $javascriptFunctions);
 }
 
-function paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner)
+function paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner, $serverIPAddress, $serverPort, $dynamicTrackerEnabled)
 {
 		$output = '<script type="text/javascript">
 
 		function param_window()
 		{
-		paramWindow = window.open("info/' . $dynamicIPAddressPath . 'param.html", "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700';
+		paramWindow = window.open("Param.php';
+
+		if($dynamicTrackerEnabled == "1")
+		{
+		    $output .= '?ip=' . $serverIPAddress . '&port=' . $serverPort;
+		}
+
+		$output .= '", "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700';
 
 		if ($newWindowSnapToCorner == "1")
-			{
+		{
 			$output .= ',left=0,top=0';
-			}
+		}
 
 		$output .= '");
 }
@@ -792,7 +815,14 @@ function paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapT
 		{
 		$output .= 'function rcon_window()
 		{
-		rconWindow = window.open("RCon.php", "rconWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375';
+		rconWindow = window.open("RCon.php';
+
+		if($dynamicTrackerEnabled == "1")
+		{
+		    $output .= '?ip=' . $serverIPAddress . '&port=' . $serverPort;
+		}
+
+		$output .= '", "rconWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375';
 
 		if ($newWindowSnapToCorner == "1")
 		{
@@ -810,16 +840,7 @@ file_put_contents("info/" . $dynamicIPAddressPath . "rconParamScript.txt", $outp
 
 function checkTimeDelay($connectionTimeout, $refreshTimeout, $dynamicIPAddressPath)
 {
-$lastRefreshTime = "0";
-if (file_exists("info/" . $dynamicIPAddressPath . "time.txt"))
-{
-    $lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt"), "", "", "wait");
-}
-else
-{
-  	file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
-    $lastRefreshTime = "0";
-}
+$lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt"), "", "", "wait");
 
 $i = 0;
 $sleepTimer = "0.15"; //This variable sets the number of seconds PHP will wait before checking to see if anything has changed.
@@ -859,13 +880,13 @@ function booleanValidator($input, $defaultValue)
     //The config file allows for a value of 1 or the string "yes" to be used for booleans.
     //Everything else must evaluate to false.
 
-    if ($input == 1 || strtolower($input) == "yes")
+    if ($input == "1" || strtolower($input) == "yes")
         {
             $input = 1;
         }
         else
         {
-            if($defaultValue == "1" && strtolower($defaultValue) == "yes")
+            if($defaultValue == "1" || strtolower($defaultValue) == "yes")
             {
                 //Not $input = $defaultValue - I want to force it to boolean, even if I make a programming error
                 $input = 1;
@@ -923,7 +944,7 @@ function stringValidator($input, $maxLength, $defaultValue)
         if ($maxLength != "" && $maxLength > 0 && strlen($input) > $maxLength)
         {
             //Trim down to the maximum length.
-            $input = substr($input,0,$maxLength);
+            $input = substr($input, 0, $maxLength);
         }
         //Trim whitespace from the end of the string. There's no reason to leave it there.
         //I will leave whitespace at the beginning, though, because people might use spaces
@@ -1153,7 +1174,7 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
     echo '-->' . $output . '</head><body class="dynamicConfigPage dynamicConfigPageStyle">
 ';
 
-    echo '<div class="dynamicPageContainer"><div class="dynamicPageWidth"><h1>ParaTracker ' . versionNumber() . ' - Dynamic Mode</h1>
+    echo '<div class="dynamicPageContainer"><div class="dynamicPageWidth"><h1>' . versionNumber() . ' - Dynamic Mode</h1>
     <i>' . $personalDynamicTrackerMessage . '</i>
     <h3>ParaConfig.php settings still apply!</h3><h6>So, for instance, if you want to enable RCon, or change levelshot options, it must be changed in ParaConfig.php, by the server owner.<br />For a full set of options, you can and should host your own ParaTracker.</h6>
 
@@ -1324,9 +1345,9 @@ if ($RConPassword != "" && $RConCommand != "")
     $RConLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  Command: " . $_POST["command"] . "  Response: " . $newRConLogEntry . $RConLog2;
 
     //Check for exploits before writing the new entry to the log. The command hasn't been validated yet, so this *must* happen a second time
-	$RConLog = str_replace("<?", 'EXPLOIT REMOVED ', $RConLog);
-	$RConLog = str_replace("?>", 'EXPLOIT REMOVED ', $RConLog);
-	$RConLog = str_replace("*/", 'EXPLOIT REMOVED ', $RConLog);
+	$RConLog = str_replace("<?", 'EXPLOIT REMOVED (LessThan, QuestionMark) ', $RConLog);
+	$RConLog = str_replace("?>", 'EXPLOIT REMOVED (QuestionMark, GreaterThan) ', $RConLog);
+	$RConLog = str_replace("*/", 'EXPLOIT REMOVED (Asterisk, ForwardSlash) ', $RConLog);
 
     //Assemble the new log entry. This is the log, so validating anything other than what was already validated is a bad idea.
     $RConLog = RConLogHeader() . "\n" . $RConLog . "\n*/ ?> ";
@@ -1552,6 +1573,19 @@ $newWindowSnapToCorner = "0";
 
 
 // End of config file
+
+/*
+
+ParaTracker is released under the MIT license, which reads thus:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
 ?>';
 file_put_contents('ParaConfig.php', $configBuffer);
 }

@@ -127,8 +127,8 @@ function createURL()
         if(document.getElementById("SkinID-C").checked)
         {
             radioButton += "C";
-            width = "0";
-            height = "0";
+            width = "600";
+            height = "225";
         }
     }
     if(document.getElementById("SkinID-B"))
