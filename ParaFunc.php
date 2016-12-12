@@ -87,7 +87,6 @@ if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
     $serverPort = numericValidator($_GET["port"], 1, 65535, 29070);
     //We need to make sure the skin given is a valid value. If not, we just default to A.
     $paraTrackerSkin = skinValidator($_GET["skin"]);
-echo " " . $serverIPAddress . ":" . $serverPort . " "; //Debug line
 }
 else
 {
@@ -255,6 +254,14 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
             //Prevent users from aborting the page! This will reduce load on both the game server and the web server
             //by forcing the refresh to finish.
             ignore_user_abort(true);
+
+            //Check to see if we were forced here. If so, change the refresh time value so that other users will wait for our refresh. This will prevent an accidental DOS of the server during high traffic.
+            echo " " . substr(trim(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt")), 0, 4) . " ";
+            if(substr(trim(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt")), 0, 4) == "wait")
+            {
+                file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait" . rand(0, getrandmax()));
+            }
+
 
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
 
@@ -844,12 +851,21 @@ $lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddres
 
 $i = 0;
 $sleepTimer = "0.15"; //This variable sets the number of seconds PHP will wait before checking to see if anything has changed.
+$checkWaitValue = file_get_contents("info/" . $dynamicIPAddressPath . "time.txt");  //This variable is used to check if the wait value changes below
+$fileInput = $checkWaitValue;
 
 while ($lastRefreshTime == "wait" && $i < ($connectionTimeout + $refreshTimeout))
 {
-    //info/Time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
+    //info/time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
     usleep($sleepTimer * 1000000);
-    $lastRefreshTime = numericValidator(file_get_contents("info/" . $dynamicIPAddressPath . "time.txt"), "", "", "wait");
+    $fileInput = file_get_contents("info/" . $dynamicIPAddressPath . "time.txt");
+    if($checkWaitValue != $fileInput)
+    {
+        //Another client has started a refresh! Let's start our wait period over so we don't DoS the game server by accident.
+        $checkWaitValue = file_get_contents("info/" . $dynamicIPAddressPath . "time.txt");
+        $i = 0;
+    }
+    $lastRefreshTime = numericValidator($fileInput, "", "", "wait");
     $i += $sleepTimer;
 }
 
