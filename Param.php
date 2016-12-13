@@ -5,7 +5,14 @@ echo "<!-- ";
 //The point of this variable is to prevent ParaFunc from being executed directly,
 //as it would be a complete waste of CPU power.
 $safeToExecuteParaFunc = "1";
- 
+
+//Check to see if Dynamic mode gave us an IP address. If it has, let's go into Dynamic mode.
+if(isset($_GET["ip"]))
+{
+    $dynamicTrackerCalledFromCorrectFile = "1";
+}
+
+
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
@@ -17,18 +24,8 @@ else
     exit();
 }
 
-if($dynamicTrackerEnabled == "1")
-{
-    //Terminate the script with an instruction page if no IP address was given!
-    if (!isset($_GET["ip"]))
-    {
-        dynamicInstructionsPage($personalDynamicTrackerMessage);
-    }
-    $serverIPAddress = ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
-    $serverPort = numericValidator($_GET["port"], 1, 65535, 29070);
-}
-
-//ParaFunc already does the validation for everything, including the IP address. It should be fine to just refresh.
+//ParaFunc already does the validation for everything, including the IP address. It should be fine to just check if a refresh is needed.
+//If it isn't, the data should be parsed from the old data anyhow.
 checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled);
 
 echo "-->" . file_get_contents("info/" . $dynamicIPAddressPath . "param.txt");

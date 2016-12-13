@@ -1,3 +1,13 @@
+function levelshotClick()
+{
+    if (mode == 1)
+    {
+        //Clear the levelshot timer, and force an immediate levelshot change
+        clearTimeout(timer);
+        timer = setTimeout("fadelevelshot()", 10);
+    }
+}
+
 function bitValueClick(cvarName)
 {
     if (document.getElementById(cvarName).className == "collapsedList")

@@ -16,7 +16,7 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    Return("ParaTracker 1.2");
+    Return("ParaTracker 1.2.1");
 }
 
 //This is here to suppress error messages
@@ -79,20 +79,49 @@ $personalDynamicTrackerMessage = stringValidator($personalDynamicTrackerMessage,
 if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
 {
     //Terminate the script with an instruction page if no IP address was given!
-    if (!isset($_GET["ip"]))
+    if(!isset($_GET["ip"]))
     {
         dynamicInstructionsPage($personalDynamicTrackerMessage);
     }
+    else
+    {
+        $serverIPAddress = ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
+    }
     $serverIPAddress = ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
-    $serverPort = numericValidator($_GET["port"], 1, 65535, 29070);
     //We need to make sure the skin given is a valid value. If not, we just default to A.
-    $paraTrackerSkin = skinValidator($_GET["skin"]);
+    if(isset($_GET["port"]))
+    {
+        $serverPort = numericValidator($_GET["port"], 1, 65535, 29070);
+    }
+    else
+    {
+        $serverPort = numericValidator("", 1, 65535, 29070);
+    }
+
+    if(isset($_GET["game"]))
+    {
+        $gameName = stringValidator(rawurldecode($_GET["game"]), "", "Jedi Academy");
+    }
+    else
+    {
+        $gameName = stringValidator("", "", "Jedi Academy");
+    }
+
+    if(isset($_GET["skin"]))
+    {
+        $paraTrackerSkin = skinValidator($_GET["skin"]);
+    }
+    else
+    {
+        $paraTrackerSkin = "A";
+    }
 }
 else
 {
     $serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
     $serverPort = numericValidator($serverPort, 1, 65535, 29070);
     $paraTrackerSkin = "";
+    $gameName = stringValidator($gameName, "", "Jedi Academy");
 }
 
 $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
@@ -109,15 +138,6 @@ $levelshotTransitionTime = numericValidator($levelshotTransitionTime, 0.1, 5, 0.
 $levelshotFPS = numericValidator($levelshotFPS, 1, 60, 30);
 $maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
 
-//Gamename can also be given dynamically, so let's check for that too.
-if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
-{
-    $gameName = stringValidator(rawurldecode($_GET["game"]), "", "Jedi Academy");
-}
-else
-{
-    $gameName = stringValidator($gameName, "", "Jedi Academy");
-}
 //Generate a levelshot path
 $levelshotFolder = $gameName;
 //Check to make sure the folder exists, and convert the string and directory name to lowercase
@@ -314,36 +334,18 @@ function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAd
 {
 	//Before we start, wipe out the parameter list. That way, if we encounter an error later, the list does not remain
     file_put_contents('info/' . $dynamicIPAddressPath . 'param.txt', "");
-
     if($useOldServerDump != "1")
     {
         //On with the good stuff!
-        $fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, $connectionTimeout);
-        fwrite($fp, str_repeat(chr(255),4) . "getstatus\n");
-        $s='';
-        stream_set_timeout($fp, $connectionTimeout);
-
-        while (false !== ($char = fgetc($fp)))
-        {
-		    $s .= $char;
-		}
-        fclose($fp);
-
+		$s = connectToServerAndGetResponse(str_repeat(chr(255),4) . "getstatus\n", $dynamicIPAddressPath, $serverIPAddress, $serverPort, $connectionTimeout);
 
         if(strlen($s) > $maximumServerInfoSize)
         {
 	        displayError('Received too much data!<br />' . strlen($s) . ' characters received, the limit is ' . $maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.', $dynamicIPAddressPath, $lastRefreshTime, $floodProtectTimeout);
-	        }
+        }
 
 	//This file is used for determining if the server connection was successful and regenerating dynamic content, plus it's good for debugging
 	file_put_contents("info/" . $dynamicIPAddressPath . "serverDump.txt", $s);
-
-	if($errstr == "" && $s == "")
-	{
-	    $errstr = "No response in " . $connectionTimeout . " seconds.";
-	    echo "No response in " . $connectionTimeout . " seconds.";
-	}
-	file_put_contents("info/" . $dynamicIPAddressPath . "connectionErrorMessage.txt", stringValidator($errstr, "", ""));
 
     }
     else
@@ -377,7 +379,7 @@ function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAd
 
 		levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotFolder);
 
-		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner, $serverIPAddress, $serverPort, $dynamicTrackerEnabled);
+		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner, $serverIPAddress, $serverPort,  $gameName, $dynamicTrackerEnabled);
 
 		//This has to be last, because the timer will output on this page
 		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameName, $cvar_array_single, $parseTimer);
@@ -515,7 +517,7 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameNam
 			        {
 			            if($cvar['name'] == $gametypeCVarName)
 			            {
-			                $buf .= $cvar['value'] . ' (<b>' . $gametypeArray[$cvar['value']] . '</b>)';
+			                $buf .= $cvar['value'] . '<br /><b>' . $gametypeArray[$cvar['value']] . '</b>';
 			                file_put_contents('info/' . $dynamicIPAddressPath . 'gametype.txt', $gametypeArray[$cvar['value']]);
 			                $foundMatch = 1;
 			            }
@@ -712,10 +714,10 @@ file_put_contents("info/" . $dynamicIPAddressPath . "refreshCode.txt", $output);
 
 function levelshotJavascriptAndCSS($dynamicIPAddressPath, $levelshotBuffer, $enableAutoRefresh, $autoRefreshTimer, $fadeLevelshots, $levelshotCount, $levelshotTransitionTime, $levelshotFPS, $levelshotDisplayTime, $levelshotFolder)
 {
-$javascriptFunctions = "";
+    $javascriptFunctions = '<script type="text/javascript"><!--';
 
-        $javascriptFunctions .= '<script type="text/javascript"><!--
-		var timer = 0;  //Used for setting re-execution timeout
+        $javascriptFunctions .= '
+        var timer = 0;  //Used for setting re-execution timeout
 		var allowFading = ' . $fadeLevelshots . ';   //Used to test whether fading levelshots is disabled
 		var opac = 1;   //Opacity level for the top layer.
 		var shot = 1;   //Levelshot number
@@ -754,6 +756,8 @@ $javascriptFunctions = "";
 				mode = 0;
 				shot++;
 				if(shot > maxLevelshots) shot = 1;
+				//Clear any timers that shouldnt be active, just in case
+				clearTimeout(timer);
 				//Now, re-execute the script to start fading a new levelshot!
 				timer = setTimeout("fadelevelshot()", 10);
 			}
@@ -793,7 +797,7 @@ $javascriptFunctions .= '//--></script>
 file_put_contents("info/" . $dynamicIPAddressPath . "levelshotJavascriptAndCSS.txt", $javascriptFunctions);
 }
 
-function paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner, $serverIPAddress, $serverPort, $dynamicTrackerEnabled)
+function paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner, $serverIPAddress, $serverPort,  $gameName, $dynamicTrackerEnabled)
 {
 		$output = '<script type="text/javascript">
 
@@ -803,7 +807,7 @@ function paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapT
 
 		if($dynamicTrackerEnabled == "1")
 		{
-		    $output .= '?ip=' . $serverIPAddress . '&port=' . $serverPort;
+		    $output .= '?ip=' . $serverIPAddress . '&port=' . $serverPort . '&game=' . $gameName;
 		}
 
 		$output .= '", "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700';
@@ -858,7 +862,7 @@ while ($lastRefreshTime == "wait" && $i < ($connectionTimeout + $refreshTimeout)
     //info/time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
     usleep($sleepTimer * 1000000);
     $fileInput = file_get_contents("info/" . $dynamicIPAddressPath . "time.txt");
-    if($checkWaitValue != $fileInput)
+    if($checkWaitValue != $fileInput && stripos($fileInput, "wait" !== false))
     {
         //Another client has started a refresh! Let's start our wait period over so we don't DoS the game server by accident.
         $checkWaitValue = file_get_contents("info/" . $dynamicIPAddressPath . "time.txt");
@@ -1055,10 +1059,11 @@ function skinValidator($paraTrackerSkin)
         $paraTrackerSkin = strtoupper($paraTrackerSkin);
     }
 
+    //Let's prevent any goofballs from getting the bright idea of loading ParaTrackerDynamic or ParaTrackerTemplate
     if(strtolower($paraTrackerSkin) == "dynamic" || strtolower($paraTrackerSkin) == "template")
     {
         $paraTrackerSkin = "A";
-        echo "Invalid skin specified! Assuming default skin.";
+        echo " Invalid skin specified! Assuming default skin. ";
     }
 
     if(!file_exists("ParaTracker" . $paraTrackerSkin . ".php"))
@@ -1069,8 +1074,9 @@ function skinValidator($paraTrackerSkin)
         }
         else
         {
+        //Non-fatal error; default to skin A and give a debug message.
         $paraTrackerSkin = "A";
-        echo "Invalid skin specified! Assuming default skin.";
+        echo " Invalid skin specified! Assuming default skin. ";
         }
     }
     return $paraTrackerSkin;
@@ -1106,7 +1112,7 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
 
             $index = count($arrayList);
 
-            if ($index < 1)
+            if ($index < 1 || $cvarValue == 0)
             {
                 $output .= '<div id="' . $cvarName . '" class="collapsedList"><br /><i>None</i></div>';
             }
@@ -1292,6 +1298,30 @@ WE COMPLY WITH ALL LAWS AND REGULATIONS REGARDING THE USE OF LAWS AND REGULATION
     exit();
 }
 
+function connectToServerAndGetResponse($messageToSend, $dynamicIPAddressPath, $serverIPAddress, $serverPort, $connectionTimeout)
+{
+	$s='';
+    $fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, 30);
+	fwrite($fp, $messageToSend);
+	stream_set_timeout($fp, $connectionTimeout);
+
+	//Loop and grab the response, character by character
+	while (false !== ($char = fgetc($fp)))
+	{
+		$s .= $char;
+	}
+	fclose($fp);
+
+	if($errstr == "" && $s == "")
+	{
+	    $errstr = "No response in " . $connectionTimeout . " seconds.";
+	    echo " No response in " . $connectionTimeout . " seconds. ";
+	}
+	file_put_contents("info/" . $dynamicIPAddressPath . "connectionErrorMessage.txt", stringValidator($errstr, "", ""));
+
+	return($s);
+}
+
 function sendRecieveRConCommand($serverIPAddress, $serverPort, $dynamicIPAddressPath, $connectionTimeout, $RConEnable, $RConFloodProtect, $RConPassword, $RConCommand, $RConLogSize)
 {
 $serverResponse = "";
@@ -1304,14 +1334,7 @@ if ($RConPassword != "" && $RConCommand != "")
 	{
 		$output .= '';
 
-		$fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, 30);
-		fwrite($fp, str_repeat(chr(255),4) . 'RCon ' . $RConPassword . ' ' . $RConCommand);
-		$s='';
-		stream_set_timeout($fp, $connectionTimeout);
-		while (false !== ($char = fgetc($fp))) {
-			$s .= $char;
-		}
-		fclose($fp);
+		$s = connectToServerAndGetResponse(str_repeat(chr(255),4) . 'RCon ' . $RConPassword . ' ' . $RConCommand, $dynamicIPAddressPath, $serverIPAddress, $serverPort, $connectionTimeout);
 
 		if($s != "")
 		{
@@ -1321,7 +1344,7 @@ if ($RConPassword != "" && $RConCommand != "")
 			$serverResponse = str_replace("?>", 'EXPLOIT REMOVED ', $serverResponse);
 			$serverResponse = str_replace("*/", 'EXPLOIT REMOVED ', $serverResponse);
 
-			//Replace line breaks with spaces for the RCon log only
+			//Replace line breaks for the RCon log only
 			$newRConLogEntry = str_replace(chr(0x0A), '\n', $serverResponse);
 
 		    //Validate the rest!
@@ -1329,7 +1352,7 @@ if ($RConPassword != "" && $RConCommand != "")
 
 		    //Now we format the remaining data in a readable fashion
 			$serverResponse = str_replace(str_repeat(chr(255),4) . 'print', '', $serverResponse);
-			$serverResponse = str_replace(chr(0x0A), '<br />', $serverResponse);
+			$serverResponse = str_replace(chr(0x0A), '<br />', trim($serverResponse));
 			//This next line apparently replaces spaces with....spaces? Not sure who added that but I'm commenting it out
 			//$serverResponse = str_replace(chr(0x20), ' ', $serverResponse);
 

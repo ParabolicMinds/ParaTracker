@@ -369,6 +369,7 @@ width: 300px;
 overflow: hidden;
 float: left;
 user-select: none;
+cursor: pointer;
 }
 
 /* This is the corner of the frame image that goes between levelshots */
@@ -796,6 +797,7 @@ width: 300px;
 overflow: hidden;
 float: left;
 user-select: none;
+cursor: pointer;
 }
 
 /* This is the corner of the frame image that goes between levelshots */
@@ -1142,6 +1144,7 @@ width: 300px;
 overflow: hidden;
 float: left;
 user-select: none;
+cursor: pointer;
 }
 
 /* This is the corner of the frame image that goes between levelshots */

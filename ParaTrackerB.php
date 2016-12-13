@@ -153,7 +153,7 @@ $output .= ' levelshotCornerB';
 }
 
 $output .= '">
-<div id="topLayerFade" class="levelshotFrameB levelshot1">';
+<div id="topLayerFade" class="levelshotFrameB levelshot1" onclick="levelshotClick()">';
 
 if ($disableFrameBorder == 0)
 {

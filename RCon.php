@@ -6,6 +6,13 @@ echo "<!-- ";
 //as it would be a complete waste of CPU power.
 $safeToExecuteParaFunc = "1";
 
+//Check to see if Dynamic mode or a refresh of the RCon page gave us an IP address. If it has, let's go into Dynamic mode.
+if(isset($_GET["ip"]) || isset($_POST["ip"]))
+{
+    $dynamicTrackerCalledFromCorrectFile = "1";
+}
+
+
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
@@ -53,7 +60,18 @@ else
         $RConPassword = "";
     }
 
-    $output .= '<form action="RCon.php" method="post" onsubmit="disableRConForm()">
+    $output .= '<form action="RCon.php';
+
+    if(isset($_GET["ip"]))
+    {
+        $output .= '?ip=' . $_GET["ip"];
+        if(isset($_GET["port"]))
+        {
+            $output .= '&port=' . $_GET["port"];
+        }
+    }
+
+    $output .= '" method="post" onsubmit="disableRConForm()">
     <div class="RConPasswordCommand RConPasswordCommandSize">
     Command:<input id="commandTextField" class="RConInput" size="35" type="text" value="' . $RConCommand . '" name="command" />
     &nbsp;Password:<input id="passwordTextField" class="RConInput" type="password" name="password" value="" />
