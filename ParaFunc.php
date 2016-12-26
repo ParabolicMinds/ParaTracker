@@ -363,7 +363,7 @@ function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAd
 	    $parseTimer = microtime(true);
 
 	    //Now, we call a function to parse the data
-	    $dataParserReturn = dataParser($s, $dynamicIPAddressPath);
+	    $dataParserReturn = dataParser($s, $dynamicIPAddressPath, $filterOffendingServerNameSymbols);
 	    //Organize the data that came back in the array
 		$cvar_array_single = $dataParserReturn[0];
 		$cvars_hash = $dataParserReturn[1];
@@ -384,12 +384,12 @@ function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAd
 		paramRConJavascript($dynamicIPAddressPath, $RConEnable, $newWindowSnapToCorner, $serverIPAddress, $serverPort,  $gameName, $dynamicTrackerEnabled);
 
 		//This has to be last, because the timer will output on this page
-		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameName, $cvar_array_single, $parseTimer);
+		cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $filterOffendingServerNameSymbols, $gameName, $cvar_array_single, $parseTimer);
 
 	}
 }
 
-function dataParser($s, $dynamicIPaddressPath)
+function dataParser($s, $dynamicIPaddressPath, $filterOffendingServerNameSymbols)
 {
 $player_array = "";
 //Split the info first, then we'll loop through and remove any dangerous characters
@@ -426,7 +426,7 @@ $player_array = "";
 
 		if(isset($cvars_hash["sv_hostname"]))
 		{
-		    file_put_contents('info/' . $dynamicIPaddressPath . 'sv_hostname.txt', colorize($cvars_hash["sv_hostname"]));
+		    file_put_contents('info/' . $dynamicIPaddressPath . 'sv_hostname.txt', colorize(removeOffendingServerNameCharacters($cvars_hash["sv_hostname"], $filterOffendingServerNameSymbols)));
 		}
 		else
 		{
@@ -441,7 +441,18 @@ $player_array = "";
 		return(array($cvar_array_single, $cvars_hash, $player_array, $playerParseCount));
 }
 
-function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameName, $cvar_array_single, $parseTimer)
+function removeOffendingServerNameCharacters($input, $filterOffendingServerNameSymbols)
+{
+    //Check to see if the offending characters are to be removed
+    if ($filterOffendingServerNameSymbols == 1)
+    {
+        //The following line removes the Euro symbol, €
+        $input = str_replace(chr(128), '', $input);
+    }
+    return $input;
+}
+
+function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $filterOffendingServerNameSymbols, $gameName, $cvar_array_single, $parseTimer)
 {
 		$buf = '</head>
 		<body class="cvars_page">
@@ -504,14 +515,12 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameNam
 			}
 			else if (($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'hostname'))
 			{
-			    if ($filterOffendingServerNameSymbols == "1")
+			    //Need to check for offending symbols and remove them from server names, since it's obnoxious and everybody does it.
+			    $filteredName = removeOffendingServerNameCharacters($cvar['value'], $filterOffendingServerNameSymbols);
+
+				if ((strpos(colorize($cvar['value']), $filteredName)) == FALSE || $filteredName != $cvar['value'])
 			    {
-			        //Need to check for the Euro symbol and remove it from server names, since it's obnoxious and everybody does it.
-				    $cvar['value'] = str_replace(chr(0x80), '', $cvar['value']);
-			    }
-			    if ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE)
-			    {
-				    $buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
+			        $buf .= '<b>' . colorize($filteredName) . "</b><br />" . $cvar['value'];
 			    }
 			}
 			else
@@ -1316,15 +1325,20 @@ function connectToServerAndGetResponse($messageToSend, $dynamicIPAddressPath, $s
 {
 	$s='';
     $fp = fsockopen("udp://" . $serverIPAddress, $serverPort, $errno, $errstr, 30);
-	fwrite($fp, $messageToSend);
-	stream_set_timeout($fp, $connectionTimeout);
-
-	//Loop and grab the response, character by character
-	while (false !== ($char = fgetc($fp)))
+	if(!fwrite($fp, $messageToSend))
 	{
-		$s .= $char;
+	    $errstr = "Could not open the connection to the game server!\nMake sure your web host allows outgoing connections.";
 	}
-	fclose($fp);
+	else
+	{
+	    stream_set_timeout($fp, $connectionTimeout);
+	    //Loop and grab the response, character by character
+	    while (($char = fgetc($fp)) !== false)
+	    {
+		    $s .= $char;
+		}
+	    fclose($fp);
+	}
 
 	if($errstr == "" && $s == "")
 	{
