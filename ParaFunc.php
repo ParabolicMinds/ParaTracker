@@ -16,7 +16,7 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    Return("ParaTracker 1.2.1");
+    Return("ParaTracker 1.2.2");
 }
 
 //This is here to suppress error messages
@@ -143,6 +143,8 @@ $levelshotFolder = $gameName;
 //Check to make sure the folder exists, and convert the string and directory name to lowercase
 $levelshotFolder = checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder);
 
+$filterOffendingServerNameSymbols = booleanValidator($filterOffendingServerNameSymbols, 1);
+
 $noPlayersOnlineMessage = stringValidator($noPlayersOnlineMessage, "", "No players online.");
 
 $enableAutoRefresh = booleanValidator($enableAutoRefresh, 1);
@@ -260,7 +262,7 @@ function checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder)
     return $levelshotFolder;
 }
 
-function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled)
+function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $filterOffendingServerNameSymbols, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled)
 {
 
     //Check to see if a refresh is already in progress, and if it is, wait a reasonable amount of time for it to finish
@@ -287,7 +289,7 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
             //Remove any lingering error messages. We will write a new one later if we encounter another error.
             file_put_contents("info/" . $dynamicIPAddressPath . "errorMessage.txt", "");
 
-            doUpdate("0", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled);
+            doUpdate("0", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $filterOffendingServerNameSymbols, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled);
 
             file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", time());
 
@@ -321,7 +323,7 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
                 $oldRefreshTime = file_get_contents("info/" . $dynamicIPAddressPath . "time.txt");
                 file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", "wait");
 
-                doUpdate("1", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled);
+                doUpdate("1", $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $filterOffendingServerNameSymbols, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled);
 
                 //Put the old refresh time back into time.txt
                 file_put_contents("info/" . $dynamicIPAddressPath . "time.txt", $oldRefreshTime);
@@ -330,7 +332,7 @@ function checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicI
         }
 }
 
-function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner,  $dynamicTrackerEnabled)
+function doUpdate($useOldServerDump, $serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $disableFrameBorder, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $filterOffendingServerNameSymbols, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner,  $dynamicTrackerEnabled)
 {
 	//Before we start, wipe out the parameter list. That way, if we encounter an error later, the list does not remain
     file_put_contents('info/' . $dynamicIPAddressPath . 'param.txt', "");
@@ -496,9 +498,21 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameNam
 		{
 			$buf .= '<tr class="cvars_row' . $c . '"><td class="nameColumnWidth">' . $cvar['name'] . '</td><td class="valueColumnWidth">';
 
-			if ((($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'hostname') || ($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
+			if ((($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
 			{
 				$buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
+			}
+			else if (($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'hostname'))
+			{
+			    if ($filterOffendingServerNameSymbols == "1")
+			    {
+			        //Need to check for the Euro symbol and remove it from server names, since it's obnoxious and everybody does it.
+				    $cvar['value'] = str_replace(chr(0x80), '', $cvar['value']);
+			    }
+			    if ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE)
+			    {
+				    $buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
+			    }
 			}
 			else
 			{
@@ -532,7 +546,7 @@ function cvarList($serverIPAddress, $serverPort, $dynamicIPAddressPath, $gameNam
 			$c++;
 			if($c > 2) $c = 1;
 		}
-		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5></body></html>';
+		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
 		$buf = htmlDeclarations("Server CVars", "") . $buf;
 		file_put_contents('info/' . $dynamicIPAddressPath . 'param.txt', $buf);
 }
@@ -1340,9 +1354,9 @@ if ($RConPassword != "" && $RConCommand != "")
 		{
 		    $serverResponse = $s;
 		    //Check for exploits in the response that might trigger some PHP code
-			$serverResponse = str_replace("<?", 'EXPLOIT REMOVED ', $serverResponse);
-			$serverResponse = str_replace("?>", 'EXPLOIT REMOVED ', $serverResponse);
-			$serverResponse = str_replace("*/", 'EXPLOIT REMOVED ', $serverResponse);
+			$serverResponse = str_replace("<?", ' EXPLOIT REMOVED (LessThan, QuestionMark) ', $serverResponse);
+			$serverResponse = str_replace("?>", ' EXPLOIT REMOVED (QuestionMark, GreaterThan) ', $serverResponse);
+			$serverResponse = str_replace("*/", ' EXPLOIT REMOVED (Asterisk, ForwardSlash) ', $serverResponse);
 
 			//Replace line breaks for the RCon log only
 			$newRConLogEntry = str_replace(chr(0x0A), '\n', $serverResponse);
@@ -1380,12 +1394,12 @@ if ($RConPassword != "" && $RConCommand != "")
     $RConLog2 = implode("\n", $RConLogArray);
 
     //Assemble the new log entry.
-    $RConLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  Command: " . $_POST["command"] . "  Response: " . $newRConLogEntry . $RConLog2;
+    $RConLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  Command: " . str_replace("\n", '\n', $RConCommand) . "  Response: " . $newRConLogEntry . $RConLog2;
 
     //Check for exploits before writing the new entry to the log. The command hasn't been validated yet, so this *must* happen a second time
-	$RConLog = str_replace("<?", 'EXPLOIT REMOVED (LessThan, QuestionMark) ', $RConLog);
-	$RConLog = str_replace("?>", 'EXPLOIT REMOVED (QuestionMark, GreaterThan) ', $RConLog);
-	$RConLog = str_replace("*/", 'EXPLOIT REMOVED (Asterisk, ForwardSlash) ', $RConLog);
+	$RConLog = str_replace("<?", ' EXPLOIT REMOVED (LessThan, QuestionMark) ', $RConLog);
+	$RConLog = str_replace("?>", ' EXPLOIT REMOVED (QuestionMark, GreaterThan) ', $RConLog);
+	$RConLog = str_replace("*/", ' EXPLOIT REMOVED (Asterisk, ForwardSlash) ', $RConLog);
 
     //Assemble the new log entry. This is the log, so validating anything other than what was already validated is a bad idea.
     $RConLog = RConLogHeader() . "\n" . $RConLog . "\n*/ ?> ";
@@ -1513,6 +1527,11 @@ $maximumLevelshots = "20";
 // TRACKER SETTINGS
 // TRACKER SETTINGS
  
+// This value is boolean. When this variable is set to Yes or 1, offending symbols will be
+// filtered from the server name. Currently the only affected symbol is the Euro symbol, €.
+// Default is 1.
+$filterOffendingServerNameSymbols = "1";
+
 // This is the name of the game being tracked; I.E. Jedi Academy, Jedi Outcast, Call Of Duty 4, etc.
 // It is displayed underneath the server name in the top left corner of the tracker.
 // For future-proofing, this value is left to you, the user.

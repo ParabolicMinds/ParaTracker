@@ -107,6 +107,11 @@ $maximumLevelshots = "20";
 // TRACKER SETTINGS
 // TRACKER SETTINGS
  
+// This value is boolean. When this variable is set to Yes or 1, offending symbols will be
+// filtered from the server name. Currently the only affected symbol is the Euro symbol, €.
+// Default is 1.
+$filterOffendingServerNameSymbols = "1";
+
 // This is the name of the game being tracked; I.E. Jedi Academy, Jedi Outcast, Call Of Duty 4, etc.
 // It is displayed underneath the server name in the top left corner of the tracker.
 // For future-proofing, this value is left to you, the user.

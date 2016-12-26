@@ -45,7 +45,7 @@ else
 {
     if(isset($_POST["command"]))
     {
-        $RConCommand = stringValidator($_POST["command"], "", "");
+        $RConCommand = $_POST["command"];
     }
     else
     {
@@ -53,7 +53,7 @@ else
     }
     if(isset($_POST["password"]))
     {
-    $RConPassword = stringValidator($_POST["password"], "", "");
+        $RConPassword = $_POST["password"];
     }
     else
     {
@@ -64,16 +64,16 @@ else
 
     if(isset($_GET["ip"]))
     {
-        $output .= '?ip=' . $_GET["ip"];
+        $output .= '?ip=' . ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
         if(isset($_GET["port"]))
         {
-            $output .= '&port=' . $_GET["port"];
+            $output .= '&port=' . numericValidator($_GET["port"], 1, 65535, 29070);
         }
     }
 
     $output .= '" method="post" onsubmit="disableRConForm()">
     <div class="RConPasswordCommand RConPasswordCommandSize">
-    Command:<input id="commandTextField" class="RConInput" size="35" type="text" value="' . $RConCommand . '" name="command" />
+    Command:<input id="commandTextField" class="RConInput" size="35" type="text" value="' . stringValidator($RConCommand, "", "") . '" name="command" />
     &nbsp;Password:<input id="passwordTextField" class="RConInput" type="password" name="password" value="" />
     <input id="submitButton" type="submit" value=" Send " />
     </div>
