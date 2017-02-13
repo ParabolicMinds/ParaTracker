@@ -30,6 +30,7 @@ $json .= "]}";
 ob_clean();
 ob_end_flush();
 
+header("Content-Type: application/json");
 echo $json
 
 ?>
