@@ -14,7 +14,7 @@ body {
 
 .header {
   padding: 10px;
-  background-color: #666;
+  background-color: #222;
 }
 
 .server_name {
@@ -23,7 +23,7 @@ body {
 
 .players {
   padding: 5px;
-  background-color: #444;
+  background-color: #333;
 }
 
 .player_div {
@@ -37,7 +37,7 @@ body {
 }
 
 .player_name {
-  flex: 1 1 auto;
+
 }
 
 .player_score {
