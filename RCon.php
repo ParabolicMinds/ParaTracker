@@ -120,36 +120,6 @@ else
         var initialFloodProtectTimer = ' . floor($RConFloodProtect) . ';
         var timeRemaining = ' . intval($timeRemaining) .';
         RConTimer = setTimeout("RConFloodProtectTimer()", 50);
-        function RConFloodProtectTimer()
-	    {
-            if (timeRemaining == 0)
-            {
-                document.getElementById("RConTimeoutTimer").innerHTML = "RCon is ";
-                document.getElementById("RConTimeoutText").innerHTML = "ready!";
-            }
-            if (timeRemaining == 1)
-            {
-                timeRemaining--;
-                document.getElementById("RConTimeoutTimer").innerHTML = timeRemaining;
-                document.getElementById("RConTimeoutText").innerHTML = "seconds remaining.";
-                RConTimer = setTimeout("RConFloodProtectTimer()", 1000);
-            }
-            if (timeRemaining == 2)
-            {
-                timeRemaining--;
-                document.getElementById("RConTimeoutTimer").innerHTML = timeRemaining;
-                document.getElementById("RConTimeoutText").innerHTML = "second remaining.";
-                RConTimer = setTimeout("RConFloodProtectTimer()", 1000);
-            }
-            if (timeRemaining > 2)
-            {
-                timeRemaining--;
-                document.getElementById("RConTimeoutTimer").innerHTML = timeRemaining;
-                document.getElementById("RConTimeoutText").innerHTML = "seconds remaining.";
-                RConTimer = setTimeout("RConFloodProtectTimer()", 1000);
-            }
-	    }
-
         </script>Please wait ' . $RConFloodProtect . ' seconds between commands.<br /><div id="RConTimeoutTimer" class="RConTimeoutTimer"></div> <div id="RConTimeoutText" class="RConTimeoutTimer"></div>';
         }
     }
@@ -176,10 +146,10 @@ else
 $output .= '<h2>RCon is disabled on this tracker!</h2><br />RCon must be enabled in ParaConfig.php.';
 }
 
+$output .= '<div class="RConblinkingCursor">&nbsp;</div></div></div>';
+
 //Done with RCon Stuff! Remove the HTML comment and give the output.
 echo "-->";
-
-$output .= '<div class="RConblinkingCursor">&nbsp;</div></div></div>';
 
 echo $output;
 

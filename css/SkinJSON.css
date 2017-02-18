@@ -1,0 +1,45 @@
+body {
+  text-align: center;
+  color: #DDD;
+  padding: 0px;
+  margin: 0px;
+  background-color: #000;
+}
+
+.container {
+  width: 600px;
+  display: inline-block;
+  margin: 50px;
+}
+
+.header {
+  padding: 10px;
+  background-color: #222;
+}
+
+.server_name {
+  font-weight: bold;
+}
+
+.players {
+  padding: 5px;
+  background-color: #333;
+}
+
+.player_div {
+  display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+  margin: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  text-align: left;
+}
+
+.player_name {
+
+}
+
+.player_score {
+  flex: 0 0 auto;
+}

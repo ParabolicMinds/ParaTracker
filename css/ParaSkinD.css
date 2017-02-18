@@ -1,0 +1,46 @@
+/*
+This file contains all the fonts and color styles for
+ParaTracker Skin D.
+Edit it however you see fit.
+
+If you are looking for the tracker configuration,
+you will find it in ParaConfig.php
+*/
+
+
+
+/*
+SKIN D CLASSES
+SKIN D CLASSES
+*/
+
+.BackgroundColorImageD
+{
+
+/* This next line is the background color of the tracker.
+The numbers are given in RGBA, which is Red, Green, Blue, and Alpha.
+All values are 0 to 255, except alpha which is 0 to 1.
+0 is transparent, 1 is solid.
+Default is: background-color: rgba(0, 0, 0, 1);
+*/
+background-color: rgba(0, 0, 0, 1);
+
+/* If you want a background image on the tracker,
+this next line is the place to add it. */
+background-image: url("");
+}
+
+/* This class sets the opacity of the reload timer */
+.reloadTimerOpacityD
+{
+opacity: 0.25;
+}
+
+/* This class is for the text in the timer, at the left */
+.reloadTimerTextD
+{
+color:#EFEFEF;
+font-size:14pt;
+font-family: monospace;
+font-weight:bold;
+}

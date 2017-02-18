@@ -1,0 +1,447 @@
+/*
+This file contains all the fonts and color styles for
+ParaTracker Skin A.
+Edit it however you see fit.
+
+If you are looking for the tracker configuration,
+you will find it in ParaConfig.php
+*/
+
+
+.BackgroundColorImage
+{
+
+/* This next line is the background color of the tracker.
+The numbers are given in RGBA, which is Red, Green, Blue, and Alpha.
+All values are 0 to 255, except alpha which is 0 to 1.
+0 is transparent, 1 is solid.
+Default is: background-color: rgba(0, 0, 0, 1);
+*/
+background-color: rgba(0, 0, 0, 1);
+
+/* If you want a background image on the tracker,
+this next line is the place to add it.
+Remember to add a ../ to the start of the path, as the
+path starts in the CSS folder. */
+background-image: url("");
+
+width: 100%;
+height: 100%;
+}
+
+/* This class controls the frame visual of the tracker.
+Do not add anything to this class, as it is rendered on top of everything else. */
+.TrackerFrame
+{
+position: absolute;
+    top: 0px;
+    left: 0px;
+width: 675px;
+height: 300px;
+pointer-events: none;
+overflow: hidden;
+user-select: none;
+
+/* This next line is the metal frame image that borders the tracker.
+You can remove it without consequence if you wish, but the rest of this class must remain.
+*/
+background-image: url("../images/tracker/Skin_A_Background.png");
+}
+
+/*
+NORMAL PAGE STYLES
+NORMAL PAGE STYLES
+*/
+
+/* This class affects the reload timer */
+.reloadTimer
+{
+position: absolute;
+    top: 185px;
+    left: 0px;
+
+background-image: url("../images/tracker/refreshTimeTabLeft.png");
+opacity: 0.25;
+cursor: pointer;
+width: 40px;
+height: 40px;
+line-height: 40px;
+text-align: center;
+overflow: hidden;
+color: #EFEFEF;
+font-size: 14pt;
+font-family: monospace;
+font-weight: bold;
+}
+
+/* This class is the ParaTracker logo */
+.ParaTrackerLogo
+{
+position: absolute;
+    top: 50px;
+    left: 15px;
+width: 20px;
+height: 102px;
+user-select: none;
+background-image: url("../images/tracker/ParaTrackerLogoSideways.png");
+}
+
+/* This class is the ParaTracker text. It is meant to be used when a logo image is not used */
+.ParaTrackerText
+{
+position: absolute;
+    top: 50px;
+    left: 15px;
+width: 20px;
+height: 102px;
+text-align: center;
+overflow: hidden;
+color: #EFEFEF;
+font-size: 14pt;
+font-family: monospace;
+display: none;
+}
+
+/* This is the server name, shown at the top of the tracker */
+.serverName
+{
+position: absolute;
+    top: 10px;
+    left: 46px;
+font-size: 14pt;
+font-family: "Trebuchet MS";
+font-weight: bold;
+}
+
+/* This is the title of the game, shown just below the server name */
+.gameTitle
+{
+position: absolute;
+    top: 34px;
+    left: 46px;
+color: #808080;
+font-size: 10pt;
+font-family: verdana;
+font-style: italic;
+}
+
+/* This class positions the column headers for name, score and ping.
+The width *must* be set correctly.
+The correct width value is the width of .playerTable minus 17 pixels (for the vertical scroll bar),
+and minus the left and right padding of the .playerRow classes (10 by default) */
+.nameScorePing
+{
+position: absolute;
+    top: 54px;
+    left: 46px;
+width: 294px;
+height: 15px;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+/* This is the style of the Name column header for the player list */
+.playerNameHeader
+{
+font-family: monospace;
+color: #FFFFBB;
+}
+
+/* This is the style of the Ping column header for the player list */
+.playerScoreHeader
+{
+font-family: monospace;
+color: #FFFFBB;
+text-align: center;
+}
+
+/* This is the style of the Score column header for the player list */
+.playerPingHeader
+{
+font-family: monospace;
+color: #FFFFBB;
+text-align: center;
+}
+
+/* This class sets the size of the player list, and enables vertical scrolling only */
+.playerTable
+{
+position: absolute;
+    top: 76px;
+    left: 46px;
+width: 321px;
+height: 164px;
+vertical-align: middle;
+overflow-y: scroll;
+overflow-x: hidden;
+}
+
+/* This class sets the attributes of the player name column. It also adjusts the column header. */
+.playerNameSize
+{
+width: 60%;
+display: inline-block;
+overflow: hidden;
+}
+
+/* This class sets the attributes of the player score column. It also adjusts the column header. */
+.playerScoreSize
+{
+width: 21%;
+display: inline-block;
+overflow: hidden;
+}
+
+/* This class sets the attributes of the player ping column. It also adjusts the column header.  */
+.playerPingSize
+{
+width: 19%;
+display: inline-block;
+overflow: hidden;
+}
+
+/* This class is used for the odd rows in the player list */
+.playerRow1
+{
+background-color: #191919;
+font-family: monospace;
+color: #FFFFFF;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+/* This class is used for the even rows in the player list */
+.playerRow2
+{
+background-color: #2a2a2a;
+font-family: monospace;
+color: #FFFFFF;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+/* This class sets the size and font of player names */
+.playerName
+{
+font-size: 10pt;
+font-family: monospace;
+}
+
+/* This class sets the size and font of player scores */
+.playerScore
+{
+font-size: 10pt;
+font-family: monospace;
+text-align: center;
+}
+
+/* This class sets the size and font of players' pings */
+.playerPing
+{
+font-size: 10pt;
+font-family: monospace;
+text-align: center;
+}
+
+/* This class is used for the player count, displayed on the bottom left */
+.playerCount
+{
+position: absolute;
+    top: 259px;
+    left: 46px;
+width: 130px;
+color: #EFEFEF;
+font-size: 13pt;
+font-family: arial;
+vertical-align: middle;
+text-align: center;
+}
+
+/* This class is used to style the message when there are no players online */
+.noPlayersOnline
+{
+color: #FFFFFF;
+font-size: 10pt;
+font-family: monospace;
+text-align: left;
+}
+
+/* This class is the RCon button */
+.rconButton
+{
+position: absolute;
+    top: 247px;
+    left: 196px;
+width: 85px;
+height: 45px;
+cursor: pointer;
+background-image: url("../images/tracker/rcon.png");
+}
+
+/* This class is the hover image for the RCon button */
+.rconButton:hover
+{
+background-image: url("../images/tracker/rcon_h.png");
+}
+
+/* This class is the Param button */
+.paramButton
+{
+position: absolute;
+    top: 247px;
+    left: 281px;
+width: 85px;
+height: 45px;
+cursor: pointer;
+background-image: url("../images/tracker/param.png");
+}
+
+/* This class is the hover image for the RCon button */
+.paramButton:hover
+{
+background-image: url("../images/tracker/param_h.png");
+}
+
+/* This is a container for the levelshots, and it disables selecting them */
+.levelshotFrame
+{
+position: absolute;
+    left: 375px;
+    top: 0px;
+height: 225px;
+width: 300px;
+overflow: hidden;
+user-select: none;
+cursor: pointer;
+}
+
+/* This class is used for the map name, below the levelshot */
+.mapName
+{
+position: absolute;
+    left: 375px;
+    top: 235px;
+height: 17px;
+width: 282px;
+color: #EEEEEE;
+font-size: 9pt;
+font-family: monospace;
+overflow: hidden;
+padding-left: 7px;
+}
+
+/* This class is used for the mod name, below the levelshot */
+.modName
+{
+position: absolute;
+    left: 375px;
+    top: 255px;
+height: 17px;
+width: 150px;
+color: #EFEFEF;
+font-size: 8pt;
+font-family: monospace;
+overflow: hidden;
+padding-left: 7px;
+}
+
+/* This class is used for the gametype, below the levelshot */
+.gametype
+{
+position: absolute;
+    left: 531px;
+    top: 255px;
+height: 17px;
+width: 126px;
+color: #EFEFEF;
+font-size: 8pt;
+font-family: monospace;
+overflow: hidden;
+padding-left: 7px;
+}
+
+/* This class is used for the IP address, below the levelshot */
+.IPAddress
+{
+position: absolute;
+    left: 375px;
+    top: 275px;
+height: 17px;
+width: 255px;
+display: flex;
+color: #EFEFEF;
+font-size: 8pt;
+font-family: monospace;
+overflow: hidden;
+padding-left: 7px;
+}
+
+/* This class is for the blinking cursor at the end of the IP address */
+.blinkingCursor
+{
+height: 20px;
+width: 10px;
+background: url("../images/tracker/blinker1.gif") no-repeat;
+background-position: 2px -2px;
+user-select: none;
+}
+
+
+/*
+NO CONNECTION PAGE STYLES
+NO CONNECTION PAGE STYLES
+*/
+
+/* Used for the text on the "Could Not Connect" page */
+.couldNotConnectText
+{
+color :#EEEEEE;
+font-size: 11pt;
+font-family: monospace;
+}
+
+/* This class is the Reconnect button */
+.reconnectButton
+{
+position: absolute;
+    top: 247px;
+    left: 196px;
+width: 170px;
+height: 45px;
+cursor: pointer;
+background-image: url("../images/tracker/reconnect.png");
+}
+
+/* This class is the hover image for the Reconnect button */
+.reconnectButton:hover
+{
+background-image: url("../images/tracker/reconnect_h.png");
+}
+
+
+/* This class removes the margin and padding around the edge of the page, so ParaTracker will sit flush in the containing element */
+.ParaTrackerPage
+{
+margin: 0px;
+padding: 0px;
+}
+
+
+/*
+This class controls the size of the tracker. It is also the parent element for the entire tracker.
+All properties applied here will be global.
+*/
+.ParaTrackerSize
+{
+width: 675px;
+height: 300px;
+overflow: hidden;
+white-space: nowrap;
+}
+

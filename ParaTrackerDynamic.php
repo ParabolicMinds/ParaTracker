@@ -34,10 +34,10 @@ else
 
 if($dynamicTrackerEnabled != "1")
 {
-    displayError('<h3 class="errorMessage">Dynamic ParaTracker is disabled! If you wish to enable it,<br />first read the warnings in ParaConfig.php then PROCEED WITH CAUTION!</h3>');
+    displayError("Dynamic ParaTracker is disabled! If you wish to enable it,<br />first read the warnings in ParaConfig.php then PROCEED WITH CAUTION!", "", "", "");
 }
 
 
-include("ParaTracker" . $paraTrackerSkin . ".php");
+include($paraTrackerSkin . ".php");
 
 ?>
