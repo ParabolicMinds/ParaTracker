@@ -1,3 +1,3 @@
 # ParaTracker
 
-Open README.HTML for more info.
+Open README.html for more info.
