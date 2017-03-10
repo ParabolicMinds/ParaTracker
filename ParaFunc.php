@@ -70,7 +70,7 @@ else
 }
 
 
-//These two IF statements will avoid warning messages during validation
+//These three IF statements will avoid warning messages during validation
 if(!isset($dynamicTrackerCalledFromCorrectFile))
 {
     $dynamicTrackerCalledFromCorrectFile = "0";
@@ -78,6 +78,10 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
 if(!isset($calledFromRCon))
 {
     $calledFromRCon = "0";
+}
+if(!isset($calledFromParam))
+{
+    $calledFromParam = "0";
 }
 
 /*
@@ -154,20 +158,18 @@ if(isset($paraTrackerSkin))
 {
     $paraTrackerSkin = skinValidator($paraTrackerSkin);
 }
-//If no skin value is given, call the skinValidator function with a null input.
-//This will give us the default value, and suppress error messages.
 else
 {
-    $paraTrackerSkin = skinValidator("");
+    $paraTrackerSkin = skinValidator($defaultSkin);
 }
 
-if($dynamicTrackerCalledFromCorrectFile == "1")
+if($dynamicTrackerCalledFromCorrectFile == "1" || $calledFromParam == "1" || $calledFromRCon == "1")
 {
     //We are running in Dynamic mode. Check to see if a skin file was specified in the URL.
     if(isset($_GET["skin"]))
     {
         //A skin was specified - load it in and validate it.
-        $paraTrackerSkin = skinValidator($_GET["skin"]);
+        $paraTrackerSkin = skinValidator(rawurldecode($_GET["skin"]));
     }
 }
 
@@ -700,15 +702,16 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 
 			            $index = count($returnArray);
 
-			            if ($index < 1 || $cvar['value'] == 0)
+			            if ($index < 1 || $cvar['value'] == "0")
 			            {
-			                $buf .= '<div id="' . $cvar['name'] . '" class="collapsedList"><br /><i>None</i></div>';
+			                $buf .= '<i>None</i>';
+			                $buf2 .= '""';
 			            }
 			            elseif ($cvar['value'] >= pow(2, count($$BitFlagsIndex[$i])))
 			            {
 			                //Miscount detected! Array does not have enough values
 			                $buf .= "<br />Miscount detected! Not enough values in the array for " . $cvar['name'] . ". Check GameInfo.php and add the missing values!</i></div></div>";
-			                $buf2 .= '"Miscount"';
+			                $buf2 .= '"Error: Miscount detected"';
 			            }
 			            else
 			            {
@@ -739,7 +742,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			if($c > 2) $c = 1;
 		}
 		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
-		$buf = htmlDeclarations("Server CVars", "", paraTrackerSkin) . $buf;
+		$buf = htmlDeclarations("Server CVars", "") . $buf;
 		file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
 		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . '],' . $buf2);
 }

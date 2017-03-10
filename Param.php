@@ -6,6 +6,8 @@ echo "<!-- ";
 //as it would be a complete waste of CPU power.
 $safeToExecuteParaFunc = "1";
 
+$calledFromParam = "1";
+
 //Check to see if Dynamic mode gave us an IP address. If it has, let's go into Dynamic mode.
 if(isset($_GET["ip"]))
 {
