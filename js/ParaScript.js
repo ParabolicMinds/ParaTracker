@@ -1,10 +1,136 @@
+//This function opens the param window
+function param_window()
+{
+	if (newWindowSnapToCorner == "1")
+	{
+	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700,left=0,top=0");
+	}
+	else
+	{
+	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700");
+	}
+}
+
+//This function opens the RCon window
+function rcon_window()
+{
+	if (newWindowSnapToCorner == "1")
+	{
+		rconWindow = window.open("RCon.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin, "rconWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375,left=0,top=0");
+	}
+	else
+	{
+		rconWindow = window.open("RCon.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin, "rconWindow" ,"resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375");
+	}
+}
+
+//This function handles the animated levelshots
+function animateLevelshot()
+{
+    if(allowTransitions == 1)
+    {
+        //Set mode to 0 to prevent further triggering
+        mode = 0;
+        //Clear any timers that shouldn't be active, just in case
+        clearTimeout(timer);
+        originalStyleData = document.getElementById("topLayerFade").style.cssText;
+
+        if(levelshotTransitionAnimation == "0")
+        {
+            document.getElementById("topLayerFade").style = originalStyleData + "animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: " + animationList[Math.floor((Math.random() * animationList.length))] + ";";
+        }
+        else
+        {
+            document.getElementById("topLayerFade").style = originalStyleData + "animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: levelshotTransition" + levelshotTransitionAnimation + ";";
+        }
+        timer = setTimeout("swapLevelshots()", levelshotTransitionTime * 1000);
+    }
+}
+
+function swapLevelshots()
+{
+    if (maxLevelshots > 1 && allowTransitions == 1)
+    {
+        //Clear any timers that shouldn't be active, just in case
+        clearTimeout(timer);
+        //A levelshot has finished it's transition, so reset everything
+        count = 0;
+        shot++;
+
+        if(shot > maxLevelshots) shot = 1;
+        {
+            document.getElementById("topLayerFade").style = document.getElementById("bottomLayerFade").style.cssText;
+            document.getElementById("bottomLayerFade").style = document.getElementById("levelshotPreload1").style.cssText;
+            document.getElementById("levelshotPreload1").style = document.getElementById("levelshotPreload2").style.cssText;
+            document.getElementById("levelshotPreload2").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+
+            originalStyleData = "";
+            opac = 1;
+            count = 0;
+            mode = 1;
+
+            //Clear the levelshot timer, and force an immediate levelshot change
+            clearTimeout(timer);
+
+            timer = setTimeout("animateLevelshot()", 1000 * levelshotDisplayTime);
+        }
+    }
+}
+
+function detectLevelshotClasses()
+{
+//Let's detect all levelshot transition animation classes currently in memory.
+//If levelshot transitions are set to random, we'll pick one at random from this list.
+
+    for (let sheeti = 0; sheeti < document.styleSheets.length; sheeti++)
+    {
+      let sheet = document.styleSheets[sheeti]
+      for (let rulei = 0; rulei < sheet.cssRules.length; rulei++)
+        {
+            let rule = sheet.cssRules[rulei]
+            if (rule.cssText.startsWith("@keyframes") && rule.name.startsWith("levelshotTransition"))
+            {
+                animationList.push(rule.name)
+            }
+        }
+    }
+}
+
+//This little bit of code pre-loads the second and third levelshots, and terminates the script if only one levelshot is available.
+function firstExecution()
+{
+   if (maxLevelshots > 1 && allowTransitions == 1);
+        {
+            detectLevelshotClasses();
+            document.getElementById("topLayerFade").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+            shot++;
+            document.getElementById("bottomLayerFade").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+ 
+            //let's set up a pre-loader in case there are more than 2 levelshots
+            shot++;
+            //In case there are only two levelshots, then we will just go back to shot 1
+            if(shot > maxLevelshots) shot = 1;
+            document.getElementById("levelshotPreload1").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+
+            shot++;
+            //In case there are only three levelshots, then we will just go back to shot 1
+            if(shot > maxLevelshots) shot = 1;
+            document.getElementById("levelshotPreload2").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+ 
+            opac = 1;
+            count = 0;
+            mode = 1;
+            timer = setTimeout("animateLevelshot()", 1000 * levelshotDisplayTime);
+        }
+}
+
 function levelshotClick()
 {
-    if (mode == 1)
+    if (mode == 1 && allowTransitions == "1")
     {
         //Clear the levelshot timer, and force an immediate levelshot change
         clearTimeout(timer);
-        timer = setTimeout("fadelevelshot()", 10);
+        animateLevelshot()
     }
 }
 
@@ -25,6 +151,34 @@ function makeReconnectButtonVisible()
     var replaceReconnectClass = "";
     replaceReconnectClass = document.getElementById("reconnectButton").className;
  	document.getElementById("reconnectButton").className = replaceReconnectClass.replace("hide", "");
+}
+
+function initializeTimer()
+{
+    replaceStuff = document.getElementById("refreshTimerDiv").className;
+    document.getElementById("refreshTimerDiv").className = replaceStuff.replace("hiddenTimer", "");
+    document.getElementById("refreshTimerDiv").innerHTML = refreshTimer;
+
+    pageReloadTimer = setTimeout("refreshTick()", 1000);
+}
+
+//This function counts down each second until the tracker's auto-refresh
+function refreshTick()
+{
+    if(refreshCancelled == "0")
+    {
+        if(refreshTimer > 0)
+        {
+            refreshTimer--;
+            document.getElementById("refreshTimerDiv").innerHTML = refreshTimer;
+            pageReloadTimer = setTimeout("refreshTick()", 1000);
+        }
+        else
+        {
+		    document.getElementById("refreshTimerDiv").innerHTML = "...";
+            pageReload();
+        }
+    }
 }
 
 function pageReload()
@@ -67,10 +221,11 @@ function createURL()
     }
     else
     {
-    var outputURL = "http://";
+    var outputURL = "//";
     var width = "";
     var height = "";
-    var radioButton = "";
+    var skinFile = "";
+    var skinFieldValue = "";
 
     outputURL += document.getElementById("currentURL").value;
     outputURL += "?ip=";
@@ -87,118 +242,22 @@ function createURL()
     }
 
     outputURL += "&skin=";
-    if(document.getElementById("SkinID-JSON"))
-    {
-        if(document.getElementById("SkinID-JSON").checked)
-        {
-            radioButton += "ParaJSON";
-            width = "675";
-            height = "300";
-        }
-    }
-    if(document.getElementById("SkinID-H"))
-    {
-        if(document.getElementById("SkinID-H").checked)
-        {
-            radioButton += "ParaTrackerH";
-            width = "120";
-            height = "600";
-        }
-    }
-    if(document.getElementById("SkinID-G"))
-    {
-        if(document.getElementById("SkinID-G").checked)
-        {
-            radioButton += "ParaTrackerG";
-            width = "120";
-            height = "600";
-        }
-    }
-    if(document.getElementById("SkinID-F"))
-    {
-        if(document.getElementById("SkinID-F").checked)
-        {
-            radioButton += "ParaTrackerF";
-            width = "468";
-            height = "60";
-        }
-    }
-    if(document.getElementById("SkinID-E"))
-    {
-        if(document.getElementById("SkinID-E").checked)
-        {
-            radioButton += "ParaTrackerE";
-            width = "468";
-            height = "60";
-        }
-    }
-    if(document.getElementById("SkinID-D"))
-    {
-        if(document.getElementById("SkinID-D").checked)
-        {
-            radioButton += "ParaTrackerD";
-            width = "250";
-            height = "250";
-        }
-    }
-    if(document.getElementById("SkinID-C"))
-    {
-        if(document.getElementById("SkinID-C").checked)
-        {
-            radioButton += "ParaTrackerC";
-            width = "600";
-            height = "225";
-        }
-    }
-    if(document.getElementById("SkinID-B"))
-    {
-        if(document.getElementById("SkinID-B").checked)
-        {
-            radioButton += "ParaTrackerB";
-            width = "600";
-            height = "225";
-        }
-    }
-    if(document.getElementById("SkinID-A"))
-    {
-        if(document.getElementById("SkinID-A").checked)
-        {
-            radioButton += "ParaTrackerA";
-            width = "675";
-            height = "300";
-        }
-    }
-    if(radioButton == "")
-    {
-        radioButton = "ParaTrackerA";
-    }
 
-    outputURL += radioButton;
-    
-    outputURL += "&game=";
+    skinFieldValue = document.getElementById("skinID").value;
+    skinFieldValue = skinFieldValue.split(":#:");
+    skinFile = skinFieldValue[0];
 
-    if(document.getElementById("GameNameDropdown").value == "other")
-    {
-        if(document.getElementById("GameName").value == "")
-        {
-            outputURL += "Jedi Academy";
-        }
-        else
-        {
-        outputURL += document.getElementById("GameName").value;
-        }
-    }
-    else
-    {
-    outputURL += document.getElementById("GameNameDropdown").value;
-    }
+    skinWidth = skinFieldValue[1];
+    skinHeight = skinFieldValue[2];
+
+    outputURL += skinFile;
 
 
     outputURL= encodeURI(outputURL);
 
     document.getElementById("finalURL").value = outputURL;
 
-    outputURL = '<object id="ParaTracker" type="text/html" data="' + outputURL + '" width="' + width + '" height="' + height + '" ></object>';
+    outputURL = '<iframe id="ParaTracker" src="' + outputURL + '" width="' + skinWidth + '" height="' + skinHeight + '" sandbox="allow-forms allow-popups allow-scripts allow-same-origin" style="border:none;background:none transparent;" allowtransparency="true" scrolling="no"></iframe>';
     document.getElementById("finalURLHTML").value = outputURL;
 
     document.getElementById("paraTrackerTestFrameContent").innerHTML = outputURL;
@@ -229,7 +288,6 @@ function clearOutputFields()
     document.getElementById("finalURL").value = "";
     document.getElementById("finalURLHTML").value = "";
     document.getElementById("paraTrackerTestFrameContent").innerHTML = "";
-//    document.getElementById("paraTrackerTestFrame").className = "collapsedFrame";  //I see no reason to remove the frame, it just scrolls the page up for no reason and is annoying.
 }
 
 function RConFloodProtectTimer()
@@ -261,4 +319,3 @@ function RConFloodProtectTimer()
         RConTimer = setTimeout("RConFloodProtectTimer()", 1000);
     }
 }
-

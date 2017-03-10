@@ -1,5 +1,4 @@
 <?php
-echo "<!--";
 /*
 
 ParaTracker is released under the MIT license, which reads thus:
@@ -12,6 +11,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 */
 
+
+//This line is for JSON, and absolutely must be the first thing
+ob_start();
+
+
+echo "<!--";
 
 //This variable allows ParaFunc.php to see that we are running in dynamic mode
 $dynamicTrackerCalledFromCorrectFile = "1";
@@ -37,7 +42,14 @@ if($dynamicTrackerEnabled != "1")
     displayError("Dynamic ParaTracker is disabled! If you wish to enable it,<br />first read the warnings in ParaConfig.php then PROCEED WITH CAUTION!", "", "", "");
 }
 
-
-include($paraTrackerSkin . ".php");
+if (file_exists("ParaTrackerStatic.php"))
+{
+include 'ParaTrackerStatic.php';
+}
+else
+{
+    displayError("ParaTrackerStatic.php not found - cannot continue!", "");
+    exit();
+}
 
 ?>

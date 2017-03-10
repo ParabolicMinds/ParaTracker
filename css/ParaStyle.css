@@ -10,293 +10,31 @@ you will find it in ParaConfig.php
 
 
 
-
-
-
-
 /*
-RCON PAGE CLASSES
-RCON PAGE CLASSES
+PARATRACKER DYNAMIC SETUP PAGE CLASSES
+PARATRACKER DYNAMIC SETUP PAGE CLASSES
 */
 
 
-/* This class is the overall appearance of the RCon window */
-.RConPage
+/* This class sets the width of the page */
+.dynamicPageWidth
 {
-background-color: #000000;
-color: #EEEEEE;
-font-size: 11pt;
-font-family: monospace;
-text-align: left;
+width: 1050px;
+display: inline-block;
 }
 
-/* This class is for the Command and Password labels */
-.RConPasswordCommand
+/* This class aligns the text to the center of the page */
+.dynamicPageContainer
 {
-font-family: inherit;
-}
-
-/* This class is for the text boxes where the user enters RCon data */
-.RConInput
-{
-background-color: inherit;
-color: #FFFFFF;
-}
-
-/* This class is for the text boxes where the user enters the RCON data */
-input[type=text], input[type=password]
-{
-padding: 4px 10px;
-border: 1px;
-border-bottom-style: solid;
-border-top-style: none;
-border-right-style: none;
-border-left-style: none;
-font-family: inherit;
-}
-
-/* This class is for the Send button */
-input[type=submit]
-{
-padding: 10px 10px;
-border: 1px;
-background-color: #292929;
-cursor: pointer;
-color: #EEEEEE;
-font-family: inherit;
-}
-
-/* This class is for the server address and response text, just below the form */
-.RConServerAddressResponse
-{
-background-color: inherit;
-font-family: inherit;
-}
-
-/* This class is for the actual server response */
-.RConServerResponse
-{
-background-color: inherit;
-font-family: inherit;
-color: #EEEEEE;
-}
-
-/* This class is for the blinking cursor on the RCon page */
-.RConblinkingCursor
-{
-display: inline;
-width: 12px;
-background: url("../images/tracker/blinker2.gif") no-repeat;
-user-select: none;
-}
-
-/* This class is used as a container for the countdown timer that appears if someone tries to send RCon commands too quickly */
-.RConTimeoutTimer
-{
-display: inline;
-}
-
-/* No idea if this is used any more */
-.text
-{
-color:#EFEFEF;
-font-size:8pt;
-font-family: verdana;
-}
-
-/* This class sets the size of the form where the user enters the RCon command and password */
-.RConPasswordCommandSize
-{
-width: 740px;
-height: 50px;
-text-align: left;
-}
-
-/* This class sets the size of the container that displays the server's response. */
-.RConServerResponseFrame
-{
-width: 740px;
-}
-
-/* This class sets the size of the container that displays the server's response. */
-.RConServerResponseScroll
-{
-width: 740px;
-height: 215px;
-/*
-Not sure if I should use this next line or not. It kind of ruins the already barely-existing feel of using a command prompt...
-overflow-y: scroll;
-*/
-overflow-wrap: break-word;
-}
-
-
-/*
-PARAM PAGE CLASSES
-PARAM PAGE CLASSES
-*/
-
-
-/* This class is the fonts and colors for the Param page */
-.cvars_page
-{
-background-color:#111111;
-color:#EFEFEF;
-font-size:8pt;
-font-family: "Trebuchet MS";
-text-align:center;
-}
-
-/* This class is for the "Server Cvars" text at the top of the page */
-.CVarHeading
-{
-color:#EFEFEF;
-font-size:22pt;
-font-weight:bold;
-text-align:center;
-}
-
-/* This class is for the server IP and port at the top of the page */
-.CVarServerAddress
-{
-color:#EFEFEF;
-font-size:9pt;
-font-weight:bold;
-text-align:center;
-}
-
-/* This class is for the title row at the top of the CVar table */
-.cvars_titleRow
-{
-background-color:#383833;
-font-weight:bold;
-font-size: 14pt;
+width: 100%;
 text-align: center;
-vertical-align: middle;
 }
 
-/* This class determines the color of each odd row of the CVar table */
-.cvars_row1
-{
-height: 28px;
-background-color:#333333;
-text-align: center;
-font-size: 10pt;
-}
-
-/* This class determines the color of each even row of the CVar table */
-.cvars_row2
-{
-height: 28px;
-background-color:#3F3F3F;
-text-align: center;
-font-size: 10pt;
-}
-
-/* This class is for the individual table cells in the CVar table */
-.CVarCell
-{
-width: 270px;
-text-align: center;
-font-size: 10pt;
-padding-bottom: 10px;
-vertical-align: middle;
-}
-
-/* This class is for the "(Click to expand/collapse)" text on the expanding list */
-.expandCollapse
-{
-font-size: 7pt;
-}
-
-/*
-PARAM PAGE CLASSES
-PARAM PAGE CLASSES
-*/
-
-
-/* This class centers the table and makes it fill most of the window */
-.FullSizeCenter
-{
-width: 540px;
-margin: 0 auto 0 auto;
-}
-
-/* This class sets the width of the Name column */
-.nameColumnWidth
-{
-width: 250px;
-overflow-wrap: break-word;
-}
-
-/* This class sets the width of the Name column */
-.valueColumnWidth
-{
-padding-top: 6px;
-padding-bottom: 6px;
-width: 290px;
-display: block;
-overflow-wrap: break-word;
-}
-
-/* This class sets the padding and size of the CVar table */
-.CVarTable
-{
-border:1px solid white;
-width: 540px;
-padding-top: 0px;
-padding-bottom: 0px;
-padding-right: 0px;
-padding-left: 0px;
-}
-
-/* This class aligns the CVar table in the center of the page */
-.CVarTableWrapper
+/* This class is used for the page formatting in ParaTrackerDynamic.php */
+.dynamicConfigPage
 {
 text-align: center;
-width: 540px;
-margin: auto;
 }
-
-/* This class defines the size of the title row. It should be slightly larger than the rest of the table */
-.cvars_titleRowSize
-{
-padding-bottom: 5px;
-height: 28px;
-width: 540px;
-}
-
-/* This class is for each row in the CVar table  */
-.CVarRow
-{
-padding-bottom: 10px;
-height: 28px;
-}
-
-/* This class displays the CVar lists for the collapsible items  */
-.expandedList
-{
-display: inline;
-}
-
-/* This class hides the CVar lists for the collapsible items  */
-.collapsedList
-{
-display: none;
-}
-
-/* This class makes the cursor display a pointer over the expand/collapse lists  */
-.CVarExpandList
-{
-cursor:pointer;
-}
-
-
-
-/*
-PARA TRACKER DYNAMIC SETUP PAGE CLASSES
-PARA TRACKER DYNAMIC SETUP PAGE CLASSES
-*/
 
 
 /* This class is used for the page formatting in ParaTrackerDynamic.php */
@@ -318,90 +56,127 @@ font-family: inherit;
 font-size: 12pt;
 }
 
+/* This class is used to center the list of supported games on ParaTrackerDynamic.php */
+.centerTable
+{
+margin-left: auto;
+margin-right: auto;
+text-align: center;
+width: 500px;
+}
 
-/*
-COLORIZER CLASSES
-COLORIZER CLASSES
+/* This class is for the "Generate!" button on ParaTrackerDynamic.php */
+.dynamicFormButtons
+{
+padding: 10px 10px;
+border: 1px;
+cursor: pointer;
+}
 
-The following values are used for colorizing things like player names and the server name.
-They are already accurate. Do not change them unless you have a very good reason!
-*/
+/* This class is used for the test frame on ParaTrackerDynamic.php */
+.paraTrackerTestFrame
+{
+background-color: #EEEEEE;
+color: #EEEEEE;
+width: 901px;
+height: 812px;
+margin: 0 auto;
+text-align: center;
+}
 
-.color0
+/* This class makes the test frame visible on ParaTrackerDynamic.php */
+.expandedFrame
+{
+display: block;
+}
+
+/* This class hides the test frame on ParaTrackerDynamic.php */
+.collapsedFrame
+{
+display: none;
+}
+
+
+
+/* The following values are used for colorizing the list of supported games. */
+.gameColor0
 /* Black (Gray is used for readability)
 Default is #6F6F6F */
 {
 color: #6F6F6F;
+font-weight: bold;
 }
 
-.color1
+.gameColor1
 /* Red
 Default is #FF0000 */
 {
 color: #FF0000;
+font-weight: bold;
 }
 
-.color2
+.gameColor2
 /* Green
 Default is #00FF00 */
 {
 color: #00FF00;
+font-weight: bold;
 }
 
-.color3
+.gameColor3
 /* Yellow
 Default is #FFFF00 */
 {
 color: #FFFF00;
+font-weight: bold;
 }
 
-.color4
+.gameColor4
 /* Blue
 Default is #2222FF */
 {
 color: #2222FF;
+font-weight: bold;
 }
 
-.color5
+.gameColor5
 /* Cyan
 Default is #00FFFF */
 {
 color: #00FFFF;
+font-weight: bold;
 }
 
-.color6
+.gameColor6
 /* Pink/Purple
 Default is #FF00FF */
 {
 color: #FF00FF;
+font-weight: bold;
 }
 
-.color7
+.gameColor7
 /* White
 Default is #FFFFFF */
 {
 color: #FFFFFF;
+font-weight: bold;
 }
 
-.color8
+.gameColor8
 /* Orange
 Default is #FF4400 */
 {
 color: #FF4400;
+font-weight: bold;
 }
 
-.color9
+.gameColor9
 /* Gray
 Default is #8A8A8A */
 {
 color: #8A8A8A;
-}
-
-.color?
-/* Unknown Colors
-Default is #FFFFFF */
-{
-color: #FFFFFF;
+font-weight: bold;
 }
 
 
@@ -419,6 +194,26 @@ font-size:18pt;
 font-weight:bold;
 }
 
+/* When an error message is displayed, this is the class used. Most error messages use the <h3> tag as well. */
+.errorMessage
+{
+font-weight: bold;
+font-size: 14pt;
+}
+
+/* This class removes link formatting from anchor tags */
+a
+{
+color: inherit;
+text-decoration: none;
+}
+
+/* Used for div tables, but I don't think it is used anywhere */
+.clear
+{
+clear: both;
+}
+
 /* No idea if this is used any more */
 .info
 {
@@ -428,8 +223,15 @@ font-family:monospace;
 line-height:90%;
 }
 
-/* This class is used to hide the refresh timer on page load. Do not remove it. */
+/* This class is used to hide the refresh timer on page load. */
 .hiddenTimer
 {
 display: none;
 }
+
+/* This class is used to hide the reconnect button until another attempt is available. */
+.hide
+{
+display: none;
+}
+

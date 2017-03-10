@@ -3,10 +3,11 @@
 // ParaTracker Configuration //
 ///////////////////////////////
 
-// This is the config file for ParaTracker.
-// The only visual setting found here is the frame border.
+// This is the configuration file for ParaTracker.
 // If you want to edit fonts and colors, they are found
-// in ParaStyle.css and the ParaSkin.css files, not here.
+// in the css files found in the /skins folder.
+// You can change the skin used in static mode here, but there are
+// no other visual settings.
 
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
@@ -24,7 +25,7 @@
 // This is the IP Address of the server. Do not include the port number!
 // By default, and for security, this value is empty. If ParaTracker is launched without a value here,
 // it will display a message telling the user to check config.php before running.
-$serverIPAddress = "212.224.101.83";
+$serverIPAddress = "";
 
 
 // Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
@@ -58,24 +59,37 @@ $connectionTimeout = "2.5";
 $refreshTimeout = "3";
 
 
+// VISUAL SETTINGS
+// VISUAL SETTINGS
+
+// This line specifies which skin file to load. Skins are found in the skins/ folder, and they are all
+// simple CSS files. The name is case sensitive.
+// ParaTracker will automatically search in the skins/ folder for the file specified, and it will automatically
+// add the ".css" file extension. All you need to include here is the file name, minus the extension.
+// You can make your own custom CSS skins, but if you want to use JSON to make a custom skin, then
+// set this value to "JSON" and the tracker will send an unformatted JSON response.
+// Default value is "Metallic Console"
+$paraTrackerSkin = "Metallic Console";
+
+
 // LEVELSHOT SETTINGS
 // LEVELSHOT SETTINGS
 
 // Levelshots will be searched for on the web server in the images/levelshots folder.
 // If the map is mp/ffa5, ParaTracker will search for images in images/levelshots/mp/ffa5.
 
-// For levelshots to fade, they will have to be named with _1, _2, and _3 at the end of the file name.
-// For instance, to have three fading levelshots for mp/ffa5, the files would have to be in
+// For levelshots to animate, they will have to be named with _1, _2, and _3 at the end of the file name.
+// For instance, to have three animated levelshots for mp/ffa5, the files would have to be in
 // the images/levelshots/mp folder, and they would need to be named ffa5_1.jpg, ffa5_2.jpg,
 // and ffa5_3.jpg
 
 // ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be used first, JPGs second,
 // and GIFs third. If no images are found, a placeholder image will be displayed instead.
 
-// The following value will enable or disable fading levelshots. A value of 1 or "Yes" will allow them,
+// The following value will enable or disable levelshot transitions. A value of 1 or "Yes" will allow them,
 // and any other value with disable them. If this is disabled, only the first levelshot will show.
 // Default value is 1.
-$fadeLevelshots = "1";
+$levelshotTransitionsEnabled = "1";
 
 // This is the amount of time, in seconds, each levelshot will be displayed before moving on to the next.
 // Decimals are acceptable. Minimum is 1 second. Maximum is 15 seconds.
@@ -85,15 +99,31 @@ $levelshotDisplayTime = "3";
 // This is the amount of time, in second, each levelshot will take to fade into the next one.
 // Note that fades do not work in some browsers, like Internet Explorer 8.
 // Decimals are acceptable. Minimum is 0.1 seconds. Maximum is 5 seconds.
-// Default is .5 seconds.
-$levelshotTransitionTime = ".5";
+// Default is 1 seconds.
+$levelshotTransitionTime = "1";
 
-// This is the frame rate at which levelshots will transition. Higher values are smoother,
-// and lower values are choppier. Values between 10 and 30 are good. A value of 1 will
-// disable the fading and give a "slide show" feel.
-// Any value below 1 is forbidden. Values above 60 are also forbidden.
-// Default is 30 FPS.
-$levelshotFPS = "30";
+// This is the animation that will be used for fading levelshots.
+// If you want to change the animations, they are found in "css/LevelshotAnimations.css"
+// Valid values are whole numbers between 0 to 999 (No decimals).
+// Setting this value to 0 will play a random animation.
+// Default value is 0
+// The default transitions are as follows:
+// Transition 1: Fade
+// Transition 2: Fade to black
+// Transition 3: Hue shift
+// Transition 4: Skew
+// Transition 5: Horizontal Stretch
+// Transition 6: Stretch and rebound
+// Transition 7: Slide to left
+// Transition 8: Slide to right
+// Transition 9: Slide to top
+// Transition 10: Slide to bottom
+// Transition 11: Spin and fly to top left
+// Transition 12: Spin and fly to top right
+// Transition 13: Fall away and spin
+// Transition 14: Zoom in
+// Transition 15: Blur
+$levelshotTransitionAnimation = "0";
 
 // The following value is the maximum number of levelshots that can be used. Keep in mind that
 // more levelshots is not always better. Minimum is 1, maximum is 99.
@@ -105,17 +135,10 @@ $maximumLevelshots = "20";
 // TRACKER SETTINGS
 
 // This value is boolean. When this variable is set to Yes or 1, offending symbols will be
-// filtered from the server name. Currently the only affected symbol is the Euro symbol, €.
+// filtered from the server name. Frequently, people will put unreadable symbols into their
+// server names to get a higher alphabetical listing. This feature will remove the nonsense symbols.
 // Default is 1.
 $filterOffendingServerNameSymbols = "1";
-
-// This is the name of the game being tracked; I.E. Jedi Academy, Jedi Outcast, Call Of Duty 4, etc.
-// It is displayed underneath the server name in the top left corner of the tracker.
-// For future-proofing, this value is left to you, the user.
-// The levelshots derive their directory from this value, so make sure it is correct! For instance,
-// a value of "Jedi Academy" means ParaTracker will look for levelshots in "images/levelshots/jedi academy"
-// Default is "Jedi Academy"
-$gameName = "Jedi Academy";
 
 // No Players Online Message
 // This message displays in place of the player list when nobody is online.
@@ -137,21 +160,22 @@ $enableAutoRefresh = "1";
 $autoRefreshTimer = "30";
 
 // This variable will set the maximum number of characters ParaTracker will accept from the server.
-// This prevents pranksters from sending 50MB back, in the unlikely event that you connect to
+// This prevents pranksters from sending 50MB back, in the event that you connect to
 // the wrong server. Minimum is 2000 characters, maximum is 50000 characters.
-// Default is 4000 characters.
-$maximumServerInfoSize = "4000";
+// If this limit is met, ParaTracker will terminate with an error.
+// Default is 16384 characters (One packet).
+$maximumServerInfoSize = "16384";
 
 // This next setting enables "Dynamic" ParaTracker. Clients can load "ParaTrackerDynamic.php" and give
 // an IP address, port number and visual theme ID in the URL, and ParaTracker will connect to that server.
-// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=ParaTrackerA&game=Jedi%20Academy"
+// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=ParaSkinA"
 // DO *NOT*, I REPEAT, DO *NOT* ENABLE THIS FEATURE UNLESS YOU WANT PEOPLE USING YOUR WEBSITE TO TRACK THEIR SERVERS.
 // Also, DO NOT run ParaTracker in this mode without isolating it in its own webroot first - the consequences
 // can be grave if there is a security hole that I have not yet found!
-// If you do not understand what this feature is, DO NOT enable it.
+// If you do not understand what this feature is, then DO NOT enable it.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default.
-$dynamicTrackerEnabled = "1";
+$dynamicTrackerEnabled = "0";
 
 // The following setting is a personal message that will be displayed on ParaTrackerDynamic.php when a user is setting
 // up ParaTracker for their own use. By default, this is simply a link to our GitHub, where you can download the program
@@ -167,7 +191,7 @@ $personalDynamicTrackerMessage = "ParaTracker is free, open-source software! Dow
 // This value will enable or disable RCon.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default for security.
-$RConEnable = "1";
+$RConEnable = "0";
 
 // This value sets the maximum number of characters ParaTracker will send to the server.
 // If the command or password is any larger than this, the command will not be sent.
@@ -198,6 +222,24 @@ $RConLogSize = "1000";
 // Does not appear to work correctly in Google Chrome.
 // Default is 0.
 $newWindowSnapToCorner = "0";
+
+
+// GEOIP SETTINGS
+// GEOIP SETTINGS
+
+// This value is boolean. When this variable is set to Yes or 1, GeoIP will be enabled, which
+// allows a country flag icon to be displayed on the tracker.
+// GEOIP MUST BE INSTALLED ON THE SERVER FOR THIS TO WORK.
+// If ParaTracker does not find GeoIP, it will ignore this setting and give an error message.
+// Default is 0.
+$enableGeoIP = "0";
+
+// For GeoIP to work, ParaTracker needs to know where to find it. This path needs to point to
+// the GeoIP PHP file, as ParaTracker will load it on startup.
+// Since typically GeoIP will be in the same directory as ParaTracker, the
+// default value is ""
+$geoIPPath = "";
+
 
 
 // End of config file

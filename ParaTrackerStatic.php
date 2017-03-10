@@ -1,5 +1,4 @@
 <?php
-echo "<!--";
 /*
 
 ParaTracker is released under the MIT license, which reads thus:
@@ -13,18 +12,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 
-//This line specifies which CSS file to load. The name is case sensitive.
-//This is a direct link, so the directory must be included.
-$skinFile = "css/ParaSkinA.css";
-
-// --- IF YOU WANT TO CHANGE THE APPEARANCE, CHANGE THE CSS FILE LINKED TO ON THE LINE ABOVE ---
-
-
-
-// --- DO NOT EDIT ANYTHING BEYOND THIS POINT ---
-// --- DO NOT EDIT ANYTHING BEYOND THIS POINT ---
+if(!isset($dynamicTrackerCalledFromCorrectFile))
+{
+    //We are running in static mode. Set the output buffer here, for JSON compatibility.
+    ob_start();
+}
 
 
+echo "<!--";
 
 //This variable will allow ParaFunc to execute.
 //The point of this variable is to prevent ParaFunc from being executed directly,
@@ -48,29 +43,48 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
     }
 }
 
-//Check to see if the supplied CSS file for the skin is legitimate.
-if (!file_exists($skinFile))
-{
-    displayError('Could not find CSS file "' . $skinFile . '"!');
-}
-
 //Check to see if an update needs done, and do it
-checkForAndDoUpdateIfNecessary($serverIPAddress, $serverPort, $dynamicIPAddressPath, $floodProtectTimeout, $connectionTimeout, $refreshTimeout, $fadeLevelshots, $levelshotDisplayTime, $levelshotTransitionTime, $levelshotFPS, $maximumLevelshots, $levelshotFolder, $filterOffendingServerNameSymbols, $gameName, $noPlayersOnlineMessage, $enableAutoRefresh, $autoRefreshTimer, $maximumServerInfoSize, $RConEnable, $RConMaximumMessageSize, $RConFloodProtect, $RConLogSize, $newWindowSnapToCorner, $dynamicTrackerEnabled);
+checkForAndDoUpdateIfNecessary();
 
 
-if (file_exists("info/" . $dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . $dynamicIPAddressPath . "serverDump.txt") != "")
+if (file_exists("info/" . dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . dynamicIPAddressPath . "serverDump.txt") != "")
 {
     //Server dump detected - connection assumed successful! Rendering a normal page.
-    $output = renderNormalHTMLPage($dynamicIPAddressPath, $skinFile, $gameName, $serverIPAddress, $serverPort, $RConEnable);
+    if(strtolower(paraTrackerSkin) == "json")
+    {
+        //We are running in JSON mode! Output the JSON response here.
+        renderJSONPage();
+    }
+    else
+    {
+        //Render a normal tracker page
+        $output = renderNormalHTMLPage(file_get_contents("info/" . dynamicIPAddressPath . "gamename.txt"));
+
+        //Flush the output buffer to the client
+        ob_end_flush();
+    }
 }
 else
 {
     //Could not connect to the server! Display error page.
-    $output = renderNoConnectionHTMLPage($dynamicIPAddressPath, $skinFile, $serverIPAddress, $serverPort, $floodProtectTimeout);
+    if(strtolower(paraTrackerSkin) == "json")
+    {
+        //We are running in JSON mode! Output the JSON response here.
+        renderJSONPage();
+    }
+    else
+    {
+        //Render a normal error page
+        $output = renderNoConnectionHTMLPage();
+
+    }
 }
 
 echo "-->";
 
 echo $output;
+
+//Flush the output buffer to the client
+ob_end_flush();
 
 ?>

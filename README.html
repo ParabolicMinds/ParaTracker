@@ -155,7 +155,7 @@ color: #FF8800;
 ********************************************************
 </h2>
 
-<h3>Title: ParaTracker 1.2.2</h3>
+<h3>Title: ParaTracker 1.3</h3>
 
 <h3>Authors: Parabolic Mind - <span class="green">NA</span><span class="pink">B6</span><span class="blue">22</span>, <span class="blue">Phazmatis</span>, <span class="red">Cagelight</span></h3>
 
@@ -170,17 +170,17 @@ color: #FF8800;
 </div>
 <div id="description" class="hidden">
 <p>
-ParaTracker is a server tracker created for Jedi Academy, but it can also track most other Quake III games.<br />
-Jedi Outcast and Tremulous are supported by default. All you have to do is put ParaTracker on your web server, make sure it has permission to read and write files and directories, then configure it with the IP address, port, and the title of the game running on your server.
+ParaTracker is a PHP based server tracker originally created for Jedi Academy, but it can also track many other Quake III games.<br />
+All you have to do is put ParaTracker on your web server, make sure it has permission to read and write files and directories, then configure it with the IP address and port of the game server, and optionally, a skin file of your choice.
 </p>
 <p>
 ParaTracker has two modes: <span class="red">Static</span> and <span class="blue">Dynamic</span>.
 </p>
 <p>
 <span class="red">Static</span> mode runs directly from the settings in <span class="green">ParaConfig.php</span>, and none of the options<br />
-can be changed by the end user.</p>
+can be changed by the viewers.</p>
 <p>
-<span class="blue">Dynamic</span> mode loads all the settings from <span class="green">ParaConfig.php</span>, but it accepts an IP address, port number, skin ID, and game name from the end user. This enables other people to use ParaTracker on their own website, without installing it. This mode is a little risky and should be used with caution.
+<span class="blue">Dynamic</span> mode loads all the settings from <span class="green">ParaConfig.php</span>, but it accepts an IP address, port number and skin ID from the end user. This enables other people to use ParaTracker on their own website, without installing it. This mode is a little risky and should be used with caution.
 </p>
 </div>
 
@@ -194,8 +194,8 @@ can be changed by the end user.</p>
 
 <p>To install ParaTracker, just copy all the files from this folder onto your own web server,<br />
 and make sure it has enough free space after installation to write files.<br />
-For <span class="red">static</span> mode (Only tracking one server, which is the default), you should only need about 20 MB of space.<br />
-If you are running in <span class="blue">dynamic</span> mode, make sure there are several hundred MB of space available, as every server that is tracked will cause a new folder to be created and filled with data.</p>
+For <span class="red">static</span> mode (Only tracking one server, which is the default), you should only need 5 MB of free space or less.<br />
+If you are running in <span class="blue">dynamic</span> mode, make sure there are several hundred MB of space available, because every server that is tracked will create a new folder and populate it with server data.</p>
 </div>
 
 <hr class="width50" />
@@ -208,33 +208,24 @@ If you are running in <span class="blue">dynamic</span> mode, make sure there ar
 <p>After installing ParaTracker, open <span class="green">ParaConfig.php</span> in a text editor. Set the IP address and port of your server, as well
 as any other parameters that you feel like changing.</p>
 
-<p>There are comments throughout the file that explain each feature. RCon is available, but is disabled
+<p>There are comments throughout <span class="green">ParaConfig.php</span> that explain each feature. RCon is available, but is disabled
 by default for security. <span class="blue">Dynamic</span> mode, which enables the user to input their own IP
 address and port, is also disabled by default, because it enables other users to use your
 website's bandwidth, as well as being a security risk. <strong>DO NOT</strong> enable <span class="blue">dynamic</span> mode unless ParaTracker
 is isolated in it's own webroot, as any security holes in ParaTracker could give someone root access
 to your web server.</p>
 
-<h3>If you mess something up in <span class="green">ParaConfig.php</span> and you can't figure it out, delete the file and load <span class="green">ParaTrackerA.php</span> in your browser. A default file will be generated for you, and you can start over.</h3>
+<h3>If you mess something up in <span class="green">ParaConfig.php</span> and you can't figure it out, delete the file and load <span class="green">ParaTrackerStatic.php</span> in your browser. A default file will be generated for you, and you can start over.</h3>
 
-<p>To use ParaTracker in <span class="red">static</span> mode (Running strictly with options from <span class="green">ParaConfig.php</span>), load one of the skin files
-on your web browser, like:
-<span class="green">ParaTrackerA.php</span>, <span class="green">ParaTrackerB.php</span>, <span class="green">ParaTrackerC.php</span>, <span class="green">ParaTrackerD.php</span>, and so on.</p>
+<p>To use ParaTracker in <span class="red">static</span> mode (Running strictly with options from <span class="green">ParaConfig.php</span>), load <span class="green">ParaTrackerStatic.php</span>.</p>
 
-<p>To insert ParaTracker onto a web page in <span class="red">static</span> mode, add an <strong>&lt;object&gt;</strong> tag somewhere on your website that
-references the skin file you want to use, with the appropriate size and width settings. For instance:</p>
-
-<!--
-<object id="ParaTracker" type="text/html" data="http://www.nab622.com/ParaTracker/ParaTrackerA.php" width="675" height="300" ></object>
--->
+<p>To insert ParaTracker onto a web page in <span class="red">static</span> mode, use the <strong>&lt;object&gt;</strong> tag, with the appropriate size and width settings. For instance:</p>
 
 <h3><span class="red">
-&lt;object id="ParaTracker" type="text/html" data="http://www.nab622.com/ParaTracker/<span class="green">ParaTrackerA.php</span>" width="<span class="green">675</span>" height="<span class="green">300</span>"&gt;&lt;/object&gt;
+&lt;object id="ParaTracker" type="text/html" data="http://www.nab622.com/ParaTracker/<span class="green">ParaTrackerStatic.php</span>" width="<span class="green">675</span>" height="<span class="green">300</span>"&gt;<br />&lt;/object&gt;
 </span></h3>
 
-<p>In the above sample, <span class="green">ParaTrackerA.php</span> means that it will load skin <span class="green">A</span>, and the <span class="green">width</span> and <span class="green">height</span> settings are set to match the size of the skin.<br />
-For skin <span class="green">B</span>, you would load <span class="green">ParaTrackerB.php</span>, and set the <span class="green">width</span> to <span class="red">600</span> and the <span class="green">height</span> to <span class="red">225</span>. <!-- For skin C, you would load <strong>ParaTrackerC.php</strong>, etc. -->
-</p>
+<p>Keep in mind that each skin is a different size; if you want to change skins, you will need to change the size to match.</p>
 
 
 <p>To use ParaTracker in <span class="blue">dynamic</span> mode, you first have to enable it in <span class="green">ParaConfig.php</span>. Then, load up
@@ -242,9 +233,9 @@ For skin <span class="green">B</span>, you would load <span class="green">ParaTr
 Remember: other people can use this mode to track their game servers, using your web server as the medium.</p>
 
 
-<p>All RCon usage is logged in the logs/ folder. Inside the logs folder will be a folder named after the server
+<p>All RCon usage is logged in the /logs folder. Inside the logs folder will be a folder named after the server
 IP address and port number of the server, and inside that folder will be <span class="green">RConLog.php</span>. For security reasons,
-you cannot load this file from a web browser - you must download it to your computer, and open it in a text editor.</p>
+you cannot load this file from a web browser - you must download it to your computer, and open it in a text editor. All attempts at RCon access will be logged.</p>
 </div>
 
 <hr class="width45" />
@@ -255,20 +246,23 @@ you cannot load this file from a web browser - you must download it to your comp
 <div id="levelshots" class="hidden">
 
 <p>
-ParaTracker will accept custom levelshots for any game it is able to track. It will automatically search for levelshots in a folder named after the game you specify. The levelshots must be stored in:<br />
+ParaTracker will accept custom levelshots for any game it is able to track. It will automatically search for levelshots in a folder named after the game. The levelshots must be stored in:<br />
 <span class="red">/images/levelshots/&lt;GameName&gt;</span><br />
 So, if you were adding levelshots for <span class="blue">Jedi Academy</span>, you would put them in:<br />
 <span class="red">/images/levelshots/jedi academy</span></p>
-<p>Note that ParaTracker will convert the <span class="blue">game directory</span> name to lowercase automatically, to ensure compatibility with Unix servers.</p>
 
 <p>Levelshots can be <span class="green">.png</span>, <span class="green">.jpg</span> or <span class="green">.gif</span> (And yes, you can animate the .gifs). ParaTracker will look for <span class="green">PNG</span> first, <span class="green">JPG</span> second, and <span class="green">GIF</span> last, and use whichever one it finds first.</p>
 <p>If you only have one levelshot, you can just name it after the map name, and ParaTracker will find it.<br />
 If you have more than one levelshot, add a <span class="green">_1</span> to the end of the filename of the first one, <span class="green">_2</span> to the end of the second one, and so on.<br />
 So, if the map is <span class="red">mp/ffa3</span>, and you have 3 PNG levelshots, you would name them:<br />
-<span class="red">mp/ffa3</span><span class="green">_1</span><span class="red">.png</span>, <span class="red">mp/ffa3</span><span class="green">_2</span><span class="red">.png</span>, and <span class="red">mp/ffa3</span><span class="green">_3</span><span class="red">.png</span>.<br />
-By default, ParaTracker supports 20 levelshots, and can support up to 99 levelshots, but nobody will stick around to view that many, so you should keep it to a decent amount.</p>
+<span class="red">ffa3</span><span class="green">_1</span><span class="red">.png</span>, <span class="red">ffa3</span><span class="green">_2</span><span class="red">.png</span>, and <span class="red">ffa3</span><span class="green">_3</span><span class="red">.png</span>, and put them in an /mp subfolder.</p>
 
-<p>ParaTracker can also use any resolution levelshot, but to keep the size reasonable and save on bandwidth, you should make them all the standard resolution of <span class="blue">300 x 225</span>.</p>
+<p>By default, ParaTracker supports 20 levelshots, and can support up to 99 levelshots, but nobody will stick around to view that many, so you should keep it to a decent amount.
+
+<p>ParaTracker can use any resolution levelshot, but to keep the size reasonable and save on bandwidth, you should make them all the standard resolution of <span class="blue">300 x 225</span>.</p>
+
+<p>Also, if you open ParaTracker on a web page and click on a levelshot, the tracker will immediately transition to the next levelshot with no delay.</p>
+
 </div>
 
 <hr class="width40" />
@@ -316,6 +310,29 @@ If you find a bug, report it at:
 <h3>CHANGELOG:</h3>
 </div>
 <div id="changelog" class="hidden">
+
+<p>
+<span class="date">3/10/2017</span><br />Released ParaTracker 1.3
+</p>
+<p>
+&bull; Added Call Of Duty 4 support.<br />
+&bull; Changed levelshot transitions to use CSS animations, and added a setting in ParaConfig.php to control them.<br />
+&bull; Added css/LevelshotAnimations.css to allow users easy access to the animation classes.<br />
+&bull; ParaTracker will now auto-detect the game it is tracking.<br />
+&bull; Rewrote and improved the parsing of game-specific information.<br />
+&bull; Greatly improved the speed at which server data is retrieved (Thanks, <span class="red">Cagelight</span>)<br />
+&bull; Rewrote the parsing function to be faster. (Thanks, <span class="red">Cagelight</span>)<br />
+&bull; Removed a few deprecated features from ParaConfig.<br />
+&bull; Moved skins from the /css folder into a new /skins folder<br />
+&bull; Renamed skins (Since users can create their own.)<br />
+&bull; Added a setting in ParaConfig that specifies the skin to be used (Static mode only).<br />
+&bull; Completely rewrote the HTML and CSS files for the skins.<br />
+&bull; Created a template skin file.<br />
+&bull; Added automatic detection of a skin's resolution during ParaTrackerDynamic setup.<br />
+&bull; Fixed a bug in the RCon system that would send commands to the wrong address under certain conditions.<br />
+&bull; Fixed a bug in the booleanValidator function that always resulted in the default value being returned.<br />
+&bull; Various other bugfixes.<br />
+</p>
 
 <p>
 <span class="date">12/26/16</span><br />Released ParaTracker 1.2.2
