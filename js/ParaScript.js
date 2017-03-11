@@ -257,7 +257,7 @@ function createURL()
 
     document.getElementById("finalURL").value = outputURL;
 
-    outputURL = '<iframe id="ParaTracker" src="' + outputURL + '" width="' + skinWidth + '" height="' + skinHeight + '" sandbox="allow-forms allow-popups allow-scripts" style="border:none;background:none transparent;" allowtransparency="true" scrolling="no"></iframe>';
+    outputURL = '<iframe id="ParaTracker" src="' + outputURL + '" width="' + skinWidth + '" height="' + skinHeight + '" sandbox="allow-forms allow-popups allow-scripts allow-same-origin" style="border:none;background:none transparent;" allowtransparency="true" scrolling="no"></iframe>';
     document.getElementById("finalURLHTML").value = outputURL;
 
     document.getElementById("paraTrackerTestFrameContent").innerHTML = outputURL;
