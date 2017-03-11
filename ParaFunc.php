@@ -469,7 +469,7 @@ function doUpdate($lastRefreshTime)
 		file_put_contents('info/' . dynamicIPAddressPath . 'mapname_raw.txt', $mapname);
 		file_put_contents('info/' . dynamicIPAddressPath . 'modname.txt', colorize($modName));
 		file_put_contents("info/" . dynamicIPAddressPath . "playerCount.txt", $player_count);
-		file_put_contents('info/' . dynamicIPAddressPath . 'sv_hostname.txt', colorize(removeOffendingServerNameCharacters($sv_hostname)));
+		file_put_contents('info/' . dynamicIPAddressPath . 'sv_hostname.txt', removeOffendingServerNameCharacters($sv_hostname));
 		file_put_contents('info/' . dynamicIPAddressPath . 'sv_maxclients.txt', $sv_maxclients);
 
 
@@ -624,7 +624,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 {
         //$buf2 and $buf3 are used for JSON stuff.
         $buf2 = '"info":{';
-        $buf3 = '"bitflags":[';
+        $buf3 = '"parsedInfo":[';
         $firstExecution = "1";
         $firstBitFlag = "1";
 
@@ -661,14 +661,13 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 		        $buf2 .= ',';
 		    }
 		    $firstExecution = "0";
+		    $buf2 .= '"' . $cvar['name'] . '":"' . $cvar['value'] . '"';
 
 			$buf .= '<tr class="cvars_row' . $c . '"><td class="nameColumnWidth">' . $cvar['name'] . '</td><td class="valueColumnWidth">';
-            $buf2 .= '"' . $cvar['name'] . '":';
 
 			if ((($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
 			{
 				$buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
-				$buf2 .= '"' . $cvar['value'] . '"';
 			}
 			else if (($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'hostname'))
 			{
@@ -677,7 +676,6 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			    $filteredName = removeOffendingServerNameCharacters($cvar['value']);
 
 			    $buf .= '<b>' . colorize($filteredName) . "</b>";
-		        $buf2 .= '"' . $filteredName . '"';
 
 				if ((strpos(colorize($cvar['value']), $filteredName)) == FALSE || $filteredName != $cvar['value'])
 			    {
@@ -705,26 +703,23 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			            if ($index < 1 || $cvar['value'] == "0")
 			            {
 			                $buf .= '<i>None</i>';
-			                $buf2 .= '""';
 			            }
 			            elseif ($cvar['value'] >= pow(2, count($$BitFlagsIndex[$i])))
 			            {
 			                //Miscount detected! Array does not have enough values
 			                $buf .= "<br />Miscount detected! Not enough values in the array for " . $cvar['name'] . ". Check GameInfo.php and add the missing values!</i></div></div>";
-			                $buf2 .= '"Error: Miscount detected"';
+			                $buf3 .= '"Error: Miscount detected"';
 			            }
 			            else
 			            {
 			                $buf .=  implode("<br />", $returnArray);
 			                $buf .= '</i></div></div>';
-			                $buf2 .= '"' . $cvar['value'] . '"';
 
 			                if($firstBitFlag == "0")
 			                {
 			                    $buf3 .= ',';
 			                }
 			                $firstBitFlag = "0";
-			                //{"name":"cvar_1","flags":["flag1","flag2"]},
 			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":["' . implode('","', $returnArray) . '"]}';
 			            }
 
@@ -733,8 +728,6 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			    if($foundMatch == 0)
 			    {
 			        $buf .= $cvar['value'];
-			        $buf2 .= '"' . $cvar['value'] . '"';
-
 			    }
 			}
 			$buf .= '</td></tr>' . "\n";
@@ -743,8 +736,10 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 		}
 		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
 		$buf = htmlDeclarations("Server CVars", "") . $buf;
+
+		$buf3 .= ',{"servername":"' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '","gamename":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt') .  '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"}],';
 		file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
-		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . '],' . $buf2);
+		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . $buf2);
 }
 
 function playerList($player_array, $playerParseCount)
@@ -1586,7 +1581,7 @@ $output .= '<div class="CustomDiv3"></div>';
 $output .= '<div class="ParaTrackerText">' . versionNumber() . '</div>';
 
 //This adds the server name to the page.
-$output .= '<div class="serverName">' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '</div>';
+$output .= '<div class="serverName">' . colorize(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt")) . '</div>';
 
 //This adds the game name to the page.
 $output .= '<div class="gameTitle">' . file_get_contents("info/" . dynamicIPAddressPath . "gamename.txt") . '</div>';
