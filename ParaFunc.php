@@ -698,6 +698,13 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 
 			            $buf .= '<div class="CVarExpandList" onclick="bitValueClick(' . "'" . $cvar['name'] . "'" .  ')"><i><b>' . $cvar['value'] . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i><div id="' . $cvar['name'] .  '" class="collapsedList"><br />';
 
+		                if($firstBitFlag == "0")
+		                {
+		                    $buf3 .= ',';
+		                }
+		                $firstBitFlag = "0";
+
+
 			            $index = count($returnArray);
 
 			            if ($index < 1 || $cvar['value'] == "0")
@@ -715,12 +722,6 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			            {
 			                $buf .=  implode("<br />", $returnArray);
 			                $buf .= '</i></div></div>';
-
-			                if($firstBitFlag == "0")
-			                {
-			                    $buf3 .= ',';
-			                }
-			                $firstBitFlag = "0";
 			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":["' . implode('","', $returnArray) . '"]}';
 			            }
 
@@ -738,7 +739,11 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
 		$buf = htmlDeclarations("Server CVars", "") . $buf;
 
-		$buf3 .= ',{"servername":"' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '","gamename":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt') .  '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"}],';
+		if($firstBitFlag == "0")
+		{
+		    $buf3 .= ',';
+		}
+		$buf3 .= '{"servername":"' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '","gamename":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt') .  '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"}],';
 		file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
 		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . $buf2);
 }
