@@ -703,13 +703,13 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			            if ($index < 1 || $cvar['value'] == "0")
 			            {
 			                $buf .= '<i>None</i>';
-			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":["none"]},';
+			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":[""]}';
 			            }
 			            elseif ($cvar['value'] >= pow(2, count($$BitFlagsIndex[$i])))
 			            {
 			                //Miscount detected! Array does not have enough values
 			                $buf .= "<br />Miscount detected! Not enough values in the array for " . $cvar['name'] . ". Check GameInfo.php and add the missing values!</i></div></div>";
-			                $buf3 .= '"Error: Miscount detected"';
+			                $buf3 .= '{"name":"' . $cvar['name'] . '","Error: Miscount detected"}';
 			            }
 			            else
 			            {
@@ -721,7 +721,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			                    $buf3 .= ',';
 			                }
 			                $firstBitFlag = "0";
-			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":["' . implode('","', $returnArray) . '"]},';
+			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":["' . implode('","', $returnArray) . '"]}';
 			            }
 
 			        }
@@ -738,7 +738,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
 		$buf = htmlDeclarations("Server CVars", "") . $buf;
 
-		$buf3 .= '{"servername":"' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '","gamename":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt') .  '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"}],';
+		$buf3 .= ',{"servername":"' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '","gamename":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt') .  '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"}],';
 		file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
 		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . $buf2);
 }
