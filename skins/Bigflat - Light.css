@@ -34,7 +34,7 @@ All values are 0 to 255, except alpha which is 0 to 1.
 0 is transparent, 1 is solid.
 Default is: background-color: rgba(0, 0, 0, 1);
 */
-background-color: rgba(0, 0, 0, .15);
+background-color: rgba(1, 1, 1, .85);
 
 /* If you want a background image on the tracker,
 this next line is the place to add it.
