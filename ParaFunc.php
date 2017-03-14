@@ -787,6 +787,7 @@ function playerList($player_array, $playerParseCount)
 
 function levelshotFinder($mapName, $levelshotFolder)
 {
+		$levelshotCheckName = strtolower($mapName);
 		$levelshotBuffer = '';
 
 		$levelshotCount = 0;
@@ -799,25 +800,25 @@ function levelshotFinder($mapName, $levelshotFolder)
 		    $foundLevelshot = 0;
 
 		    //Check for a PNG first
-		    if(file_exists($levelshotFolder . $mapName . '_' . $levelshotIndex . '.png'))
+		    if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png'))
 		    {
-		        $levelshotBuffer .= $levelshotFolder . $mapName . '_' . $levelshotIndex . '.png';
+		        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png';
         		$foundLevelshot = 1;
 		    }
 		    else
 		    {
 		    //Failed to find a PNG, so let's check for a JPG
-		        if(file_exists($levelshotFolder . $mapName . '_' . $levelshotIndex . '.jpg'))
+		        if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg'))
 		        {
-		            $levelshotBuffer .= $levelshotFolder . $mapName . '_' . $levelshotIndex . '.jpg';
+		            $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg';
 		            $foundLevelshot = 1;
 		        }
 		        else
 		        {
 		            //Also failed to find a JPG, so let's check for a GIF
-		            if(file_exists($levelshotFolder . $mapName . '_' . $levelshotIndex . '.gif'))
+		            if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif'))
 		            {
-		                $levelshotBuffer .= $levelshotFolder . $mapName . '_' . $levelshotIndex . '.gif';
+		                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif';
 		                $foundLevelshot = 1;
 		            }
 		            else
@@ -829,23 +830,23 @@ function levelshotFinder($mapName, $levelshotFolder)
 		                if ($levelshotCount == 0)
 		                {
 		                //Checking for a PNG again:
-		                	if(file_exists($levelshotFolder . $mapName . $levelshotIndex . '.png'))
+		                	if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.png'))
 		            		{
-		                        $levelshotBuffer .= $levelshotFolder . $mapName . '.png';
+		                        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.png';
         				    }
         				    else
         				    {
         				        //And checking for a JPG again:
-		                	    if(file_exists($levelshotFolder . $mapName . $levelshotIndex . '.jpg'))
+		                	    if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.jpg'))
 		                	    {
-		                	        $levelshotBuffer .= $levelshotFolder . $mapName . '.jpg';
+		                	        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.jpg';
 		                	    }
 		                	    else
 		                	    {
 		                	        //Lastly...checking for a GIF.
-		                	        if(file_exists($levelshotFolder . $mapName . $levelshotIndex . '.gif'))
+		                	        if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.gif'))
 		                	        {
-		                                $levelshotBuffer .= $levelshotFolder . $mapName . '.gif';
+		                                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.gif';
 		                	        }
 		                	        else
 		                	        {
