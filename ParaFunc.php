@@ -511,7 +511,7 @@ function removeColorization($input)
 
 function dataParser($s)
 {
-    $player_array = "";
+    $player_array = array();
     //Split the info first, then we'll loop through and remove any dangerous characters
         $sections = explode("\n", $s);
         array_pop($sections);
