@@ -411,8 +411,6 @@ function doUpdate($lastRefreshTime)
     //On with the good stuff! Connect to the server.
     $s = connectToServerAndGetResponse(str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
 
-    echo $s;
-
     if($s === false)
     {
         //If the connection failed, let's try one more time, just in case the message was lost somewhere
@@ -1445,8 +1443,8 @@ WE COMPLY WITH ALL LAWS AND REGULATIONS REGARDING THE USE OF LAWS AND REGULATION
 
 function connectToServerAndGetResponse($messageToSend, $lastRefreshTime)
 {
-	$s='';
-	$errstr = '';
+	$s = "";
+	$errstr = "";
 
 	//Empty the server's previous ping from the file
 	file_put_contents("info/" . dynamicIPAddressPath . "serverPing.txt", "");
@@ -1471,6 +1469,8 @@ function connectToServerAndGetResponse($messageToSend, $lastRefreshTime)
     {
      displayError('Received maximum data allowance!<br />' . strlen($s) . ' bytes received, the limit is ' . maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.', $lastRefreshTime);
     }
+
+    echo "\n\n" . var_dump($errstr) . "\n" . var_dump($s) . "\n\n";
 
 	if($errstr == "" && $s === false)
 	{
