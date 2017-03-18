@@ -416,6 +416,7 @@ function doUpdate($lastRefreshTime)
     if($s === false)
     {
         //If the connection failed, let's try one more time, just in case the message was lost somewhere
+        echo " First attempt failed to connect! ";
         $s = connectToServerAndGetResponse(str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
     }
 
@@ -1445,6 +1446,7 @@ WE COMPLY WITH ALL LAWS AND REGULATIONS REGARDING THE USE OF LAWS AND REGULATION
 function connectToServerAndGetResponse($messageToSend, $lastRefreshTime)
 {
 	$s='';
+	$errstr = '';
 
 	//Empty the server's previous ping from the file
 	file_put_contents("info/" . dynamicIPAddressPath . "serverPing.txt", "");
