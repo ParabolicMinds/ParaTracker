@@ -408,12 +408,14 @@ function doUpdate($lastRefreshTime)
     //And let's declare a variable for the game name
     $gameName = "";
 
-    //On with the good stuff!
+    //On with the good stuff! Connect to the server.
     $s = connectToServerAndGetResponse(str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
 
-    //If the connection failed, let's try one more time
+    echo $s;
+
     if($s === false)
     {
+        //If the connection failed, let's try one more time, just in case the message was lost somewhere
         $s = connectToServerAndGetResponse(str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
     }
 
