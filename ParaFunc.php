@@ -411,6 +411,12 @@ function doUpdate($lastRefreshTime)
     //On with the good stuff!
     $s = connectToServerAndGetResponse(str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
 
+    //If the connection failed, let's try one more time
+    if($s === false)
+    {
+        $s = connectToServerAndGetResponse(str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
+    }
+
     //This line removes the first four characters. They serve no purpose for us.
     $s = substr($s, 4);
 
@@ -948,24 +954,25 @@ function checkTimeDelay()
 $lastRefreshTime = numericValidator(file_get_contents("info/" . dynamicIPAddressPath . "time.txt"), "", "", "wait");
 
 $i = 0;
-$sleepTimer = "0.15"; //This variable sets the number of seconds PHP will wait before checking to see if anything has changed.
+$sleepTimer = "0.15"; //This variable sets the number of seconds PHP will wait before checking to see if the refresh is complete.
 $checkWaitValue = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");  //This variable is used to check if the wait value changes below
 $fileInput = $checkWaitValue;
 
-while ($lastRefreshTime == "wait" && $i < (connectionTimeout + refreshTimeout))
-{
-    //info/time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
-    usleep($sleepTimer * 1000000);
-    $fileInput = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");
-    if($checkWaitValue != $fileInput && stripos($fileInput, "wait" !== false))
+    while ($lastRefreshTime == "wait" && $i < (connectionTimeout * 2 + refreshTimeout))
     {
-        //Another client has started a refresh! Let's start our wait period over so we don't DoS the game server by accident.
-        $checkWaitValue = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");
-        $i = 0;
+        //info/time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
+        usleep($sleepTimer * 1000000);
+        $fileInput = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");
+
+        if($checkWaitValue != $fileInput && stripos($fileInput, "wait" !== false))
+        {
+            //Another client has started a refresh! Let's start our wait period over so we don't DoS the game server by accident.
+            $checkWaitValue = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");
+            $i = 0;
+        }
+        $lastRefreshTime = numericValidator($fileInput, "", "", "wait");
+        $i += $sleepTimer;
     }
-    $lastRefreshTime = numericValidator($fileInput, "", "", "wait");
-    $i += $sleepTimer;
-}
 
 }
 
@@ -1461,14 +1468,17 @@ function connectToServerAndGetResponse($messageToSend, $lastRefreshTime)
      displayError('Received maximum data allowance!<br />' . strlen($s) . ' bytes received, the limit is ' . maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.', $lastRefreshTime);
     }
 
-	if($errstr == "" && $s == "")
+	if($errstr == "" && $s === false)
 	{
 	    $errstr = "No response in " . connectionTimeout . " seconds.";
 	}
 	file_put_contents("info/" . dynamicIPAddressPath . "connectionErrorMessage.txt", stringValidator($errstr, "", ""));
 
 	//Convert encoding from ANSI to ASCII. If this fails due to illegal characters, leave it as-is.
-	$s = convertFromANSI($s);
+	if($s !== false)
+	{
+	    $s = convertFromANSI($s);
+	}
 
 	return($s);
 }
@@ -1865,11 +1875,8 @@ $serverPort = "";
 $floodProtectTimeout = "15";
 
 // This value is the number of seconds ParaTracker will wait for a response from the game server
-// before timing out. Note that, every time the tracker gets data from the server, it will ALWAYS
-// wait the full delay time. Server connections are UDP, so the tracker cannot tell when the data
-// stream is complete. After this time elapses, ParaTracker will assume it has all the data and
-// parse it. If your web server has a slow response time to the game server, set this value
-// higher. ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
+// before timing out. If the first attempt fails, a second attempt will be made.
+// ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
 // Not recommended to go above 5 seconds, as people will get impatient and leave.
 // This setting also affects RCon wait times.
 // Default is 2.5 seconds.

@@ -41,11 +41,8 @@ $serverPort = "";
 $floodProtectTimeout = "15";
 
 // This value is the number of seconds ParaTracker will wait for a response from the game server
-// before timing out. Note that, every time the tracker gets data from the server, it will ALWAYS
-// wait the full delay time. Server connections are UDP, so the tracker cannot tell when the data
-// stream is complete. After this time elapses, ParaTracker will assume it has all the data and
-// parse it. If your web server has a slow response time to the game server, set this value
-// higher. ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
+// before timing out. If the first attempt fails, a second attempt will be made.
+// ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
 // Not recommended to go above 5 seconds, as people will get impatient and leave.
 // This setting also affects RCon wait times.
 // Default is 2.5 seconds.
