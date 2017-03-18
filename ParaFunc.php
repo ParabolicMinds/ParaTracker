@@ -1472,7 +1472,7 @@ function connectToServerAndGetResponse($messageToSend, $lastRefreshTime)
 
     echo "\n\n" . var_dump($errstr) . "\n" . var_dump($s) . "\n\n";
 
-	if($errstr == "" && $s === false)
+	if($errstr == "" && $s == "")
 	{
 	    $errstr = "No response in " . connectionTimeout . " seconds.";
 	}
