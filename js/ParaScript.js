@@ -175,7 +175,6 @@ function refreshTick()
         }
         else
         {
-		    document.getElementById("refreshTimerDiv").innerHTML = "...";
             pageReload();
         }
     }
@@ -183,6 +182,8 @@ function refreshTick()
 
 function pageReload()
 {
+    document.getElementById("refreshTimerDiv").innerHTML = "...";
+    clearTimeout(pageReloadTimer);
     window.location.reload(true);
 }
 

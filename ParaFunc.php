@@ -414,7 +414,6 @@ function doUpdate($lastRefreshTime)
     if($s == "")
     {
         //If the connection failed, let's try one more time, just in case the message was lost somewhere
-        echo " First attempt failed to connect! ";
         $s = connectToServerAndGetResponse(str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
     }
 
