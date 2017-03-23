@@ -73,24 +73,77 @@ border: 1px;
 cursor: pointer;
 }
 
+/* This class is used for the subscripts underneath the Color input boxes on the dynamic setup page */
+.smallText
+{
+font-size: 8pt;
+}
+
+/* This class is used to put a border around the color selections */
+.colorSelections
+{
+margin: 0 auto;
+margin-top: 30px;
+text-align: center
+padding-left: 10px;
+padding-right: 10px;
+padding-top: 10px;
+padding-bottom: 10px;
+box-shadow: 0px 0px 20px #44F, inset 0px 0px 10px #44F;
+width: 600px;
+}
+
 /* This class is used for the test frame on ParaTrackerDynamic.php */
 .paraTrackerTestFrame
 {
-background-color: #EEEEEE;
-color: #EEEEEE;
-width: 901px;
-height: 812px;
+background-color: #FFFFFF;
+width: 1050px;
 margin: 0 auto;
 text-align: center;
 }
 
-/* This class makes the test frame visible on ParaTrackerDynamic.php */
+/* This class is used for the background gradient on the dynamic setup page */
+.paraTrackerTestFrameGradient
+{
+background-size: 150%;
+background: linear-gradient(to right, #FF9999, #FFFF99, #99FF99, #99FFFF, #9999FF, #FF99FF, #FF9999, #FFFF99, #99FF99, #99FFFF, #9999FF, #FF99FF, #FF9999, #FFFF99, #99FF99, #99FFFF, #9999FF, #FF99FF, #FF9999, #FFFF99, #99FF99, #99FFFF, #9999FF, #FF99FF, #FF9999, #FFFF99, #99FF99, #99FFFF, #9999FF, #FF99FF, #FF9999, #FFFF99, #99FF99, #99FFFF, #9999FF, #FF99FF, #FF9999);
+animation: paraTrackerTestFrameGradientAnimation 5s linear infinite;
+}
+
+/* This class animates the background gradient */
+@keyframes paraTrackerTestFrameGradientAnimation
+{
+    0% {background-position: 0px 0px;}
+    100% {background-position: -175px 0px;}
+}
+
+/* This class is used for the background gradient on the dynamic setup page */
+.paraTrackerTestFrameTexture
+{
+background-image: url("../images/tracker/backgroundTest.jpg");
+animation: paraTrackerTestFrameTextureAnimation 20s linear infinite;
+}
+
+.paraTrackerTestFrameTexturePreload
+{
+background-image: url("../images/tracker/backgroundTest.jpg");
+display: none;
+}
+
+/* This class animates the background gradient */
+@keyframes paraTrackerTestFrameTextureAnimation
+{
+    0% {background-position: 0px 0px;}
+    100% {background-position: -1024px 256px;}
+}
+
+/* This class makes the test frame and color selections visible on ParaTrackerDynamic.php */
 .expandedFrame
 {
 display: block;
 }
 
-/* This class hides the test frame on ParaTrackerDynamic.php */
+/* This class hides the test frame and color selections on ParaTrackerDynamic.php */
 .collapsedFrame
 {
 display: none;
