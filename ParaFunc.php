@@ -1100,6 +1100,12 @@ function colorValidator($input)
         return str_repeat(substr($input, 0, 1), 2) . str_repeat(substr($input, 1, 1), 2) . str_repeat(substr($input, 2, 1), 2);
     }
 
+    //If the string we received is 2 characters, it is a 1 digit hex color, with two digits
+    if(strlen($input) == "2")
+    {
+        return str_repeat($input, 3);
+    }
+
     //If the string we received is 1 character, it is a 1 digit hex color
     if(strlen($input) == "1")
     {
