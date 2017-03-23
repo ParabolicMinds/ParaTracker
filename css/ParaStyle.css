@@ -36,7 +36,6 @@ text-align: center;
 text-align: center;
 }
 
-
 /* This class is used for the page formatting in ParaTrackerDynamic.php */
 .dynamicConfigPageStyle
 {
@@ -84,12 +83,13 @@ font-size: 8pt;
 {
 margin: 0 auto;
 margin-top: 30px;
-text-align: center
+text-align: center;
 padding-left: 10px;
 padding-right: 10px;
 padding-top: 10px;
 padding-bottom: 10px;
 box-shadow: 0px 0px 20px #44F, inset 0px 0px 10px #44F;
+border: 2px solid #44F;
 width: 600px;
 }
 
