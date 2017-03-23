@@ -15,7 +15,7 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    Return("ParaTracker 1.3");
+    Return("ParaTracker 1.3.1");
 }
 
 //Define the default skin, to be used throughout this file. MAKE SURE it refers to an actual .css file in the skins folder, or it will break stuff. And do not include the file extension!
@@ -27,7 +27,13 @@ $lastRefreshTime = "";
 $floodProtectTimeout = "";
 $serverPort = "";
 $executeDynamicInstructionsPage = "0";
-
+$backgroundColor = "";
+$backgroundOpacity = "100";
+$textColor = "";
+$playerListColor1 = "";
+$playerListColor1Opacity = "100";
+$playerListColor2 = "";
+$playerListColor2Opacity = "100";
 
 define("defaultSkin", $defaultSkin);
 
@@ -121,6 +127,35 @@ if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
         {
             $serverPort = $_GET["port"];
         }
+
+        if(isset($_GET["backgroundColor"]))
+        {
+            $backgroundColor = colorValidator($_GET["backgroundColor"]);
+        }
+        if(isset($_GET["backgroundOpacity"]))
+        {
+            $backgroundOpacity = numericValidator($_GET["backgroundOpacity"], 0, 100, 100);
+        }
+        if(isset($_GET["textColor"]))
+        {
+            $textColor = colorValidator($_GET["textColor"]);
+        }
+        if(isset($_GET["playerListColor1"]))
+        {
+            $playerListColor1 = colorValidator($_GET["playerListColor1"]);
+        }
+        if(isset($_GET["playerListColor1Opacity"]))
+        {
+            $playerListColor1Opacity = numericValidator($_GET["playerListColor1Opacity"], 0, 100, 100);
+        }
+        if(isset($_GET["playerListColor2"]))
+        {
+            $playerListColor2 = colorValidator($_GET["playerListColor2"]);
+        }
+        if(isset($_GET["playerListColor2Opacity"]))
+        {
+            $playerListColor2Opacity = numericValidator($_GET["playerListColor2Opacity"], 0, 100, 100);
+        }
     }
 }
 else
@@ -173,6 +208,17 @@ if($dynamicTrackerCalledFromCorrectFile == "1" || $calledFromParam == "1" || $ca
     }
 }
 
+//If we are running in static mode, we need to validate the color overrides as well
+if($dynamicTrackerEnabled == "0")
+{
+    $backgroundColor = colorValidator($backgroundColor);
+    $backgroundOpacity = numericValidator($backgroundOpacity, 0, 100, 100);
+    $textColor = colorValidator($textColor);
+    $playerListColor1 = colorValidator($playerListColor1);
+    $playerListColor1Opacity = numericValidator($playerListColor1Opacity, 0, 100, 100);
+    $playerListColor2 = colorValidator($playerListColor2);
+    $playerListColor2Opacity = numericValidator($playerListColor2Opacity, 0, 100, 100);
+}
 
 $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
 $floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 15);
@@ -256,6 +302,14 @@ define("RConLogSize", $RConLogSize);
 define("newWindowSnapToCorner", $newWindowSnapToCorner);
 define("enableGeoIP", $enableGeoIP);
 define("geoIPPath", $geoIPPath);
+
+define("backgroundColor", $backgroundColor);
+define("backgroundOpacity", $backgroundOpacity);
+define("textColor", $textColor);
+define("playerListColor1", $playerListColor1);
+define("playerListColor1Opacity", $playerListColor1Opacity);
+define("playerListColor2", $playerListColor2);
+define("playerListColor2Opacity", $playerListColor2Opacity);
 
 if($executeDynamicInstructionsPage == "1")
 {
@@ -745,13 +799,9 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
 		$buf = htmlDeclarations("Server CVars", "") . $buf;
 
-		if($firstBitFlag == "0")
-		{
-		    $buf3 .= ',';
-		}
-		$buf3 .= '{"servername":"' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '","gamename":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt') .  '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"}],';
+		$buf3 .= '],"serverInfo":{"servername":"' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '","gamename":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt') .  '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"},';
 		file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
-		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . $buf2);
+		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . $buf2 . "},");
 }
 
 function playerList($player_array, $playerParseCount)
@@ -958,6 +1008,7 @@ $sleepTimer = "0.15"; //This variable sets the number of seconds PHP will wait b
 $checkWaitValue = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");  //This variable is used to check if the wait value changes below
 $fileInput = $checkWaitValue;
 
+    //connectionTimeout needs to be multiplied by two, because doUpdate will attempt to connect twice before giving up.
     while ($lastRefreshTime == "wait" && $i < (connectionTimeout * 2 + refreshTimeout))
     {
         //info/time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
@@ -1018,6 +1069,44 @@ function booleanValidator($input, $defaultValue)
             }
         }
     return $input;
+}
+
+function convertToRGBA($input)
+{
+    //colorValidator already ensured that the input will be 6 characters long
+    return hexdec(substr($input, 0, 2)) . ', ' . hexdec(substr($input, 2, 2)) . ', ' . hexdec(substr($input, 4, 2));
+}
+
+function colorValidator($input)
+{
+    //Get rid of all non-hex characters on the input.
+    $input = trim($input);
+    $input = preg_replace("/[^A-F0-9]/", "", strtoupper($input));
+
+    if(strlen($input) > 6)
+    {
+        $input = substr($input, 0, 6);
+    }
+
+    //If the string we received is 6 characters, it is a 6 digit hex color
+    if(strlen($input) == "6")
+    {
+        return $input;
+    }
+
+    //If the string we received is 3 characters, it is a 3 digit hex color
+    if(strlen($input) == "3")
+    {
+        return str_repeat(substr($input, 0, 1), 2) . str_repeat(substr($input, 1, 1), 2) . str_repeat(substr($input, 2, 1), 2);
+    }
+
+    //If the string we received is 1 character, it is a 1 digit hex color
+    if(strlen($input) == "1")
+    {
+        return str_repeat($input, 6);
+    }
+
+    return "";
 }
 
 function numericValidator($input, $minValue, $maxValue, $defaultValue)
@@ -1207,7 +1296,6 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
 {
             $iBlewItUp = "";
             $toBeExploded = "";
-             //$output = '<div class="CVarExpandList" onclick="bitValueClick(' . "'" . $cvarName . "'" .  ')"><b>' . $cvarValue . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i>';
 
                 $index = count($arrayList);
                 //Sort through the bits in the value given, and for every 1, output the matching array value
@@ -1232,13 +1320,14 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
 function htmlDeclarations($pageTitle, $filePath)
 {
     $pageTitle = stringValidator($pageTitle, "", "ParaTracker - The Ultimate Quake III Server Tracker");
-    $output = levelshotJavascriptAndCSS();
-    $output .= '<!DOCTYPE html>
+    $output = '<!DOCTYPE html>
     <html lang="en">
     <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/ParaStyle.css" type="text/css" />
     <link rel="stylesheet" href="css/LevelshotAnimations.css" type="text/css" />';
+
+    $output .= levelshotJavascriptAndCSS();
 
     //If a skin is defined, then include it here in the header
     if(paraTrackerSkin != "")
@@ -1275,25 +1364,32 @@ function colorize($string)
 
 function dynamicInstructionsPage($personalDynamicTrackerMessage)
 {
+    $gameList = detectGameName("");
+    $gameOutput = "";
+
+  for($i = 0; $i < count($gameList); $i++)
+  {
+    $gameOutput .= $gameList[$i] . ', ';
+  }
+
     $urlWithoutParameters = explode('?', $_SERVER["REQUEST_URI"], 2);
     $currentURL = $_SERVER['HTTP_HOST'] . $urlWithoutParameters[0];
 
     $output = htmlDeclarations("", "");
-    
-    $output .= '<meta name="description" content="Free game server tracker for Quake 3 based games">
-  <meta name="keywords" content="Free, Quake 3, Jedi Academy, Jedi Outcast, Server Tracker, PHP, JediTracker">
+
+    $output .= '<meta name="keywords" content="Free PHP server tracker, ID Tech 3, JediTracker, ' . $gameOutput .'Game Tracker">
+  <meta name="description" content="Free Server Tracker for ' . $gameOutput . 'Written in PHP">
   <meta name="author" content="Parabolic Minds">
 
     </head><body class="dynamicConfigPage dynamicConfigPageStyle">
 ';
 
+    $output .= '<div class="paraTrackerTestFrameTexturePreload"></div>';
     $output .= '<div class="dynamicPageContainer"><div class="dynamicPageWidth"><h1>' . versionNumber() . ' - Dynamic Mode</h1>
     <i>' . $personalDynamicTrackerMessage . '</i>
     <h6>ParaConfig.php settings still apply, so for instance, if you want to enable RCon, or change levelshot options, it must be changed in ParaConfig.php, by the server owner.<br />For a full set of options, you can (and should) host your own ParaTracker.</h6>';
 
 $output .= '<h3>Supported Games:</h3><div class="centerTable"><table class="centerTable"><tr>';
-
-    $gameList = detectGameName("");
 
     $colorNumber = 0;
 
@@ -1306,34 +1402,30 @@ $output .= '<h3>Supported Games:</h3><div class="centerTable"><table class="cent
         $colorNumber++;
         if($colorNumber > 9)
         {
-        $colorNumber = 0;
+            $colorNumber = 0;
         }
 
-        //Was this an even trip through the array? If so, start a new table row.
-        if($i % 2 != 0)
+        //Was this an even trip through the array, but also not the last trip? If so, start a new table row.
+        if($i % 2 != 0 && $i + 1 != count($gameList))
         {
             $output .= "</tr><tr>";
         }
     }
 
-        if($i % 2 == 0)
-        {
-            $output .= "</td><td>";
-        }
-$output .= "</td></tr></table></div>";
+$output .= "</tr></table></div>";
 
 $output .= '<br /><p>Current page URL:<br /><input type="text" size="80" id="currentURL" value="' . $currentURL . '" readonly /></p>
     <br />
-    <h3>Enter the appropriate data below to get a URL you can use for ParaTracker Dynamic:</h3>
+    <h3>Enter the data below to get a URL you can use for ParaTracker Dynamic:</h3>
 
     <form>
 
-    <p>Server IP Address: <input type="text" size="46" oninput="clearOutputFields()" id="IPAddress" value="" /></p>
-    <p>Server port number: <input type="text" size="15" oninput="clearOutputFields()" id="PortNumber" value="" /></p>';
+    <p><span class="gameColor1">Server IP Address:</span> <input type="text" size="46" onchange="createURL()" id="IPAddress" value="" /></p>
+    <p><span class="gameColor1">Server port number:</span> <input type="text" size="15" onchange="createURL()" id="PortNumber" value="" /></p>';
 
 
     //Let's dynamically find the CSS files, and parse the resolution of the tracker from them
-    $output .= '<p>Skin:<br />';
+    $output .= '<p><span class="gameColor3">Skin:</span><br />';
     $directoryList = scandir("skins/");
 
     //Sort the array in a readable fashion
@@ -1411,25 +1503,42 @@ $output .= '<br /><p>Current page URL:<br /><input type="text" size="80" id="cur
         {
             $output .= ' (' . $width . ' x ' . $height . ')';
         }
-        $output .= '</option><br />';
+        $output .= '</option>
+';
     }
 
     $output .= '<option value="JSON:#:800:#:800">JSON (Text-only response for clientside Javascript parsing)</option>';
-    $output .= '</select><br />';
+    $output .= '</select><br /><br /></p>';
 
-    $output .= '<p><button type="button" class="dynamicFormButtons dynamicFormButtonsStyle" onclick="createURL()"> Generate! </button></p>
-    <p>Direct link:<br /><textarea rows="3" cols="120" id="finalURL" readonly></textarea></p>
+    $output .= '<p onclick="colorSelectionClick(' . "'colorSelections'" . ')"><span class="dynamicFormButtons dynamicFormButtonsStyle"> Show/hide color options </span></p>';
+
+    $output .= '<div id="colorSelections" class="collapsedFrame">';
+    $output .= '<div class="colorSelections"><p><span class="gameColor2">Background Color:</span>&nbsp;&nbsp;# <input id="backgroundColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
+    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="backgroundOpacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
+    $output .= '<p><span class="gameColor7">Text Color:</span>&nbsp;&nbsp;# <input id="textColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Does not affect colorized text like server names,<br />mod names, map names, or player names)</span></p>';
+    $output .= '<p><span class="gameColor0">Player List Color 1:</span>&nbsp;&nbsp;# <input id="playerListColor1" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
+    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor1Opacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
+    $output .= '<p><span class="gameColor9">Player List Color 2:</span>&nbsp;&nbsp;# <input id="playerListColor2" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
+    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor2Opacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
+
+    $output .= '</div></div>';
+    $output .= '<p><br /><button type="button" class="dynamicFormButtons dynamicFormButtonsStyle" onclick="createURL()"> Generate! </button></p>
+
+    <div id="paraTrackerTestFrame" class="collapsedFrame" ><h2>Sample Tracker:</h2>
+    <p class="smallText">
+    <input type="checkbox" id="textureToggle" value="on" onchange="toggleTextureBackground()"> Toggle texture background<br />
+    <input type="checkbox" id="backgroundToggle" value="on" onchange="toggleGradientBackground()"> Toggle colored background<br />
+    (Useful for testing transparency)</p>
+    <div id="paraTrackerTestFrameContent2" class="paraTrackerTestFrame"><div id="paraTrackerTestFrameContent" class="" ></div></div></div>
+
+    <p><br />Direct link:<br /><textarea rows="3" cols="120" id="finalURL" readonly></textarea></p>
     <p>HTML code to insert on a web page:<br /><textarea rows="5" cols="120" id="finalURLHTML" readonly></textarea></p>
 
     </form>
 
-    <div id="paraTrackerTestFrame" class="collapsedFrame" ><h2>Sample Tracker:</h2>
-    <div id="paraTrackerTestFrameContent" class="paraTrackerTestFrame" ></div></div>
-
     <h6>Trademark&#8482; Pen Pineapple Apple Pen, no rights deserved. The use of this product will not cavse any damnification to your vehicle.</h6>
-    <h6><p>
+    <h6>
 WE COMPLY WITH ALL LAWS AND REGULATIONS REGARDING THE USE OF LAWS AND REGULATIONS. WE PROMISE THAT THIS THING IS A THING. THIS THING COLLECTS INFORMATION. THIS INFORMATION IS THEN USED TO MAKE MISINFORMATION. THIS MISINFORMATION IS THEN SOLD TO THE MOST NONEXISTENT BIDDER. BY READING THIS, YOU AGREE. CLICK NEXT TO CONTINUE. OTHERWISE, CONTINUE ANYWAY AND SEE IF WE CARE. WOULD YOU LIKE TO SET PARATRACKER AS YOUR HOME PAGE? TOO BAD, WE DID IT ALREADY. WE ALSO INSTALLED A BROWSER TOOLBAR WITHOUT ASKING, BECAUSE TOOLBARS ARE COOL AND SO ARE WE.
-</p>
 </h6>
 <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />Nope, nothing here. Promise.
     </div></div></body>
@@ -1576,60 +1685,82 @@ function renderNormalHTMLPage($gameName)
 {
 
 $output = htmlDeclarations("ParaTracker - The Ultimate Quake III Server Tracker", "");
+
+//Let's add in the dynamic colors...
+//If dynamic mode is disabled these will already have been declared as null, so no worries
+if(backgroundColor != "")
+{
+    $output .= '<style>.BackgroundColorImage{background: none; background-color: rgba(' . convertToRGBA(backgroundColor) . ', ' . backgroundOpacity / 100  . ');}</style>';
+}
+if(textColor != "")
+{
+    $output .= '<style>.textColor{color: #' . textColor . ';}</style>';
+}
+if(playerListColor1 != "")
+{
+    //background: none; removes the old background (Gradient, for instance) before applying the new color.
+    $output .= '<style>.playerRow1{background: none; background-color: rgba(' . convertToRGBA(playerListColor1) . ', ' . playerListColor1Opacity / 100  . ');}</style>';
+}
+if(playerListColor2 != "")
+{
+    //background: none; removes the old background (Gradient, for instance) before applying the new color.
+    $output .= '<style>.playerRow2{background: none; background-color: rgba(' . convertToRGBA(playerListColor2) . ', ' . playerListColor2Opacity / 100  . ');}</style>';
+}
+
 $output .= '</head>';
 
 //This adds the default formatting to the page. It removes the padding and margins, sets the size, and hides any overflow.
-$output .= '<body class="ParaTrackerPage">';
+$output .= '<body class="ParaTrackerPage textColor">';
 
 //This adds the background color and image class to the page. It is an optional CSS feature that is only there for ease of use.
-$output .= '<div class="ParaTrackerSize">';
+$output .= '<div class="ParaTrackerSize textColor">';
 
 //This adds the background color and image class to the page. It is an optional CSS feature that is only there for ease of use.
-$output .= '<div class="BackgroundColorImage">';
+$output .= '<div class="BackgroundColorImage textColor">';
 
 //This adds the ParaTracker logo to the page.
-$output .= '<div class="ParaTrackerLogo"></div>';
+$output .= '<div class="ParaTrackerLogo textColor"></div>';
 
 //This adds three custom DIVs to the page, to be used however the skin creator desires.
-$output .= '<div class="CustomDiv1"></div>';
-$output .= '<div class="CustomDiv2"></div>';
-$output .= '<div class="CustomDiv3"></div>';
+$output .= '<div class="CustomDiv1 textColor"></div>';
+$output .= '<div class="CustomDiv2 textColor"></div>';
+$output .= '<div class="CustomDiv3 textColor"></div>';
 
 //This adds the ParaTracker text to the page.
-$output .= '<div class="ParaTrackerText">' . versionNumber() . '</div>';
+$output .= '<div class="ParaTrackerText textColor">' . versionNumber() . '</div>';
 
 //This adds the server name to the page.
-$output .= '<div class="serverName">' . colorize(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt")) . '</div>';
+$output .= '<div class="serverName textColor">' . colorize(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt")) . '</div>';
 
 //This adds the game name to the page.
-$output .= '<div class="gameTitle">' . file_get_contents("info/" . dynamicIPAddressPath . "gamename.txt") . '</div>';
+$output .= '<div class="gameTitle textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "gamename.txt") . '</div>';
 
 //This adds the column headers for name, score and ping to the page.
-$output .= '<div class="nameScorePing"><div class="playerNameSize playerNameHeader"></div><div class="playerScoreSize playerScoreHeader"></div><div class="playerPingSize playerPingHeader"></div></div>';
+$output .= '<div class="nameScorePing textColor"><div class="playerNameSize playerNameHeader textColor"></div><div class="playerScoreSize playerScoreHeader textColor"></div><div class="playerPingSize playerPingHeader textColor"></div></div>';
 
 //This adds the player list table to the page.
-$output .= '<div class="playerTable">' . file_get_contents("info/" . dynamicIPAddressPath . "playerList.txt") . '</div>';
+$output .= '<div class="playerTable textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "playerList.txt") . '</div>';
 
 //This adds the player count to the page.
-$output .= '<div class="playerCount">' . file_get_contents("info/" . dynamicIPAddressPath . "playerCount.txt") . '/' . file_get_contents("info/" . dynamicIPAddressPath . "sv_maxclients.txt") . '</div>';
+$output .= '<div class="playerCount textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "playerCount.txt") . '/' . file_get_contents("info/" . dynamicIPAddressPath . "sv_maxclients.txt") . '</div>';
 
 //This adds the map name to the page.
-$output .= '<div class="mapName">' . file_get_contents("info/" . dynamicIPAddressPath . "mapname.txt") . '</div>';
+$output .= '<div class="mapName textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "mapname.txt") . '</div>';
 
 //This adds the mod name to the page.
-$output .= '<div class="modName">' . file_get_contents("info/" . dynamicIPAddressPath . "modname.txt") . '</div>';
+$output .= '<div class="modName textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "modname.txt") . '</div>';
 
 //This adds the gametype to the page.
-$output .= '<div class="gametype">' . file_get_contents("info/" . dynamicIPAddressPath . "gametype.txt") . '</div>';
+$output .= '<div class="gametype textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "gametype.txt") . '</div>';
 
 //This adds the IP Address and blinking cursor to the page.
-$output .= '<div class="IPAddress">' . serverIPAddress . ':' . serverPort . '<div class="blinkingCursor"></div></div>';
+$output .= '<div class="IPAddress textColor">' . serverIPAddress . ':' . serverPort . '<div class="blinkingCursor"></div></div>';
 
 //This adds the ping of the game server's response to the web server.
-$output .= '<div class="ServerPing">' . file_get_contents("info/" . dynamicIPAddressPath . "serverPing.txt") . '</div>';
+$output .= '<div class="ServerPing textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "serverPing.txt") . '</div>';
 
 //This adds the levelshots to the page.
-$output .= '<div id="levelshotPreload2" class="levelshotFrame levelshotSize" onclick="levelshotClick()">
+$output .= '<div id="levelshotPreload2" class="levelshotFrame levelshotSize textColor" onclick="levelshotClick()">
 <div id="levelshotPreload1" class="levelshotSize"></div>
 <div id="bottomLayerFade" class="levelshotSize"></div>
 <div id="topLayerFade" class="levelshotSize"></div>
@@ -1638,22 +1769,22 @@ $output .= '<div id="levelshotPreload2" class="levelshotFrame levelshotSize" onc
 if(enableGeoIP == 1)
 {
     //This adds the optional country flag to the page. This feature only works when GeoIP is installed.
-    $output .= '<div class="countryFlag">' . countryFlag . '</div>';
+    $output .= '<div class="countryFlag textColor">' . countryFlag . '</div>';
 }
 
 //If RCon is enabled, this adds the RCon button and the RCon image preloader to the page.
 if (RConEnable == 1)
 {
-    $output .= '<div onclick="rcon_window();"><div class="rconButton"></div></div>';
+    $output .= '<div onclick="rcon_window();"><div class="rconButton textColor"></div></div>';
     $output .= '<div class="rconPreload"></div>';
 }
 
 //This adds the Param button and Param image preloader to the page.
-$output .= '<div onclick="param_window();"><div class="paramButton"></div></div>';
+$output .= '<div onclick="param_window();"><div class="paramButton textColor"></div></div>';
 $output .= '<div class="paramPreload"></div>';
 
 //This adds the frame to the page.
-$output .= '<div class="TrackerFrame"></div>';
+$output .= '<div class="TrackerFrame textColor"></div>';
 
 if(enableAutoRefresh == "1")
 {
@@ -1678,34 +1809,46 @@ $output .= '<script type="text/javascript">
 reconnectTimer = setTimeout("makeReconnectButtonVisible()", ' . (floodProtectTimeout * 1000 + 100) . ');
 </script>';
 
+//Let's add in the dynamic colors...
+//If dynamic mode is disabled these will already have been declared as null, so no worries
+if(backgroundColor != "")
+{
+    $output .= '<style>.BackgroundColorImage{background-color: rgba(' . convertToRGBA(backgroundColor) . ', ' . backgroundOpacity / 100  . ');}</style>';
+}
+if(textColor != "")
+{
+    $output .= '<style>.textColor{color: #' . textColor . ';}</style>';
+}
+
 $output .= '</head>';
 
 //This adds the default formatting to the page. It removes the padding and margins, sets the size, and hides any overflow.
-$output .= '<body class="ParaTrackerPage">';
+$output .= '<body class="ParaTrackerPage textColor">';
 
 //This adds the background color and image class to the page. It is an optional CSS feature that is only there for ease of use.
-$output .= '<div class="ParaTrackerSize">';
+$output .= '<div class="ParaTrackerSize textColor">';
 
 //This adds the background color and image class to the page. It is an optional CSS feature that is only there for ease of use.
-$output .= '<div class="BackgroundColorImage">';
+$output .= '<div class="BackgroundColorImage textColor">';
 
 //This adds the ParaTracker logo to the page.
-$output .= '<div class="ParaTrackerLogo"></div>';
+$output .= '<div class="ParaTrackerLogo textColor"></div>';
 
 //This adds three custom DIVs to the page, to be used however the skin creator desires.
-$output .= '<div class="CustomDiv1"></div>';
-$output .= '<div class="CustomDiv2"></div>';
-$output .= '<div class="CustomDiv3"></div>';
+$output .= '<div class="CustomDiv1 textColor"></div>';
+$output .= '<div class="CustomDiv2 textColor"></div>';
+$output .= '<div class="CustomDiv3 textColor"></div>';
 
 //This adds the ParaTracker text to the page.
-$output .= '<div class="ParaTrackerTextNoConnection">' . versionNumber() . '</div>';
+$output .= '<div class="ParaTrackerTextNoConnection textColor">' . versionNumber() . '</div>';
 
 //This adds the ParaTracker logo to the page.
-$output .= '<div class="paraTrackerError"><br /><br />' . file_get_contents("info/" . dynamicIPAddressPath . "connectionErrorMessage.txt") . '</div><div class="paraTrackerErrorAddress"><br /><br />' . serverIPAddress . ':' . serverPort . '<div class="noConnectionblinkingCursor">&nbsp;</div></div>
+$output .= '<div class="paraTrackerError textColor"><br /><br />' . file_get_contents("info/" . dynamicIPAddressPath . "connectionErrorMessage.txt") . '</div>
+<div class="paraTrackerErrorAddress textColor"><br /><br />' . serverIPAddress . ':' . serverPort . '<div class="noConnectionblinkingCursor">&nbsp;</div></div>
 </div>';
 
 //This adds the frame to the page.
-$output .= '<div class="TrackerFrame"></div>';
+$output .= '<div class="TrackerFrame textColor"></div>';
 
 if(enableAutoRefresh == "1")
 {
@@ -1714,7 +1857,7 @@ if(enableAutoRefresh == "1")
 }
 
 //This adds the reconnect button to the page
-$output .= '<span onclick="pageReload();"><div id="reconnectButton" class="reconnectButton hide"></div></span>';
+$output .= '<span onclick="pageReload();"><div id="reconnectButton" class="reconnectButton textColor hide"></div></span>';
 
 //This adds the image preloader for the reconnect button to the page.
 $output .= '<div class="reconnectPreload"></div>';
@@ -1747,6 +1890,16 @@ function renderJSONPage()
     $output .= '"RConFloodProtect":"' . RConFloodProtect . '",';
     $output .= '"newWindowSnapToCorner":' . convertBooleansToString(newWindowSnapToCorner) . ',';
 
+    if(backgroundColor != "")
+    {
+        $output .= '"customRGBA":"' . convertToRGBA(backgroundColor) . ', ' . backgroundOpacity / 100 . '",';
+    }
+    if(textColor != "")
+    {
+        $output .= '"textColor":"' . textColor . '",';
+    }
+
+
     //Time for levelshot stuff. Get the array from the file and explode it
     $levelshots = file_get_contents("info/" . dynamicIPAddressPath . "levelshots.txt");
 
@@ -1778,10 +1931,10 @@ function renderJSONPage()
     $player_array = $dataParserReturn[2];
     $playerParseCount = $dataParserReturn[3];
 
-    $output .= '},"players":[';
-    for ($i = 2; $i < count($player_array); $i ++)
+    $output .= '"players":[';
+
+    for ($i = 2; $i < count($player_array) + 2; $i++)
     {
-        //$player_split = explode(' ', $player_array[$i], 3);
         if ($i != 2)
         {
             $output .= ",";
@@ -1790,7 +1943,7 @@ function renderJSONPage()
     $output .= '"score":"' . $player_array[$i]["score"] . '",';
     $output .= '"ping":"' . $player_array[$i]["ping"] . '"}';
     }
-$output .= "]}";
+$output .= ']}';
 
 ob_end_clean();
 
@@ -1841,8 +1994,8 @@ $configBuffer = '<?php
 // This is the configuration file for ParaTracker.
 // If you want to edit fonts and colors, they are found
 // in the css files found in the /skins folder.
-// You can change the skin used in static mode here, but there are
-// no other visual settings.
+// You can change the skin used in static mode here and override a few
+// colors, but there are no other visual settings.
 
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
@@ -1902,6 +2055,39 @@ $refreshTimeout = "3";
 // set this value to "JSON" and the tracker will send an unformatted JSON response.
 // Default value is "Metallic Console"
 $paraTrackerSkin = "Metallic Console";
+
+// This is a 6 character hexadecimal value that specifies the background color to be used.
+// The skin chosen will already have it\'s own color; this value will override it, if desired.
+// Default value is "".
+$backgroundColor = "";
+
+// This value is a percentage, from 0 to 100, of how opaque the background color will be.
+// Default value is "100".
+$backgroundOpacity = "100";
+
+// This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
+// It will not change the color of server names, mod names, map names, or player names.
+// The skin chosen will already have it\'s own color; this value will override it, if desired.
+// Default value is "".
+$textColor = "";
+
+// This is a 6 character hexadecimal value that specifies the color of the odd rows on the player list.
+// The skin chosen will already have it\'s own color; this value will override it, if desired.
+// Default value is "".
+$playerListColor1 = "";
+
+// This value is a percentage, from 0 to 100, of how opaque the color of the odd rows on the player list will be.
+// Default value is "100".
+$playerListColor1Opacity = "100";
+
+// This is a 6 character hexadecimal value that specifies the color of the even rows on the player list.
+// The skin chosen will already have it\'s own color; this value will override it, if desired.
+// Default value is "".
+$playerListColor2 = "";
+
+// This value is a percentage, from 0 to 100, of how opaque the color of the even rows on the player list will be.
+// Default value is "100".
+$playerListColor2Opacity = "100";
 
 
 // LEVELSHOT SETTINGS

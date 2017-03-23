@@ -6,8 +6,8 @@
 // This is the configuration file for ParaTracker.
 // If you want to edit fonts and colors, they are found
 // in the css files found in the /skins folder.
-// You can change the skin used in static mode here, but there are
-// no other visual settings.
+// You can change the skin used in static mode here and override a few
+// colors, but there are no other visual settings.
 
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
@@ -67,6 +67,39 @@ $refreshTimeout = "3";
 // set this value to "JSON" and the tracker will send an unformatted JSON response.
 // Default value is "Metallic Console"
 $paraTrackerSkin = "Metallic Console";
+
+// This is a 6 character hexadecimal value that specifies the background color to be used.
+// The skin chosen will already have it's own color; this value will override it, if desired.
+// Default value is "".
+$backgroundColor = "";
+
+// This value is a percentage, from 0 to 100, of how opaque the background color will be.
+// Default value is "100".
+$backgroundOpacity = "100";
+
+// This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
+// It will not change the color of server names, mod names, map names, or player names.
+// The skin chosen will already have it's own color; this value will override it, if desired.
+// Default value is "".
+$textColor = "";
+
+// This is a 6 character hexadecimal value that specifies the color of the odd rows on the player list.
+// The skin chosen will already have it's own color; this value will override it, if desired.
+// Default value is "".
+$playerListColor1 = "";
+
+// This value is a percentage, from 0 to 100, of how opaque the color of the odd rows on the player list will be.
+// Default value is "100".
+$playerListColor1Opacity = "100";
+
+// This is a 6 character hexadecimal value that specifies the color of the even rows on the player list.
+// The skin chosen will already have it's own color; this value will override it, if desired.
+// Default value is "".
+$playerListColor2 = "";
+
+// This value is a percentage, from 0 to 100, of how opaque the color of the even rows on the player list will be.
+// Default value is "100".
+$playerListColor2Opacity = "100";
 
 
 // LEVELSHOT SETTINGS

@@ -35,8 +35,8 @@ Function detectGameName($input)
             "CoD4" => "Call of Duty 4: Modern Warfare",
             "JAmp" => "Jedi Academy",
             "JK2MP" => "Jedi Outcast",
-            "Tremulous" => "Tremulous",
             "Q3" => "Quake III Arena",
+            "Tremulous" => "Tremulous",
             "Xonotic" => "Xonotic",
 
             );
@@ -51,6 +51,7 @@ Function detectGameName($input)
                 {
                     array_push($output, $value);
                 }
+                usort($output, 'strnatcasecmp');
                 return $output;
             }
 

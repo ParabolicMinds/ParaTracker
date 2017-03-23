@@ -1,4 +1,4 @@
-/* Skin by NAB622 */
+/* Skin by -INSERT NAME HERE- */
 
 /*
 If you are looking for the tracker configuration,
@@ -19,8 +19,8 @@ ParaTrackerDynamic will parse this file looking for them.
 */
 .ParaTrackerSize
 {
-width: 600px;
-height: 600px;
+width: 728px;
+height: 90px;
 overflow: hidden;
 white-space: nowrap;
 }
@@ -34,7 +34,7 @@ All values are 0 to 255, except alpha which is 0 to 1.
 0 is transparent, 1 is solid.
 Default is: background-color: rgba(0, 0, 0, 1);
 */
-background-color: rgba(220, 220, 220, .825);
+background-color: rgba(78, 80, 92, 1);
 
 /* If you want a background image on the tracker,
 this next line is the place to add it.
@@ -53,12 +53,9 @@ Do not add anything to this class, as it is rendered on top of everything else. 
 position: absolute;
     left: 0px;
     top: 0px;
-width: 600px;
-height: 300px;
 pointer-events: none;
 overflow: hidden;
 user-select: none;
-display: none;
 }
 
 
@@ -74,24 +71,17 @@ CUSTOM PAGE STYLES
 .CustomDiv1
 {
 position: absolute;
-    left: 0px;
+    left: 287px;
     top: 0px;
-width: 240px;
-height: 200px;
-overflow: hidden;
-user-select: none;
-cursor: pointer;
-background-color: #114466;
+font-size: 9pt;
+width: 297px;
+height: 17px;
+background-color: #44445A;
 }
 
 .CustomDiv2
 {
-position: absolute;
-    left: 0px;
-    top: 250px;
-width: 600px;
-height: 30px;
-background-color: #114466;
+display: none;
 }
 
 .CustomDiv3
@@ -107,7 +97,6 @@ NORMAL PAGE STYLES
 */
 
 
-/* This class adds text to the reload timer */
 .reloadTimer::before
 {
 content: "Refresh in ";
@@ -117,17 +106,17 @@ content: "Refresh in ";
 .reloadTimer
 {
 position: absolute;
-    left: 200px;
-    top: 204px;
+    left: 25px;
+    top: 78px;
 opacity: 1;
 cursor: pointer;
-width: 200px;
-height: 30px;
-line-height: 40px;
-text-align: center;
+width: 120px;
+height: 12px;
+text-align: left;
+line-height: 12px;
 overflow: hidden;
-color: #000000;
-font-size: 14pt;
+color: #EFEFEF;
+font-size: 9pt;
 font-family: monospace;
 font-weight: bold;
 }
@@ -136,13 +125,12 @@ font-weight: bold;
 .ParaTrackerLogo
 {
 position: absolute;
-    left: 524px;
-    top: 172px;
-width: 20px;
-height: 102px;
+    left: 5px;
+    top: 9px;
+width: 14px;
+height: 72px;
 user-select: none;
-background-image: url("../images/tracker/ParaTrackerLogoSideways.png");
-transform: rotate(270deg);
+background-image: url("../images/tracker/ParaTracker-Logo-smaller-sideways.png");
 }
 
 /* This class is the ParaTracker text. It is meant to be used when a logo image is not used */
@@ -155,7 +143,7 @@ width: 20px;
 height: 102px;
 text-align: center;
 overflow: hidden;
-color: #000000;
+color: #EFEFEF;
 font-size: 14pt;
 font-family: monospace;
 display: none;
@@ -165,33 +153,29 @@ display: none;
 .serverName
 {
 position: absolute;
-    left: 240px;
-    top: 6px;
-width: 353px;
-height: 24px;
-font-size: 14pt;
+    left: 25px;
+    top: 0px;
+width: 225px;
+height: 20px;
+font-size: 12pt;
 font-family: "Trebuchet MS", sans-serif;
 font-weight: bold;
 overflow: hidden;
-text-align: center;
-padding-left: 7px;
 }
 
 /* This is the title of the game, shown just below the server name */
 .gameTitle
 {
 position: absolute;
-    left: 240px;
-    top: 30px;
-width: 353px;
-height: 20px;
-color: #000000;
-font-size: 10pt;
+    left: 25px;
+    top: 20px;
+width: 225px;
+height: 15px;
+color: #999999;
+font-size: 8pt;
 font-family: "Verdana", sans-serif;
 font-style: italic;
 overflow: hidden;
-text-align: center;
-padding-left: 7px;
 }
 
 /* This class positions the column headers for name, score and ping.
@@ -201,11 +185,12 @@ and minus the left and right padding of the .playerRow classes (10 by default) *
 .nameScorePing
 {
 position: absolute;
-    left: 0px;
-    top: 250px;
-width: 560px;
-height: 30px;
-padding-top: 4px;
+    left: 287px;
+    top: 0px;
+font-size: 9pt;
+width: 270px;
+height: 14px;
+padding-top: 1px;
 padding-bottom: 4px;
 padding-left: 5px;
 padding-right: 5px;
@@ -220,10 +205,8 @@ content: "";
 /* This is the style of the Name column header for the player list */
 .playerNameHeader
 {
-font-size: 14pt;
-font-family: sans-serif;
+font-family: monospace;
 color: #FFFFBB;
-padding-left: 13px;
 }
 
 /* This class adds the text to the "Score" column in the player list */
@@ -235,8 +218,7 @@ content: "Score";
 /* This is the style of the Ping column header for the player list */
 .playerScoreHeader
 {
-font-size: 14pt;
-font-family: sans-serif;
+font-family: monospace;
 color: #FFFFBB;
 text-align: center;
 }
@@ -250,8 +232,7 @@ content: "Ping";
 /* This is the style of the Score column header for the player list */
 .playerPingHeader
 {
-font-size: 14pt;
-font-family: sans-serif;
+font-family: monospace;
 color: #FFFFBB;
 text-align: center;
 }
@@ -260,10 +241,10 @@ text-align: center;
 .playerTable
 {
 position: absolute;
-    left: 0px;
-    top: 280px;
-width: 600px;
-height: 500px;
+    left: 287px;
+    top: 17px;
+width: 297px;
+height: 73px;
 vertical-align: middle;
 overflow-y: scroll;
 overflow-x: hidden;
@@ -296,51 +277,47 @@ overflow: hidden;
 /* This class is used for the odd rows in the player list */
 .playerRow1
 {
-background: linear-gradient(#BBBBBB, #BBBBBB, #BBBBBB, #AAAAAA, #AAAAAA);
-background-color: #BBBBBB;
+background-color: #363636;
 font-family: monospace;
-color: #000000;
-padding-top: 10px;
-padding-bottom: 10px;
-padding-left: 13px;
+color: #FFFFFF;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
 padding-right: 5px;
 }
 
 /* This class is used for the even rows in the player list */
 .playerRow2
 {
-background: linear-gradient(#BBBBBB, #BBBBBB, #BBBBBB, #AAAAAA, #AAAAAA);
-background-color: #CCCCCC;
+background-color: #444444;
 font-family: monospace;
-color: #000000;
-padding-top: 10px;
-padding-bottom: 10px;
-padding-left: 13px;
+color: #FFFFFF;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
 padding-right: 5px;
 }
 
 /* This class sets the size and font of player names */
 .playerName
 {
-font-size: 14pt;
-font-weight: bold;
+font-size: 10pt;
 font-family: monospace;
-text-shadow: -2px 2px #444444;
 }
 
 /* This class sets the size and font of player scores */
 .playerScore
 {
-font-size: 14pt;
-font-family: sans-serif;
+font-size: 10pt;
+font-family: monospace;
 text-align: center;
 }
 
 /* This class sets the size and font of players' pings */
 .playerPing
 {
-font-size: 14pt;
-font-family: sans-serif;
+font-size: 10pt;
+font-family: monospace;
 text-align: center;
 }
 
@@ -354,24 +331,27 @@ content: "Players: ";
 .playerCount
 {
 position: absolute;
-    left: 0px;
-    top: 251px;
-width: 220px;
-height: 22px;
-font-size: 14pt;
-font-family: sans-serif;
-color: #EFEFEF;
-padding-top: 4px;
+    left: 287px;
+    top: 0px;
+font-size: 8pt;
+width: 130px;
+height: 14px;
+padding-top: 1px;
 padding-bottom: 4px;
-padding-left: 13px;
+padding-left: 5px;
+padding-right: 5px;
+color: #FFFFBB;
+font-size: 9pt;
+font-family: monospace;
+text-align: left;
 }
 
 /* This class is used to style the message when there are no players online */
 .noPlayersOnline
 {
-color: #000000;
-font-size: 14pt;
-font-family: sans-serif;
+color: #FFFFFF;
+font-size: 8pt;
+font-family: monospace;
 text-align: left;
 }
 
@@ -385,27 +365,25 @@ content: "";
 .rconButton
 {
 position: absolute;
-    left: 85px;
-    top: 202px;
-width: 85px;
-height: 45px;
-width: 85px;
-height: 45px;
+    left: 250px;
+    top: 46px;
+width: 20px;
+height: 38px;
 cursor: pointer;
-background-image: url("../images/tracker/rcon.png");
+background-image: url("../images/tracker/rcon_small_rotated.png");
 }
 
 /* This class is the hover image for the RCon button */
 .rconButton:hover
 {
-background-image: url("../images/tracker/rcon_h.png");
+background-image: url("../images/tracker/rcon_small_rotated_h.png");
 }
 
 /* This class is the preloader for the hover image for the RCon button. It needs to use the same background image as the class directly above it */
 .rconPreload
 {
 display: none;
-background-image: url("../images/tracker/rcon_h.png");
+background-image: url("../images/tracker/rcon_small_rotated_h.png");
 }
 
 /* This class adds optional text to the param button */
@@ -418,33 +396,33 @@ content: "";
 .paramButton
 {
 position: absolute;
-    left: 0px;
-    top: 202px;
-width: 85px;
-height: 45px;
+    left: 250px;
+    top: 6px;
+width: 20px;
+height: 38px;
 cursor: pointer;
-background-image: url("../images/tracker/param.png");
+background-image: url("../images/tracker/param_small_rotated.png");
 }
 
 /* This class is the hover image for the Param button */
 .paramButton:hover
 {
-background-image: url("../images/tracker/param_h.png");
+background-image: url("../images/tracker/param_small_rotated_h.png");
 }
 
 /* This class is the preloader for the hover image for the Param button. It needs to use the same background image as the class directly above it */
 .paramPreload
 {
 display: none;
-background-image: url("../images/tracker/param_h.png");
+background-image: url("../images/tracker/param_small_rotated_h.png");
 }
 
 /* This is a container for the levelshots, and it also disables selecting them */
 .levelshotFrame
 {
 position: absolute;
-    left: 20px;
-    top: 20px;
+    left: 584px;
+    top: -9px;
 overflow: hidden;
 user-select: none;
 cursor: pointer;
@@ -455,8 +433,8 @@ cursor: pointer;
 .levelshotSize
 {
 position: absolute;
-width: 200px;
-height: 150px;
+width: 144px;
+height: 108px;
 }
 
 /* This class adds the text to the "map name" value */
@@ -469,15 +447,19 @@ content: "";
 .mapName
 {
 position: absolute;
-    left: 0px;
-    top: 176px;
-height: 24px;
-width: 240px;
+    left: 584px;
+    top: 75px;
+height: 15px;
+width: 144px;
 color: #EEEEEE;
-font-size: 10pt;
+font-size: 8pt;
+text-align: center;
+font-weight: bold;
 font-family: monospace;
 overflow: hidden;
-text-align: center;
+pointer-events: none;
+text-shadow: 1px 1px #000000;
+z-index: 5;
 }
 
 /* This class adds the text to the "mod name" value */
@@ -490,15 +472,14 @@ content: "Mod name: ";
 .modName
 {
 position: absolute;
-    left: 240px;
-    top: 85px;
-height: 30px;
-width: 353px;
-color: #000000;
-font-size: 12pt;
+    left: 25px;
+    top: 35px;
+height: 15px;
+width: 225px;
+color: #EFEFEF;
+font-size: 8pt;
 font-family: monospace;
 overflow: hidden;
-padding-left: 7px;
 }
 
 /* This class adds the text to the "gametype" value */
@@ -511,36 +492,34 @@ content: "Gametype: ";
 .gametype
 {
 position: absolute;
-    left: 240px;
-    top: 55px;
-width: 353px;
-height: 30px;
-color: #000000;
-font-size: 12pt;
+    left: 25px;
+    top: 50px;
+height: 15px;
+width: 225px;
+color: #EFEFEF;
+font-size: 8pt;
 font-family: monospace;
 overflow: hidden;
-padding-left: 7px;
 }
 
 /* This class adds the text to the "IP address" value */
 .IPAddress::before
 {
-content: "IP: ";
+content: "Server IP: ";
 }
 
 /* This class is used for the "IP Address" value */
 .IPAddress
 {
 position: absolute;
-    left: 240px;
-    top: 115px;
-height: 30px;
-width: 353px;
-color: #000000;
-font-size: 12pt;
+    left: 25px;
+    top: 65px;
+height: 15px;
+width: 225px;
+color: #EFEFEF;
+font-size: 8pt;
 font-family: monospace;
 overflow: hidden;
-padding-left: 7px;
 }
 
 /* This class is for the blinking cursor at the end of the IP address */
@@ -558,10 +537,10 @@ display: none;
 .countryFlag
 {
 position: absolute;
-    left: 240px;
-    top: 145px;
-height: 30px;
-width: 30px;
+    left: 475px;
+    top: 275px;
+height: 20px;
+width: 20px;
 user-select: none;
 overflow: hidden;
 display: none;
@@ -570,7 +549,7 @@ display: none;
 /* This class adds the text to the server ping */
 .ServerPing::before
 {
-content: "Server Ping: ";
+content: "Ping: ";
 }
 
 /* This class is used for the game server's ping to the web server.
@@ -578,12 +557,12 @@ It is not particularly useful; nonetheless, it is a feature and can be used. */
 .ServerPing
 {
 position: absolute;
-    left: 240px;
-    top: 175px;
-height: 30px;
-width: 353px;
-color: #000000;
-font-size: 12pt;
+    left: 375px;
+    top: 265px;
+height: 17px;
+width: 255px;
+color: #EFEFEF;
+font-size: 8pt;
 font-family: monospace;
 overflow: hidden;
 padding-left: 7px;
@@ -598,27 +577,26 @@ NO CONNECTION PAGE STYLES
 */
 
 
-/* This class adds text to the reload timer */
 .reloadTimerNoConnection::before
 {
-content: "Retry in ";
+content: "Refresh in ";
 }
 
 /* This class affects the reload timer */
 .reloadTimerNoConnection
 {
 position: absolute;
-    left: 200px;
-    top: 204px;
+    left: 25px;
+    top: 78px;
 opacity: 1;
 cursor: pointer;
-width: 200px;
-height: 30px;
-line-height: 40px;
-text-align: center;
+width: 120px;
+height: 12px;
+text-align: left;
+line-height: 12px;
 overflow: hidden;
-color: #000000;
-font-size: 14pt;
+color: #EFEFEF;
+font-size: 9pt;
 font-family: monospace;
 font-weight: bold;
 }
@@ -633,14 +611,13 @@ content: "Could not connect to server!";
 .paraTrackerError
 {
 position: absolute;
-    left: 240px;
-    top: 6px;
-width: 353px;
-height: 110px;
-color :#000000;
-font-weight: bold;
+    left: 25px;
+    top: 0px;
+width: 262px;
+height: 70px;
+color :#EEEEEE;
 text-align: center;
-font-size: 12pt;
+font-size: 9pt;
 font-family: monospace;
 }
 
@@ -654,14 +631,13 @@ content: "Server Address:";
 .paraTrackerErrorAddress
 {
 position: absolute;
-    left: 240px;
-    top: 120px;
-width: 353px;
-height: 80px;
-color :#000000;
+    left: 287px;
+    top: 0px;
+width: 297px;
+height: 70px;
+color :#EEEEEE;
 text-align: center;
-font-size: 12pt;
-font-weight: bold;
+font-size: 9pt;
 font-family: monospace;
 word-wrap: break-word;
 }
@@ -674,7 +650,6 @@ width: 18px;
 background: url("../images/tracker/blinker2.gif") no-repeat;
 background-position: 2px 2px;
 user-select: none;
-display: none;
 }
 
 /* This class is for the version number, displayed when ParaTracker could not connect */
@@ -685,12 +660,11 @@ position: absolute;
     top: 275px;
 height: 17px;
 width: 255px;
-color: #000000;
+color: #EFEFEF;
 font-size: 8pt;
 font-family: monospace;
 overflow: hidden;
 padding-left: 7px;
-display: none;
 }
 
 /* This class adds optional text to the reconnect button */
@@ -703,25 +677,25 @@ content: "";
 .reconnectButton
 {
 position: absolute;
-    left: 0px;
-    top: 202px;
-width: 170px;
-height: 45px;
+    left: 150px;
+    top: 74px;
+width: 76px;
+height: 20px;
 cursor: pointer;
-background-image: url("../images/tracker/reconnect.png");
+background-image: url("../images/tracker/reconnect_small.png");
 }
 
 /* This class is the hover image for the Reconnect button */
 .reconnectButton:hover
 {
-background-image: url("../images/tracker/reconnect_h.png");
+background-image: url("../images/tracker/reconnect_small_h.png");
 }
 
 /* This class is the preloader for the hover image for the Reconnect button. It needs to use the same background image as the class directly above it */
 .reconnectPreload
 {
 display: none;
-background-image: url("../images/tracker/reconnect_h.png");
+background-image: url("../images/tracker/reconnect_small_h.png");
 }
 
 
@@ -1052,6 +1026,7 @@ color: #FFFF00;
 Default is #2222FF */
 {
 color: #2222FF;
+font-weight: bold;
 }
 
 .color5
@@ -1073,7 +1048,6 @@ color: #FF00FF;
 Default is #FFFFFF */
 {
 color: #FFFFFF;
-text-shadow: -1px 1px #444444;
 }
 
 .color8

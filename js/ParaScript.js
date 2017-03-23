@@ -146,6 +146,18 @@ function bitValueClick(cvarName)
     }
 }
 
+function colorSelectionClick(cvarName)
+{
+    if (document.getElementById(cvarName).className == "collapsedFrame")
+    {
+        document.getElementById(cvarName).className = "expandedFrame"
+    }
+    else
+    {
+        document.getElementById(cvarName).className = "collapsedFrame"
+    }
+}
+
 function makeReconnectButtonVisible()
 {
     var replaceReconnectClass = "";
@@ -213,6 +225,31 @@ function disableRConForm()
     return true;
 }
 
+//This function toggles the gradient behind the dynamic tracker on the setup page
+function toggleGradientBackground()
+{
+    if(document.getElementById("backgroundToggle").checked == true)
+    {
+        document.getElementById("paraTrackerTestFrameContent").className = "paraTrackerTestFrameGradient";
+    }
+    else
+    {
+        document.getElementById("paraTrackerTestFrameContent").className = "";
+    }
+}
+
+function toggleTextureBackground()
+{
+    if(document.getElementById("textureToggle").checked == true)
+    {
+        document.getElementById("paraTrackerTestFrameContent2").className = "paraTrackerTestFrame paraTrackerTestFrameTexture";
+    }
+    else
+    {
+        document.getElementById("paraTrackerTestFrameContent2").className = "paraTrackerTestFrame";
+    }
+}
+
 function createURL()
 {
     if(document.getElementById("IPAddress").value == "")
@@ -227,6 +264,13 @@ function createURL()
     var height = "";
     var skinFile = "";
     var skinFieldValue = "";
+    var backgroundColor = "";
+    var backgroundOpacity = "";
+    var textColor = "";
+    var playerListColor1 = "";
+    var playerListColor1Opacity = "";
+    var playerListColor2 = "";
+    var playerListColor2Opacity = "";
 
     outputURL += document.getElementById("currentURL").value;
     outputURL += "?ip=";
@@ -253,6 +297,37 @@ function createURL()
 
     outputURL += skinFile;
 
+    if(document.getElementById("backgroundColor").value != "")
+    {
+        outputURL += "&backgroundColor=" + document.getElementById("backgroundColor").value;
+        if(document.getElementById("backgroundOpacity").value != "")
+        {
+            outputURL += "&backgroundOpacity=" + document.getElementById("backgroundOpacity").value;
+        }
+    }
+
+    if(document.getElementById("textColor").value != "")
+    {
+        outputURL += "&textColor=" + document.getElementById("textColor").value;
+    }
+
+    if(document.getElementById("playerListColor1").value != "")
+    {
+        outputURL += "&playerListColor1=" + document.getElementById("playerListColor1").value;
+        if(document.getElementById("playerListColor1Opacity").value != "")
+        {
+            outputURL += "&playerListColor1Opacity=" + document.getElementById("playerListColor1Opacity").value;
+        }
+    }
+
+    if(document.getElementById("playerListColor2").value != "")
+    {
+        outputURL += "&playerListColor2=" + document.getElementById("playerListColor2").value;
+        if(document.getElementById("playerListColor2Opacity").value != "")
+        {
+            outputURL += "&playerListColor2Opacity=" + document.getElementById("playerListColor2Opacity").value;
+        }
+    }
 
     outputURL= encodeURI(outputURL);
 
@@ -261,8 +336,10 @@ function createURL()
     outputURL = '<iframe id="ParaTracker" src="' + outputURL + '" width="' + skinWidth + '" height="' + skinHeight + '" sandbox="allow-forms allow-popups allow-scripts allow-same-origin" style="border:none;background:none transparent;" allowtransparency="true" scrolling="no"></iframe>';
     document.getElementById("finalURLHTML").value = outputURL;
 
-    document.getElementById("paraTrackerTestFrameContent").innerHTML = outputURL;
+    document.getElementById("paraTrackerTestFrameContent").innerHTML = "<br />\n" + outputURL + "\n<br /><br />";
     document.getElementById("paraTrackerTestFrame").className = "expandedFrame";
+    document.getElementById("paraTrackerTestFrameContent").width = skinWidth + 100;
+    document.getElementById("paraTrackerTestFrameContent").height = skinHeight + 100;
 }    
 return false;
 }
