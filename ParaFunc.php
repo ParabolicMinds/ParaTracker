@@ -34,6 +34,7 @@ $playerListColor1 = "";
 $playerListColor1Opacity = "100";
 $playerListColor2 = "";
 $playerListColor2Opacity = "100";
+$geoipCountryCode = "";
 
 define("defaultSkin", $defaultSkin);
 
@@ -188,6 +189,8 @@ else
 $serverPort = numericValidator($serverPort, 1, 65535, 29070);
 $serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort);
 
+
+
 //If the skin parameter is not set, we need to set it to the default value
 if(isset($paraTrackerSkin))
 {
@@ -252,29 +255,22 @@ $RConLogSize = numericValidator($RConLogSize, 100, 100000, 1000);
 
 $newWindowSnapToCorner = booleanValidator($newWindowSnapToCorner, 0);
 
+//The IP address has already been validated, so we can use it for a directory name
+//Make sure we convert the path to lowercase when creating folders for it, or else the flood protection could be bypassed!
+$dynamicIPAddressPath = strtolower($serverIPAddress . "-" . $serverPort . "/");
+
 $enableGeoIP = booleanValidator($enableGeoIP, 0);
 
 if($enableGeoIP == "1")
 {
     //If GeoIP is found, include it. If there is no GeoIP file found, disable it.
-    if(file_exists($geoIPPath))
-    {
-        include($geoIPPath);
-    }
-    else
+    if(!file_exists($geoIPPath))
     {
         echo " Could not find GeoIP. Ignoring... ";
         $enableGeoIP = 0;
         $geoIPPath = "";
     }
 }
-
-
-
-//The IP address has already been validated, so we can use it for a directory name
-//Make sure we convert the path to lowercase when creating folders for it, or else the flood protection could be bypassed!
-$dynamicIPAddressPath = strtolower($serverIPAddress . "-" . $serverPort . "/");
-
 
 //Now that everything has been validated, let's define all ParaConfig values as global constants to make things easier.
 define("dynamicIPAddressPath", $dynamicIPAddressPath);
@@ -300,6 +296,7 @@ define("RConMaximumMessageSize", $RConMaximumMessageSize);
 define("RConFloodProtect", $RConFloodProtect);
 define("RConLogSize", $RConLogSize);
 define("newWindowSnapToCorner", $newWindowSnapToCorner);
+
 define("enableGeoIP", $enableGeoIP);
 define("geoIPPath", $geoIPPath);
 
@@ -310,6 +307,14 @@ define("playerListColor1", $playerListColor1);
 define("playerListColor1Opacity", $playerListColor1Opacity);
 define("playerListColor2", $playerListColor2);
 define("playerListColor2Opacity", $playerListColor2Opacity);
+
+if(enableGeoIP) {
+	global $geoipCountryCode;
+	require_once 'vendor/autoload.php';
+	$geoip_dbr = new GeoIp2\Database\Reader(geoIPPath);
+	$actualIP = gethostbyname ($serverIPAddress);
+	$geoipCountryCode = $geoip_dbr->country($actualIP)->country->isoCode;
+}
 
 if($executeDynamicInstructionsPage == "1")
 {
@@ -1895,6 +1900,11 @@ function renderJSONPage()
     $output .= '"RConEnable":' . convertBooleansToString(RConEnable) . ',';
     $output .= '"RConFloodProtect":"' . RConFloodProtect . '",';
     $output .= '"newWindowSnapToCorner":' . convertBooleansToString(newWindowSnapToCorner) . ',';
+    
+    global $geoipCountryCode;
+    if(!empty($geoipCountryCode)) {
+		$output .= '"geoipCountryCode":' . '"' . $geoipCountryCode . '"' . ',';
+	}
 
     if(backgroundColor != "")
     {
@@ -1925,7 +1935,8 @@ function renderJSONPage()
     $output .= '],';
 
     //Now let's include the bitflags (They are already parsed correctly in a text file)
-    $output .= file_get_contents("info/" . dynamicIPAddressPath . "JSONParams.txt");
+    $decent = html_entity_decode(file_get_contents("info/" . dynamicIPAddressPath . "JSONParams.txt"));
+    $output .= $decent;
 
     //Now, we call a function to parse the server response, then put it in JSON format
     $dump = file_get_contents("info/" . dynamicIPAddressPath . "serverDump.txt");
@@ -1945,7 +1956,7 @@ function renderJSONPage()
         {
             $output .= ",";
         }
-    $output .= '{"name":"' . trim($player_array[$i]["name"]) . '",';
+    $output .= '{"name":"' . html_entity_decode(trim($player_array[$i]["name"])) . '",';
     $output .= '"score":"' . $player_array[$i]["score"] . '",';
     $output .= '"ping":"' . $player_array[$i]["ping"] . '"}';
     }

@@ -1,0 +1,289 @@
+#ParaTracker {
+	background-color: #000;
+	overflow: hidden;
+	display: inline-flex;
+	flex-direction: column;
+	width: 640px;
+	height: 260px;
+	color: #FFF;
+	font-family: "DejaVu Sans Mono", monospace;
+}
+
+#tracker_header {
+	flex: 0 0 auto;
+	background-color: #222;
+	height: 40px;
+	font-size: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-bottom: 2px solid #444;
+	flex-direction: column;
+}
+
+.tracker_svinfo {
+	font-size: 10px;
+	font-weight: bold;
+	text-shadow: 0px 0px 4px;
+}
+
+#tracker_infosuper {
+	display: flex;
+	flex-direction: row;
+	flex: 0 0 auto;
+	height: 180px;
+}
+
+#tracker_infocont {
+	flex: 1 1 auto;
+	height: 180px;
+	display: flex;
+	flex-direction: column;
+}
+
+#tracker_players {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	background-color: #000;
+	overflow: auto;
+}
+
+#tracker_lv {
+	flex: 0 0 auto;
+	background-size: 240px 180px;
+	overflow: hidden;
+	border-left: 2px solid #444;
+}
+
+#tracker_info {
+	display: flex;
+	flex: 1 1 auto;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	background-color: #222;
+	border-top: 2px solid #444;
+}
+
+#tracker_players_header {
+	background-color: #181818;
+	display: flex;
+	flex-direction: row;
+	flex: 0 0 auto;
+	padding: 3px 5px 3px 5px;
+	font-size: 11px;
+	font-weight: bold;
+	margin-bottom: 1px;
+}
+#tracker_plyhead_name {
+	flex: 1 1 auto;
+	margin-right: 10px;
+	text-align: left;
+}
+
+#tracker_plyhead_count {
+	flex: 1 1 auto;
+	text-align: left;
+}
+
+#tracker_plyhead_score {
+	text-align: right;
+	flex: 0 0 auto;
+	margin: 0px 10px 0px 10px;
+}
+#tracker_plyhead_ping {
+	text-align: right;
+	flex: 0 0 auto;
+	margin-left: 10px;
+	width: 40px;
+}
+
+.tracker_plycont {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: row;
+	margin: 1px 0px 1px 0px;
+	padding: 0px 5px 0px 5px;
+}
+
+.tracker_plycontaa {
+	background-color: #121212
+}
+
+.tracker_plycontab {
+	background-color: #0C0C0C
+}
+
+.tracker_svname {
+	text-shadow: 0px 0px 10px #000, 0px 0px 5px #000;
+	font-weight: bold;
+}
+
+.tracker_plyname {
+	text-shadow: 0px 0px 10px #000, 0px 0px 5px #000;
+	flex: 1 1 auto;
+	margin-right: 10px;
+	text-align: left;
+}
+
+.tracker_plyscore {
+	text-align: right;
+	flex: 0 0 auto;
+	margin: 0px 10px 0px 10px;
+}
+
+.tracker_plyping {
+	text-align: right;
+	flex: 0 0 auto;
+	margin-left: 10px;
+	width: 40px;
+}
+
+.tracker_info_item {
+	font-size: 12px;
+	margin: 2px 10px 2px 0px;
+}
+
+.tracker_info_item_desc {
+	font-size: 12px;
+	font-weight: bold;
+	margin: 2px 0px 2px 10px;
+}
+
+.tracker_info_param {
+	color: #8F8;
+}
+
+.tracker_info_param:hover {
+	color: #CFC;
+}
+
+.tracker_info_param:visited {
+	color: inherit;
+}
+
+.tracker_info_param:active {
+	color: #8F8;
+	text-shadow: 0px 0px 5px #0F0;
+}
+
+.tracker_param_div {
+	position: absolute;
+	width: 400px;
+	height: 600px;
+	background-color: #F00;
+	display: flex;
+	overflow: auto;
+	flex-direction: column;
+	border: 4px solid #666;
+	box-shadow: 0px 0px 30px #666;
+	color: #CCC;
+}
+
+.tracker_param_row {
+	display: flex;
+	flex-direction: row;
+	flex: 1 0 auto;
+}
+
+.tracker_param_rowa {
+	background-color: #222;
+}
+
+.tracker_param_rowb {
+	background-color: #111;
+}
+
+.tracker_param_keyd {
+	text-align:left;
+	flex: 1 0 auto;
+	min-width: 0px;
+	margin: 5px;
+}
+
+.tracker_param_key {
+	word-wrap: break-word;
+}
+
+.tracker_param_vald {
+	flex: 1 1 auto;
+	text-align:right;
+	min-width: 0px;
+	margin: 5px;
+}
+
+.tracker_param_val {
+	word-wrap: break-word;
+}
+
+.tracker_lvshot {
+}
+
+.tracker_col0 {
+	color: #444;
+}
+
+.tracker_col1 {
+	color: #F00;
+}
+
+.tracker_col2 {
+	color: #0F0;
+}
+
+.tracker_col3 {
+	color: #FF0;
+}
+
+.tracker_col4 {
+	color: #00F;
+}
+
+.tracker_col5 {
+	color: #0FF;
+}
+
+.tracker_col6 {
+	color: #F0F;
+}
+
+.tracker_col7 {
+	color: #FFF;
+}
+
+.tracker_col8 {
+	color: #F60;
+}
+
+.tracker_col9 {
+	color: #888;
+}
+
+.tracker_noplayers {
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.tracker_countryimg {
+	width: 32px;
+	height: 24px;
+	background-size: contain;
+	margin-right: 10px;
+	border: 2px solid #666;
+}
+
+.tracker_refresh_timer {
+	font-size: 10px;
+	font-weight: bold;
+	margin-left: 20px;
+	padding: 4px 8px;
+	background-color: #181818;
+	border-radius: 4px;
+	width: 20px;
+}
+
+@keyframes tracker_transition {
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+}
