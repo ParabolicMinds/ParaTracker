@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 /*
 
 ParaTracker is released under the MIT license, which reads thus:
@@ -523,11 +523,11 @@ function doUpdate($lastRefreshTime)
 
         //Now, let's write the stuff we know to the individual text files for later use.
 		file_put_contents('info/' . dynamicIPAddressPath . 'gametype.txt', $gametype);
-	    file_put_contents("info/" . dynamicIPAddressPath . "gamename.txt", $gameName);
+		file_put_contents("info/" . dynamicIPAddressPath . "gamename.txt", $gameName);
 		file_put_contents('info/' . dynamicIPAddressPath . 'mapname.txt', colorize($mapname));
 		//This next line is needed for Dynamic Paratracker to use levelshots correctly
 		file_put_contents('info/' . dynamicIPAddressPath . 'mapname_raw.txt', $mapname);
-		file_put_contents('info/' . dynamicIPAddressPath . 'modname.txt', colorize($modName));
+		file_put_contents('info/' . dynamicIPAddressPath . 'modname.txt', $modName);
 		file_put_contents("info/" . dynamicIPAddressPath . "playerCount.txt", $player_count);
 		file_put_contents('info/' . dynamicIPAddressPath . 'sv_hostname.txt', removeOffendingServerNameCharacters($sv_hostname));
 		file_put_contents('info/' . dynamicIPAddressPath . 'sv_maxclients.txt', $sv_maxclients);
@@ -612,8 +612,8 @@ function removeOffendingServerNameCharacters($input)
     //Check to see if the offending characters are to be removed
     if (filterOffendingServerNameSymbols == 1)
     {
-        //The following line removes the Euro symbol, â‚¬
-        $input = str_replace('â‚¬', '', $input);
+        //The following line removes the Euro symbol, €
+        $input = str_replace('€', '', $input);
 
         //The following line removes the newline symbol, 
         $input = str_replace('', '', $input);
@@ -1640,7 +1640,7 @@ if ($RConPassword != "" && $RConCommand != "")
 		    $serverResponse = stringValidator($serverResponse, "", "");
 
 		    //Now we format the remaining data in a readable fashion
-			$serverResponse = str_replace('Ã¿Ã¿Ã¿Ã¿print', '', $serverResponse);
+			$serverResponse = str_replace('ÿÿÿÿprint', '', $serverResponse);
 			$serverResponse = str_replace(chr(0x0A), '<br />', trim($serverResponse));
 			//This next line apparently replaces spaces with....spaces? Not sure who added that but I'm commenting it out
 			//$serverResponse = str_replace(chr(0x20), ' ', $serverResponse);
@@ -2285,3 +2285,4 @@ file_put_contents('ParaConfig.php', $configBuffer);
 }
 
 ?>
+
