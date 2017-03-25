@@ -207,7 +207,7 @@ function setup_tracker() {
 		// ================
 		let cimg = document.createElement('div')
 		cimg.className = 'tracker_countryimg'
-		cimg.style.backgroundImage = 'url(http://pt.dogi.us/vendor/components/flag-icon-css/flags/4x3/' + data.geoipCountryCode.toLowerCase() + '.svg)'
+		cimg.style.backgroundImage = 'url(http://pt.dogi.us/flags/' + data.geoipCountryCode.toLowerCase() + '.svg)'
 		let locspan = wrap_span('LOC: ', 'tracker_info_item_desc')
 		locspan.marginLeft = 0
 		tracker_info.appendChild(locspan)
