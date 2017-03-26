@@ -763,7 +763,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			        if($cvar['name'] == strtolower($BitFlagsIndex[$i]))
 			        {
 			            $foundMatch = 1;
-			            $returnArray = bitvalueCalculator($cvar['name'], $cvar['value'], $$BitFlagsIndex[$i]);
+			            $returnArray = array(bitvalueCalculator($cvar['name'], $cvar['value'], $$BitFlagsIndex[$i]));
 			            array_shift($returnArray);
 
 			            $buf .= '<div class="CVarExpandList" onclick="bitValueClick(' . "'" . $cvar['name'] . "'" .  ')"><i><b>' . $cvar['value'] . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i><div id="' . $cvar['name'] .  '" class="collapsedList"><br />';
@@ -1927,7 +1927,7 @@ function renderJSONPage()
     $GeoIPInput = file_get_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt');
     if(enableGeoIP == 1 && $GeoIPInput != "")
     {
-        $GeoIPInput = explode(":#:", $flag);
+        $GeoIPInput = explode(":#:", $GeoIPInput);
         $output .= '"geoipCountryCode":' . '"' . $GeoIPInput[0] . '"' . ',';
         $output .= '"geoipCountryName":' . '"' . $GeoIPInput[1] . '"' . ',';
     }
