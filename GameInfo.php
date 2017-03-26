@@ -80,7 +80,7 @@ function callofduty4modernwarfare($cvars_hash, $cvars_hash_decolorized)
     $modName = "";
     $sv_hostname = "";
     $sv_maxclients = "";
-    $BitFlagsIndex = "";
+    $BitFlagsIndex = array("");
 
 
     //If you are adding a custom game, the stuff below is what to change.
@@ -125,7 +125,7 @@ function jediacademy($cvars_hash, $cvars_hash_decolorized)
     $modName = "";
     $sv_hostname = "";
     $sv_maxclients = "";
-    $BitFlagsIndex = "";
+    $BitFlagsIndex = array("");
 
 
     //If you are adding a custom game, the stuff below is what to change.
@@ -176,7 +176,7 @@ function jedioutcast($cvars_hash, $cvars_hash_decolorized)
     $modName = "";
     $sv_hostname = "";
     $sv_maxclients = "";
-    $BitFlagsIndex = "";
+    $BitFlagsIndex = array("");
 
 
     //If you are adding a custom game, the stuff below is what to change.
@@ -225,7 +225,7 @@ function tremulous($cvars_hash, $cvars_hash_decolorized)
     $modName = "";
     $sv_hostname = "";
     $sv_maxclients = "";
-    $BitFlagsIndex = "";
+    $BitFlagsIndex = array("");
 
 
     //If you are adding a custom game, the stuff below is what to change.
@@ -270,7 +270,7 @@ function quakeiiiarena($cvars_hash, $cvars_hash_decolorized)
     $modName = "";
     $sv_hostname = "";
     $sv_maxclients = "";
-    $BitFlagsIndex = "";
+    $BitFlagsIndex = array("");
 
 
     //If you are adding a custom game, the stuff below is what to change.
@@ -318,7 +318,7 @@ function xonotic($cvars_hash, $cvars_hash_decolorized)
     $modName = "";
     $sv_hostname = "";
     $sv_maxclients = "";
-    $BitFlagsIndex = "";
+    $BitFlagsIndex = array("");
 
 
     //If you are adding a custom game, the stuff below is what to change.

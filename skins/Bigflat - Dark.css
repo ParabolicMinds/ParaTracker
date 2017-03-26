@@ -558,8 +558,8 @@ display: none;
 /* This adds the optional country flag to the page. This feature only works when GeoIP is installed. */
 .countryFlag
 {
-height: 20px;
-width: 20px;
+height: 24px;
+width: 32px;
 user-select: none;
 overflow: hidden;
 }
