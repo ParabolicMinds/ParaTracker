@@ -833,7 +833,9 @@ function playerList($player_array, $playerParseCount)
 				$player_name = str_replace(array("\n", "\r"), '', $player["name"]);
 				$player_count++;
 				$playerListbuffer .= "\n" . '
-<div class="playerRow' . $c . '"><div class="playerName playerNameSize">'. colorize($player_name);
+<div class="playerRow' . $c . '"><div class="playerName playerNameSize">';
+//Since the colorizer does not add the color7 tags unless another color is found, let's force it here
+$playerListbuffer .= '<span class="color7">'. colorize($player_name) . '</span>';
 				$playerListbuffer .= '</div><div class="playerScore playerScoreSize">' . $player["score"] . '</div><div class="playerPing playerPingSize">' . $player["ping"] . '</div></div>';
 				$c++;
 				if($c > 2) $c = 1;
