@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 ///////////////////////////////
 // ParaTracker Configuration //
 ///////////////////////////////
@@ -260,13 +260,12 @@ $newWindowSnapToCorner = "0";
 // This value is boolean. When this variable is set to Yes or 1, GeoIP will be enabled, which
 // allows a country flag icon to be displayed on the tracker.
 // GEOIP MUST BE INSTALLED ON THE SERVER FOR THIS TO WORK.
-// If ParaTracker does not find GeoIP, it will ignore this setting and give an error message.
+// If ParaTracker does not find GeoIP, it will ignore this setting and give a debug message.
 // Default is 0.
 $enableGeoIP = "0";
 
-// For GeoIP to work, ParaTracker needs to know where to find it. This path needs to point to
-// the GeoIP PHP file, as ParaTracker will load it on startup.
-// Since typically GeoIP will be in the same directory as ParaTracker, the
+// For GeoIP to work, ParaTracker needs to know where to find the country database. This path
+// needs to point to the GeoIP database file. Include the file name and extension.
 // default value is ""
 $geoIPPath = "";
 

@@ -1,4 +1,4 @@
-//This function opens the param window
+﻿//This function opens the param window
 function param_window()
 {
 	if (newWindowSnapToCorner == "1")
@@ -27,7 +27,7 @@ function rcon_window()
 //This function handles the animated levelshots
 function animateLevelshot()
 {
-    if(allowTransitions == 1)
+    if(maxLevelshots > 1 && allowTransitions == 1)
     {
         //Set mode to 0 to prevent further triggering
         mode = 0;
@@ -126,7 +126,7 @@ function firstExecution()
 
 function levelshotClick()
 {
-    if (mode == 1 && allowTransitions == "1")
+    if (maxLevelshots > 1 && mode == "1" && allowTransitions == "1")
     {
         //Clear the levelshot timer, and force an immediate levelshot change
         clearTimeout(timer);

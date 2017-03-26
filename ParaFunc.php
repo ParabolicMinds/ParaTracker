@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 /*
 
 ParaTracker is released under the MIT license, which reads thus:
@@ -15,12 +15,17 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    Return("ParaTracker 1.3.1");
+    Return("ParaTracker 1.3.2");
 }
 
 //Define the default skin, to be used throughout this file. MAKE SURE it refers to an actual .css file in the skins folder, or it will break stuff. And do not include the file extension!
 $defaultSkin = "Metallic Console";
 
+
+if (!isset($safeToExecuteParaFunc))
+{
+    displayError("ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerStatic.php or ParaTrackerDynamic.php instead.", $lastRefreshTime);
+}
 
 //This block is here to suppress error messages
 $lastRefreshTime = "";
@@ -37,11 +42,6 @@ $playerListColor2Opacity = "100";
 $geoipCountryCode = "";
 
 define("defaultSkin", $defaultSkin);
-
-if (!isset($safeToExecuteParaFunc))
-{
-    displayError("ParaFunc.php is a library file and can not be run directly!<br />Try running ParaTrackerStatic.php or ParaTrackerDynamic.php instead.", $lastRefreshTime);
-}
 
 //If this file is executed directly, then echoing this value here will display the version number before exiting.
 //If the file is executed from one of the skin files, then this will end up in an HTML comment and will not be visible.
@@ -263,10 +263,10 @@ $enableGeoIP = booleanValidator($enableGeoIP, 0);
 
 if($enableGeoIP == "1")
 {
-    //If GeoIP is found, include it. If there is no GeoIP file found, disable it.
+    //If GeoIP is enabled but the file is not found, disable it.
     if(!file_exists($geoIPPath))
     {
-        echo " Could not find GeoIP. Ignoring... ";
+        echo ' Could not find a GeoIP Country Database. "' . $geoIPPath . '"' . "\n" . 'GeoIP has been disabled and will be ignored... ';
         $enableGeoIP = 0;
         $geoIPPath = "";
     }
@@ -308,14 +308,6 @@ define("playerListColor1Opacity", $playerListColor1Opacity);
 define("playerListColor2", $playerListColor2);
 define("playerListColor2Opacity", $playerListColor2Opacity);
 
-if(enableGeoIP) {
-	global $geoipCountryCode;
-	require_once 'vendor/autoload.php';
-	$geoip_dbr = new GeoIp2\Database\Reader(geoIPPath);
-	$actualIP = gethostbyname ($serverIPAddress);
-	$geoipCountryCode = $geoip_dbr->country($actualIP)->country->isoCode;
-}
-
 if($executeDynamicInstructionsPage == "1")
 {
     dynamicInstructionsPage($personalDynamicTrackerMessage);
@@ -342,6 +334,7 @@ function checkForMissingFiles()
     checkFileExistence("errorMessage.txt", "info/" . dynamicIPAddressPath);
     checkFileExistence("gametype.txt", "info/" . dynamicIPAddressPath);
     checkFileExistence("gamename.txt", "info/" . dynamicIPAddressPath);
+    checkFileExistence("GeoIPData.txt", "info/" . dynamicIPAddressPath);
     checkFileExistence("JSONParams.txt", "info/" . dynamicIPAddressPath);
     checkFileExistence("levelshots.txt", "info/" . dynamicIPAddressPath);
     checkFileExistence("mapname.txt", "info/" . dynamicIPAddressPath);
@@ -459,10 +452,12 @@ function checkForAndDoUpdateIfNecessary()
 
 function doUpdate($lastRefreshTime)
 {
-	//Before we start, wipe out the parameter list. That way, if we encounter an error later, the list does not remain
+    //Before we start, wipe out the parameter lists, the levelshots list, and the GeoIP flag data.
+    //If we encounter an error later, the data will not remain
+    file_put_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt', "");
+    file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', "");
     file_put_contents('info/' . dynamicIPAddressPath . 'levelshots.txt', "");
     file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', "");
-    file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', "");
 
     //And let's declare a variable for the game name
     $gameName = "";
@@ -489,72 +484,82 @@ function doUpdate($lastRefreshTime)
 	    //Mark the time in microseconds so we can see how long this takes.
 	    $parseTimer = microtime(true);
 
+            //If GeoIP is enabled, let's get the flag and country data first, and write it to a file
+            if(enableGeoIP == 1)
+            {
+                require_once 'vendor/autoload.php';
+                $geoip_dbr = new GeoIp2\Database\Reader(geoIPPath);
+                $actualIP = gethostbyname(serverIPAddress);
+                $flag = strtolower($geoip_dbr->country($actualIP)->country->isoCode);
+                $countryName = $geoip_dbr->country($actualIP)->country->name;
+                file_put_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt', $flag . ":#:" . $countryName);
+            }
+
 	    //Now, we call a function to parse the data
 	    $dataParserReturn = dataParser($s);
 
 	    //Organize the data that came back in the array
-		$cvar_array_single = $dataParserReturn[0];
-		$cvars_hash = $dataParserReturn[1];
-		$player_array = $dataParserReturn[2];
-		$playerParseCount = $dataParserReturn[3];
+            $cvar_array_single = $dataParserReturn[0];
+            $cvars_hash = $dataParserReturn[1];
+            $player_array = $dataParserReturn[2];
+            $playerParseCount = $dataParserReturn[3];
 
-		//Remove all colorization from the CVar hashmap, and save it to a new array
-		$cvars_hash_decolorized = decolorizeArray($cvars_hash);
+            //Remove all colorization from the CVar hashmap, and save it to a new array
+            $cvars_hash_decolorized = decolorizeArray($cvars_hash);
 
-		//Now we need to parse any data that is unique to each individual game.
-		//First, let's find the game name from the server's response.
-		$gameName = parseGameName($cvars_hash, $cvars_hash_decolorized, $lastRefreshTime);
+            //Now we need to parse any data that is unique to each individual game.
+            //First, let's find the game name from the server's response.
+            $gameName = parseGameName($cvars_hash, $cvars_hash_decolorized, $lastRefreshTime);
 
-		//Insert game-specific function execution here
-		$gameFunctionParserReturn = ParseGameData($gameName, $cvars_hash, $cvars_hash_decolorized);
+            //Insert game-specific function execution here
+            $gameFunctionParserReturn = ParseGameData($gameName, $cvars_hash, $cvars_hash_decolorized);
 
 	    //Remove the variables that were returned.
 	    //We must assume that they were returned in the correct order!
 	    $gametype = array_shift($gameFunctionParserReturn);
 	    $levelshotFolder = array_shift($gameFunctionParserReturn);
 	    $mapname = array_shift($gameFunctionParserReturn);
-	    $modName = array_shift($gameFunctionParserReturn);
+	    $modName = colorize(array_shift($gameFunctionParserReturn));
 	    $sv_hostname = array_shift($gameFunctionParserReturn);
 	    $sv_maxclients = array_shift($gameFunctionParserReturn);
 
 
-		//Next, let's check and make sure the $levelshotFolder value we were given is accurate.
-		$levelshotFolder = checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder);
+            //Next, let's check and make sure the $levelshotFolder value we were given is accurate.
+            $levelshotFolder = checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder);
 
 	    //The rest is all BitFlag data.
 	    $BitFlags = $gameFunctionParserReturn;
 
-		$player_count = playerList($player_array, $playerParseCount);
+            $player_count = playerList($player_array, $playerParseCount);
 
-        //Now, let's write the stuff we know to the individual text files for later use.
-		file_put_contents('info/' . dynamicIPAddressPath . 'gametype.txt', $gametype);
-		file_put_contents("info/" . dynamicIPAddressPath . "gamename.txt", $gameName);
-		file_put_contents('info/' . dynamicIPAddressPath . 'mapname.txt', colorize($mapname));
-		//This next line is needed for Dynamic Paratracker to use levelshots correctly
-		file_put_contents('info/' . dynamicIPAddressPath . 'mapname_raw.txt', $mapname);
-		file_put_contents('info/' . dynamicIPAddressPath . 'modname.txt', $modName);
-		file_put_contents("info/" . dynamicIPAddressPath . "playerCount.txt", $player_count);
-		file_put_contents('info/' . dynamicIPAddressPath . 'sv_hostname.txt', removeOffendingServerNameCharacters($sv_hostname));
-		file_put_contents('info/' . dynamicIPAddressPath . 'sv_maxclients.txt', $sv_maxclients);
+            //Now, let's write the stuff we know to the individual text files for later use.
+            file_put_contents('info/' . dynamicIPAddressPath . 'gametype.txt', $gametype);
+            file_put_contents("info/" . dynamicIPAddressPath . "gamename.txt", $gameName);
+            file_put_contents('info/' . dynamicIPAddressPath . 'mapname.txt', colorize($mapname));
+            //This next line is needed for Dynamic Paratracker to use levelshots correctly
+            file_put_contents('info/' . dynamicIPAddressPath . 'mapname_raw.txt', $mapname);
+            file_put_contents('info/' . dynamicIPAddressPath . 'modname.txt', $modName);
+            file_put_contents("info/" . dynamicIPAddressPath . "playerCount.txt", $player_count);
+            file_put_contents('info/' . dynamicIPAddressPath . 'sv_hostname.txt', removeOffendingServerNameCharacters($sv_hostname));
+            file_put_contents('info/' . dynamicIPAddressPath . 'sv_maxclients.txt', $sv_maxclients);
 
 
-		//The following function detects how many levelshots exist on the server, and passes a buffer of information back, the final count of levelshots, and whether they fade or not
-		$levelshotCount = levelshotfinder($mapname, $levelshotFolder);
+            //The following function detects how many levelshots exist on the server, and passes a buffer of information back, the final count of levelshots, and whether they fade or not
+            $levelshotCount = levelshotfinder($mapname, $levelshotFolder);
 
-		//This has to be last, because the timer will output on this page
-		cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags);
-
+            //This has to be last, because the timer will output on this page
+            cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags);
 	}
 }
 
-function decolorizeArray($cvars_hash)
+function decolorizeArray($input)
 {
-    //This function removes all colorization from the input array.
+    //This function removes all colorization from the input.
     //It is used to make game detection and parsing more foolproof.
 
-    $cvars_hash_decolorized = removeColorization($cvars_hash);
+    $output = removeColorization($input);
 
-    return $cvars_hash_decolorized;
+    return $output;
 }
 
 function removeColorization($input)
@@ -617,8 +622,8 @@ function removeOffendingServerNameCharacters($input)
     //Check to see if the offending characters are to be removed
     if (filterOffendingServerNameSymbols == 1)
     {
-        //The following line removes the Euro symbol, €
-        $input = str_replace('€', '', $input);
+        //The following line removes the Euro symbol, ï¿½
+        $input = str_replace('ï¿½', '', $input);
 
         //The following line removes the newline symbol, 
         $input = str_replace('', '', $input);
@@ -1006,6 +1011,8 @@ function passConfigValuesToJavascript()
 
 function checkTimeDelay()
 {
+echo " " . file_get_contents("info/" . dynamicIPAddressPath . "time.txt") . "\n";    //Debug line
+
 $lastRefreshTime = numericValidator(file_get_contents("info/" . dynamicIPAddressPath . "time.txt"), "", "", "wait");
 
 $i = 0;
@@ -1019,6 +1026,8 @@ $fileInput = $checkWaitValue;
         //info/time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
         usleep($sleepTimer * 1000000);
         $fileInput = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");
+
+echo " " . file_get_contents("info/" . dynamicIPAddressPath . "time.txt") . "\n";    //Debug line
 
         if($checkWaitValue != $fileInput && stripos($fileInput, "wait" !== false))
         {
@@ -1354,12 +1363,10 @@ function htmlDeclarations($pageTitle, $filePath)
     return $output;
 }
 
-function colorize($string)
+function colorize($input)
 {
-    //First, we need to wrap color 7 around the text to be colorized
-    $colorized_string = '<span class="color7">' . $string . "</span>";
-
-    $colorized_string = str_replace('^0', '</span><span class="color0">', $colorized_string);
+    //Check for any color inputs, and replace them with HTML tags
+    $colorized_string = str_replace('^0', '</span><span class="color0">', $input);
     $colorized_string = str_replace('^1', '</span><span class="color1">', $colorized_string);
     $colorized_string = str_replace('^2', '</span><span class="color2">', $colorized_string);
     $colorized_string = str_replace('^3', '</span><span class="color3">', $colorized_string);
@@ -1370,7 +1377,14 @@ function colorize($string)
     $colorized_string = str_replace('^8', '</span><span class="color8">', $colorized_string);
     $colorized_string = str_replace('^9', '</span><span class="color9">', $colorized_string);
 
-    return $colorized_string;
+    //If the input doesn't match the current output string, then we must have found colors in the string.
+    //So, we need to wrap it with span tags for color 7 before returning it.
+    if($input != $colorized_string)
+    {
+        return '<span class="color7">' . $colorized_string . "</span>";
+    }
+    //If we made it here, no colors were applied, so we can return the original string
+    return $input;
 }
 
 function dynamicInstructionsPage($personalDynamicTrackerMessage)
@@ -1388,8 +1402,8 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
 
     $output = htmlDeclarations("", "");
 
-    $output .= '<meta name="keywords" content="Free PHP server tracker, ID Tech 3, JediTracker, ' . $gameOutput .'Game Tracker">
-  <meta name="description" content="Free Server Tracker for ' . $gameOutput . 'Written in PHP">
+    $output .= '<meta name="keywords" content="Free PHP server tracker, ID Tech 3, JediTracker, ' . $gameOutput .'Game Tracker, custom colors, JSON">
+  <meta name="description" content="Free Server Tracker for ' . $gameOutput . 'Written in PHP, with custom colors, JSON compatible">
   <meta name="author" content="Parabolic Minds">
 
     </head><body class="dynamicConfigPage dynamicConfigPageStyle">
@@ -1524,9 +1538,9 @@ $output .= '<br /><p>Current page URL:<br /><input type="text" size="80" id="cur
     $output .= '<p onclick="colorSelectionClick(' . "'colorSelections'" . ')"><span class="dynamicFormButtons dynamicFormButtonsStyle"> Show/hide color options </span></p>';
 
     $output .= '<div id="colorSelections" class="collapsedFrame">';
-    $output .= '<div class="colorSelections"><p><span class="gameColor2">Background Color:</span>&nbsp;&nbsp;# <input id="backgroundColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
+    $output .= '<div class="colorSelections"><h3>All colors are in hexadecimal (#123456)</h3><p><span class="gameColor2">Background Color:</span>&nbsp;&nbsp;# <input id="backgroundColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
     $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="backgroundOpacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
-    $output .= '<p><span class="gameColor7">Text Color:</span>&nbsp;&nbsp;# <input id="textColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Does not affect colorized text like server names,<br />mod names, map names, or player names)</span></p>';
+    $output .= '<p><span class="gameColor7">Text Color:</span>&nbsp;&nbsp;# <input id="textColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Does not affect colorized text)</span></p>';
     $output .= '<p><span class="gameColor0">Player List Color 1:</span>&nbsp;&nbsp;# <input id="playerListColor1" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
     $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor1Opacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
     $output .= '<p><span class="gameColor9">Player List Color 2:</span>&nbsp;&nbsp;# <input id="playerListColor2" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
@@ -1645,7 +1659,7 @@ if ($RConPassword != "" && $RConCommand != "")
 		    $serverResponse = stringValidator($serverResponse, "", "");
 
 		    //Now we format the remaining data in a readable fashion
-			$serverResponse = str_replace('ÿÿÿÿprint', '', $serverResponse);
+			$serverResponse = str_replace('ï¿½ï¿½ï¿½ï¿½print', '', $serverResponse);
 			$serverResponse = str_replace(chr(0x0A), '<br />', trim($serverResponse));
 			//This next line apparently replaces spaces with....spaces? Not sure who added that but I'm commenting it out
 			//$serverResponse = str_replace(chr(0x20), ' ', $serverResponse);
@@ -1694,6 +1708,13 @@ if ($RConPassword != "" && $RConCommand != "")
 
 function renderNormalHTMLPage($gameName)
 {
+    $GeoIPInput = file_get_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt');
+    if(enableGeoIP == 1 && $GeoIPInput != "")
+    {
+        $GeoIPInput = explode(":#:", file_get_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt'));
+        $flag = $GeoIPInput[0];
+        $countryName = $GeoIPInput[1];
+    }
 
 $output = htmlDeclarations("ParaTracker - The Ultimate Quake III Server Tracker", "");
 
@@ -1716,6 +1737,11 @@ if(playerListColor2 != "")
 {
     //background: none; removes the old background (Gradient, for instance) before applying the new color.
     $output .= '<style>.playerRow2{background: none; background-color: rgba(' . convertToRGBA(playerListColor2) . ', ' . playerListColor2Opacity / 100  . ');}</style>';
+}
+
+if(enableGeoIP == 1 && $flag != "")
+{
+    $output .= '<style>.geoIPFlag{background-image: url("images/flags/' . $flag . '.svg");}</style>';
 }
 
 $output .= '</head>';
@@ -1741,7 +1767,15 @@ $output .= '<div class="CustomDiv3 textColor"></div>';
 $output .= '<div class="ParaTrackerText textColor">' . versionNumber() . '</div>';
 
 //This adds the server name to the page.
-$output .= '<div class="serverName textColor">' . colorize(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt")) . '</div>';
+$output .= '<div class="serverName textColor">' . colorize(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt"));
+
+if(enableGeoIP == 1)
+{
+    //This adds the optional country flag to the page. This feature only works when GeoIP is installed.
+    $output .= '<img src="flags/' . $flag . '.svg" alt="' . $countryName . '" class="countryFlag textColor" />';
+}
+
+$output .= '</div>';
 
 //This adds the game name to the page.
 $output .= '<div class="gameTitle textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "gamename.txt") . '</div>';
@@ -1776,12 +1810,6 @@ $output .= '<div id="levelshotPreload2" class="levelshotFrame levelshotSize text
 <div id="bottomLayerFade" class="levelshotSize"></div>
 <div id="topLayerFade" class="levelshotSize"></div>
 </div>';
-
-if(enableGeoIP == 1)
-{
-    //This adds the optional country flag to the page. This feature only works when GeoIP is installed.
-    $output .= '<div class="countryFlag textColor">' . countryFlag . '</div>';
-}
 
 //If RCon is enabled, this adds the RCon button and the RCon image preloader to the page.
 if (RConEnable == 1)
@@ -1900,11 +1928,14 @@ function renderJSONPage()
     $output .= '"RConEnable":' . convertBooleansToString(RConEnable) . ',';
     $output .= '"RConFloodProtect":"' . RConFloodProtect . '",';
     $output .= '"newWindowSnapToCorner":' . convertBooleansToString(newWindowSnapToCorner) . ',';
-    
-    global $geoipCountryCode;
-    if(!empty($geoipCountryCode)) {
-		$output .= '"geoipCountryCode":' . '"' . $geoipCountryCode . '"' . ',';
-	}
+
+    $GeoIPInput = file_get_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt');
+    if(enableGeoIP == 1 && $GeoIPInput != "")
+    {
+        $GeoIPInput = explode(":#:", $flag);
+        $output .= '"geoipCountryCode":' . '"' . $GeoIPInput[0] . '"' . ',';
+        $output .= '"geoipCountryName":' . '"' . $GeoIPInput[1] . '"' . ',';
+    }
 
     if(backgroundColor != "")
     {
@@ -2265,13 +2296,12 @@ $newWindowSnapToCorner = "0";
 // This value is boolean. When this variable is set to Yes or 1, GeoIP will be enabled, which
 // allows a country flag icon to be displayed on the tracker.
 // GEOIP MUST BE INSTALLED ON THE SERVER FOR THIS TO WORK.
-// If ParaTracker does not find GeoIP, it will ignore this setting and give an error message.
+// If ParaTracker does not find GeoIP, it will ignore this setting and give a debug message.
 // Default is 0.
 $enableGeoIP = "0";
 
-// For GeoIP to work, ParaTracker needs to know where to find it. This path needs to point to
-// the GeoIP PHP file, as ParaTracker will load it on startup.
-// Since typically GeoIP will be in the same directory as ParaTracker, the
+// For GeoIP to work, ParaTracker needs to know where to find the country database. This path
+// needs to point to the GeoIP database file. Include the file name and extension.
 // default value is ""
 $geoIPPath = "";
 

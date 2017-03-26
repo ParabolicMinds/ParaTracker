@@ -1,4 +1,4 @@
-/* Skin by -INSERT NAME HERE- */
+/* Skin by NAB622 */
 
 /*
 If you are looking for the tracker configuration,
@@ -536,14 +536,10 @@ display: none;
 /* This adds the optional country flag to the page. This feature only works when GeoIP is installed. */
 .countryFlag
 {
-position: absolute;
-    left: 475px;
-    top: 275px;
 height: 20px;
 width: 20px;
 user-select: none;
 overflow: hidden;
-display: none;
 }
 
 /* This class adds the text to the server ping */
