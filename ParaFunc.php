@@ -765,7 +765,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			        if($cvar['name'] == strtolower($BitFlagsIndex[$i]))
 			        {
 			            $foundMatch = 1;
-			            $returnArray = bitvalueCalculator($cvar['name'], $cvar['value'], $$BitFlagsIndex[$i]);
+			            $returnArray = array(bitvalueCalculator($cvar['name'], $cvar['value'], $$BitFlagsIndex[$i]));
 			            array_shift($returnArray);
 
 			            $buf .= '<div class="CVarExpandList" onclick="bitValueClick(' . "'" . $cvar['name'] . "'" .  ')"><i><b>' . $cvar['value'] . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i><div id="' . $cvar['name'] .  '" class="collapsedList"><br />';
