@@ -175,6 +175,9 @@ font-weight: bold;
 overflow: hidden;
 text-align: center;
 padding-left: 7px;
+
+/* This class must use inline-flex to be compatible with GeoIP country flags */
+display: inline-flex;
 }
 
 /* This is the title of the game, shown just below the server name */

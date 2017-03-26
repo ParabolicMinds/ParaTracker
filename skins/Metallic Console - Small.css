@@ -159,6 +159,9 @@ font-size: 11pt;
 font-family: "Trebuchet MS", sans-serif;
 font-weight: bold;
 overflow: hidden;
+
+/* This class must use inline-flex to be compatible with GeoIP country flags */
+display: inline-flex;
 }
 
 /* This is the title of the game, shown just below the server name */

@@ -480,7 +480,7 @@ function doUpdate($lastRefreshTime)
 	if(strlen($s))
 	{
 	    //Server responded!
-	    
+
 	    //Mark the time in microseconds so we can see how long this takes.
 	    $parseTimer = microtime(true);
 
@@ -490,8 +490,8 @@ function doUpdate($lastRefreshTime)
                 require_once 'vendor/autoload.php';
                 $geoip_dbr = new GeoIp2\Database\Reader(geoIPPath);
                 $actualIP = gethostbyname(serverIPAddress);
-                $flag = strtolower($geoip_dbr->country($actualIP)->country->isoCode);
-                $countryName = $geoip_dbr->country($actualIP)->country->name;
+                $flag = stringValidator(strtolower($geoip_dbr->country($actualIP)->country->isoCode), "", "");
+                $countryName = stringValidator($geoip_dbr->country($actualIP)->country->name, "", "");
                 file_put_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt', $flag . ":#:" . $countryName);
             }
 
@@ -1659,7 +1659,7 @@ if ($RConPassword != "" && $RConCommand != "")
 		    $serverResponse = stringValidator($serverResponse, "", "");
 
 		    //Now we format the remaining data in a readable fashion
-			$serverResponse = str_replace('����print', '', $serverResponse);
+			$serverResponse = str_replace('ÿÿÿÿprint', '', $serverResponse);
 			$serverResponse = str_replace(chr(0x0A), '<br />', trim($serverResponse));
 			//This next line apparently replaces spaces with....spaces? Not sure who added that but I'm commenting it out
 			//$serverResponse = str_replace(chr(0x20), ' ', $serverResponse);
@@ -1772,7 +1772,7 @@ $output .= '<div class="serverName textColor">' . colorize(file_get_contents("in
 if(enableGeoIP == 1)
 {
     //This adds the optional country flag to the page. This feature only works when GeoIP is installed.
-    $output .= '<img src="flags/' . $flag . '.svg" alt="' . $countryName . '" class="countryFlag textColor" />';
+    $output .= ' <img src="flags/' . $flag . '.svg" alt="' . $countryName . '" class="countryFlag textColor" />';
 }
 
 $output .= '</div>';

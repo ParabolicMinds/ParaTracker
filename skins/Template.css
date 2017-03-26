@@ -159,6 +159,9 @@ font-size: 14pt;
 font-family: "Trebuchet MS", sans-serif;
 font-weight: bold;
 overflow: hidden;
+
+/* This class must use inline-flex to be compatible with GeoIP country flags */
+display: inline-flex;
 }
 
 /* This is the title of the game, shown just below the server name */
@@ -526,8 +529,8 @@ user-select: none;
 /* This adds the optional country flag to the page. This feature only works when GeoIP is installed. */
 .countryFlag
 {
-height: 20px;
-width: 20px;
+height: 24px;
+width: 32px;
 user-select: none;
 overflow: hidden;
 }
