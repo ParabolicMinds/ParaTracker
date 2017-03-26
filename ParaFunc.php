@@ -90,8 +90,6 @@ if(!isset($calledFromParam))
     $calledFromParam = "0";
 }
 
-echo " made it ";    //Debug line
-
 /*
 Before we go any further, let's validate ALL input from the config file!
 To validate booleans:
@@ -188,7 +186,7 @@ else
 //So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
 //The port must be validated first, because it is used in IP address validation.
 $serverPort = numericValidator($serverPort, 1, 65535, 29070);
-$serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort);
+$serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
 
 
 
@@ -1212,7 +1210,7 @@ function stringValidator($input, $maxLength, $defaultValue)
 return $input;
 }
 
-function ipAddressValidator($input, $serverPort)
+function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 {
     //Remove whitespace
     $input = trim($input);
@@ -1221,7 +1219,7 @@ function ipAddressValidator($input, $serverPort)
     if($input == "")
     {
         //No address. Are we running in dynamic mode?
-        if(dynamicTrackerEnabled == "0")
+        if($dynamicTrackerEnabled == "0")
         {
             //We are in static mode, so ParaConfic.php is the problem
             displayError("No server address specified in ParaConfig.php!", $lastRefreshTime);
@@ -1229,7 +1227,7 @@ function ipAddressValidator($input, $serverPort)
         else
         {
             //We are in Dynamic mode, so the user did not give an address
-            displayError('Invalid IP address! ' . stringValidator($input) . '<br />Please specify an IP Address.', $lastRefreshTime);
+            displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Please specify an IP Address.', $lastRefreshTime);
         }
     }
 
