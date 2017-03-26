@@ -76,7 +76,6 @@ else
     displayError( "GameInfo.php not found!", "");
 }
 
-
 //These three IF statements will avoid warning messages during validation
 if(!isset($dynamicTrackerCalledFromCorrectFile))
 {
@@ -90,6 +89,8 @@ if(!isset($calledFromParam))
 {
     $calledFromParam = "0";
 }
+
+echo " made it ";    //Debug line
 
 /*
 Before we go any further, let's validate ALL input from the config file!
@@ -1739,11 +1740,6 @@ if(playerListColor2 != "")
     $output .= '<style>.playerRow2{background: none; background-color: rgba(' . convertToRGBA(playerListColor2) . ', ' . playerListColor2Opacity / 100  . ');}</style>';
 }
 
-if(enableGeoIP == 1 && $flag != "")
-{
-    $output .= '<style>.geoIPFlag{background-image: url("images/flags/' . $flag . '.svg");}</style>';
-}
-
 $output .= '</head>';
 
 //This adds the default formatting to the page. It removes the padding and margins, sets the size, and hides any overflow.
@@ -1772,7 +1768,7 @@ $output .= '<div class="serverName textColor">' . colorize(file_get_contents("in
 if(enableGeoIP == 1)
 {
     //This adds the optional country flag to the page. This feature only works when GeoIP is installed.
-    $output .= ' <img src="flags/' . $flag . '.svg" alt="' . $countryName . '" class="countryFlag textColor" />';
+    $output .= '&nbsp;<img src="flags/' . $flag . '.svg" alt="' . $countryName . '" class="countryFlag textColor" />';
 }
 
 $output .= '</div>';
