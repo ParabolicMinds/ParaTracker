@@ -692,6 +692,8 @@ function ParseGameData($gameName, $cvars_hash, $cvars_hash_decolorized)
 
 function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 {
+        $returnArray = array("");
+        $BitFlagsIndex = array("");
         //$buf2 and $buf3 are used for JSON stuff.
         $buf2 = '"info":{';
         $buf3 = '"parsedInfo":[';
