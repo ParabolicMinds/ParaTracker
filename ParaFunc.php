@@ -182,13 +182,14 @@ else
     }
 }
 
-//By default, static mode will already have given us an IP address before all of this took place.
-//So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
-//The port must be validated first, because it is used in IP address validation.
-$serverPort = numericValidator($serverPort, 1, 65535, 29070);
-$serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
-
-
+if($executeDynamicInstructionsPage == "0")
+{
+    //By default, static mode will already have given us an IP address before all of this took place.
+    //So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
+    //The port must be validated first, because it is used in IP address validation.
+    $serverPort = numericValidator($serverPort, 1, 65535, 29070);
+    $serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
+}
 
 //If the skin parameter is not set, we need to set it to the default value
 if(isset($paraTrackerSkin))
