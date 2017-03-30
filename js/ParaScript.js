@@ -146,7 +146,19 @@ function bitValueClick(cvarName)
     }
 }
 
-function colorSelectionClick(cvarName)
+function expandContractDiv(divID)
+{
+    if (document.getElementById(divID).className == "collapsedFrame")
+    {
+        document.getElementById(divID).className = "expandedFrame"
+    }
+    else
+    {
+        document.getElementById(divID).className = "collapsedFrame"
+    }
+}
+
+function expandBitValueCalculator()
 {
     if (document.getElementById(cvarName).className == "collapsedFrame")
     {
@@ -259,6 +271,13 @@ function createURL()
     }
     else
     {
+        if(document.getElementById("PortNumber").value == "")
+        {
+            document.getElementById("finalURL").value = "Please enter a port number!";
+            document.getElementById("finalURLHTML").value = "Please enter a port number!";
+        }
+        else
+        {
     var outputURL = "http://";
     var width = "";
     var height = "";
@@ -340,7 +359,8 @@ function createURL()
     document.getElementById("paraTrackerTestFrame").className = "expandedFrame";
     document.getElementById("paraTrackerTestFrameContent").width = skinWidth + 100;
     document.getElementById("paraTrackerTestFrameContent").height = skinHeight + 100;
-}    
+    }
+}
 return false;
 }
 

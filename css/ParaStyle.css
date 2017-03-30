@@ -93,6 +93,17 @@ border: 2px solid #44F;
 width: 600px;
 }
 
+/* This class is used to put a border around the Bit Value Calculator */
+.bitValueCalculator
+{
+margin: 0 auto;
+margin-top: 30px;
+text-align: center;
+box-shadow: 0px 0px 20px #FF4, inset 0px 0px 10px #FF4;
+border: 2px solid #FF4;
+width: 600px;
+}
+
 /* This class is used for the test frame on ParaTrackerDynamic.php */
 .paraTrackerTestFrame
 {
@@ -234,6 +245,296 @@ font-weight: bold;
 
 
 /*
+BITVALUE CALCULATOR CLASSES
+BITVALUE CALCULATOR CLASSES
+*/
+
+
+#bitflags_top {
+	width: 600px;
+	height: 600px;
+	display: flex;
+	flex-direction: column;
+	color: #CCC;
+}
+
+#bitflags_tabdisplay {
+	flex: 0 0 auto;
+	height: 40px;
+	display: flex;
+	flex-direction: row;
+	padding: 0px 4px 0px 4px;
+	font-size: 12px;
+	background: linear-gradient(#000, #000, #333);
+}
+
+#bitflags_bitselect {
+	flex: 0 0 auto;
+	height: 32px;
+	font-size: 14pt;
+	font-weight: bold;
+	background-color: #533;
+	border: 2px solid #666;
+	border-left: none;
+	border-right: none;
+	padding-right: 7px;
+	padding-left: 7px;
+	outline: none;
+	color: inherit;
+	cursor: pointer;
+	color: #FFF;
+	text-shadow: -1px 1px #000000;
+}
+
+#bitflags_bitselect:hover {
+    background-color: #983;
+}
+
+.bitselect_background {
+    background-color: #333;
+}
+
+#bitflags_tabregion {
+	flex: 1 1 auto;
+	background-color: #282828;
+	display: flex;
+	flex-direction: column;
+}
+
+.game_tab {
+	flex: 0 1 auto;
+	margin: 4px 4px 0px 4px;
+	padding-left: 4px;
+	padding-right: 4px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	overflow: hidden;
+	line-height: 11pt;
+	vertical-align: middle;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+	color: #FFF;
+    font-weight: bold;
+	font-weight: bold;
+	text-shadow: -1px 1px #000000;
+	font-size: 10pt;
+	user-select: none;
+	cursor: pointer;
+	opacity: .6;
+}
+
+.game_tab:hover {
+	opacity: 1;
+    background: none;
+	background: linear-gradient(to right, #A90, #DD0, #A90);
+}
+
+.game_tab_selected {
+	opacity: 1;
+    color: #FFF;
+	font-size: 11pt;
+}
+
+.game_tab_selected:hover {
+	opacity: 1;
+}
+
+.bitflags_container {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+}
+
+.bitflags_container_top {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	padding: 4px;
+	background: linear-gradient(to right, #2C2C2C, #272727);
+}
+
+.bitflags_container_bottom {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: row;
+	height: 36px;
+	background-color: #222;
+	align-items: center;
+	justify-content: center;
+}
+
+.bitflags_container_flagcont {
+	display: flex;
+	flex-direction: row;
+	height: 20px;
+	background-color: #111;
+	padding: 4px;
+	margin: 4px;
+	font-size: 12px;
+	align-items: center;
+	cursor: pointer;
+	color: #FFF;
+	text-shadow: -1px 1px #000000;
+}
+
+.bitflags_container_flagcont:hover {
+	background-color: #1C1C1C;
+	background: linear-gradient(to right, #650, #980);
+}
+
+.bitflags_container_flagcont_selected {
+	background-color: #333;
+	background: linear-gradient(to right, #363636, #444);
+}
+
+.bitflags_container_flagcont_selected:hover {
+	background-color: #383838;
+}
+
+.bitflags_container_flag {
+	flex: 1 1 auto;
+}
+
+.bitflags_container_cb {
+	flex: 0 0 auto;
+	border: 2px solid #666;
+	outline: none;
+	cursor: pointer;
+}
+
+.bitflags_container_bitvalue {
+	height: 24px;
+	background-color: #111;
+	border: 2px solid #333;
+	outline: none;
+	color: inherit;
+	text-align: center;
+	width: 120px;
+	font-size: 12pt;
+	font-weight: bold;
+}
+
+.bitflags_container_bitvalue_label {
+	color: #CCC;
+	margin-right: 10px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.bitflags_container_bitvalue_label:hover {
+	margin-right: 10px;
+	color: #FFF;
+	font-weight: bold;
+}
+
+.game_jediacademy
+{
+	background: linear-gradient(to right, #063, #6F9, #063);
+	border: 1px solid #080;
+	border-bottom-width: 0px;
+}
+
+.game_jedioutcast
+{
+	background: linear-gradient(to right, #000666, #36C, #000666);
+	border: 1px solid #038;
+	border-bottom-width: 0px;
+}
+
+.game_quakeiiiarena
+{
+	background: linear-gradient(to right, #300, #F60, #300);
+	border: 1px solid #600;
+	border-bottom-width: 0px;
+}
+
+.clearButton
+{
+    border: 1px solid #000;
+    border-radius: 6px;
+    font-size: 10pt;
+    color: #FFF;
+	text-shadow: -1px 1px #000000;
+    background-color: #422;
+    border: none;
+    padding: 6px;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+.clearButton:hover
+{
+    color: FFF;
+    background-color: #A22;
+}
+
+.selectAllButton
+{
+    border: 1px solid #000;
+    border-radius: 6px;
+    font-size: 10pt;
+    color: #FFF;
+	text-shadow: -1px 1px #000000;
+    background-color: #224;
+    border: none;
+    padding: 6px;
+    margin-left: 12px;
+    cursor: pointer;
+}
+
+.selectAllButton:hover
+{
+    color: FFF;
+    background-color: #22A;
+}
+
+
+/*
+THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
+THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
+*/
+
+
+.callofduty4modernwarfare
+{
+	color: #999;
+	font-weight: bold;
+}
+
+.jediacademy
+{
+	color: #6F9;
+	font-weight: bold;
+}
+
+.jedioutcast
+{
+	color: #36C;
+	font-weight: bold;
+}
+
+.quakeiiiarena
+{
+	color: #F00;
+	font-weight: bold;
+}
+
+.tremulous
+{
+	color: #0F0;
+	font-weight: bold;
+}
+
+.xonotic
+{
+	color: #0CF;
+	font-weight: bold;
+}
+
+
+/*
 GENERAL FORMATTING - SOME CLASSES MAY NOT BE USED
 GENERAL FORMATTING - SOME CLASSES MAY NOT BE USED
 */
@@ -287,4 +588,3 @@ display: none;
 {
 display: none;
 }
-

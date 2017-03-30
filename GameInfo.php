@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if (!isset($safeToExecuteGameInfo))
 {
@@ -17,8 +17,6 @@ if (!isset($safeToExecuteGameInfo))
 // EACH FUNCTION NAME MUST HAVE NO SPACES AND MUST BE LOWERCASE ONLY.
 // CVar names must also be lowercase.
 // The function will be executed during data parsing.
-
-// When ParaTracker finds a matching value in the index array, it will then parse the other arrays and display the data it found.
 
 Function detectGameName($input)
 {
@@ -86,22 +84,37 @@ function callofduty4modernwarfare($cvars_hash, $cvars_hash_decolorized)
     //If you are adding a custom game, the stuff below is what to change.
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
+if(isset($cvars_hash["g_gametype"]))
+{
     $gametype = ucwords($cvars_hash["g_gametype"]);
+}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "call of duty 4";
 
     //The name of the map being played.
+if(isset($cvars_hash["mapname"]))
+{
     $mapname = $cvars_hash["mapname"];
+}
 
     //The name of the mod being run.
+if(isset($cvars_hash["gamename"]))
+{
     $modName = $cvars_hash["gamename"];
+}
 
     //The name of the server. Some games use a different variable.
+if(isset($cvars_hash["sv_hostname"]))
+{
     $sv_hostname = $cvars_hash["sv_hostname"];
+}
 
-    //The name of the server. Some games use a different variable.
+    //The maximum number of players the server can take.
+if(isset($cvars_hash["sv_maxclients"]))
+{
     $sv_maxclients = $cvars_hash["sv_maxclients"];
+}
 
     //All BitFlag arrays must be declared here
 
@@ -113,6 +126,7 @@ function callofduty4modernwarfare($cvars_hash, $cvars_hash_decolorized)
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex);
 }
+
 
 function jediacademy($cvars_hash, $cvars_hash_decolorized)
 {
@@ -132,37 +146,60 @@ function jediacademy($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("FFA", "", "", "Duel", "Power Duel", "Team FFA", "Siege", "CTF");
+if(isset($cvars_hash_decolorized["g_gametype"]))
+{
     $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
+}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "jedi academy";
 
     //The name of the map being played.
+if(isset($cvars_hash["mapname"]))
+{
     $mapname = $cvars_hash["mapname"];
+}
 
     //The name of the mod being run.
+if(isset($cvars_hash["gamename"]))
+{
     $modName = $cvars_hash["gamename"];
+}
 
     //The name of the server. Some games use a different variable.
+if(isset($cvars_hash["sv_hostname"]))
+{
     $sv_hostname = $cvars_hash["sv_hostname"];
+}
 
-    //The name of the server. Some games use a different variable.
+    //The maximum number of players the server can take.
+if(isset($cvars_hash["sv_maxclients"]))
+{
     $sv_maxclients = $cvars_hash["sv_maxclients"];
+}
 
     //All BitFlag arrays must be declared here
     $dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
     $g_weaponDisable = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "Golan Arms FC1 Flechette", "Merr-Sonn Portable Missile Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
     $g_forcePowerDisable = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", "Grip", "Lightning", "Rage", "Protect", "Absorb", "Team Heal", "Team Force", "Drain", "Sight", "Saber Offense", "Saber Defense", "Saber Throw");
 
+    //These values should never be returned by the server, but they will be used for the bit calculator
+    $jp_councilAllowedCMD = array("", "amkick", "amban", "amshowmotd", "amorigin", "amslap", "amsleep", "amwake", "amghost", "amdenyvote", "amprotect", "amsilence", "amunsilence", "amUnForceAltDim", "amForceAltDim", "amempower", "ammerc", "ammindtrick", "amtele", "amstatus", "amwhois", "ammap", "ampsay", "npc", "amrename", "amlockteam", "amforceteam", "amkillvote", "amvstr", "amweather");
+    $jp_knightAllowedCMD = array("", "amkick", "amban", "amshowmotd", "amorigin", "amslap", "amsleep", "amwake", "amghost", "amdenyvote", "amprotect", "amsilence", "amunsilence", "amUnForceAltDim", "amForceAltDim", "amempower", "ammerc", "ammindtrick", "amtele", "amstatus", "amwhois", "ammap", "ampsay", "npc", "amrename", "amlockteam", "amforceteam", "amkillvote", "amvstr", "amweather");
+    $jp_instructorAllowedCMD = array("", "amkick", "amban", "amshowmotd", "amorigin", "amslap", "amsleep", "amwake", "amghost", "amdenyvote", "amprotect", "amsilence", "amunsilence", "amUnForceAltDim", "amForceAltDim", "amempower", "ammerc", "ammindtrick", "amtele", "amstatus", "amwhois", "ammap", "ampsay", "npc", "amrename", "amlockteam", "amforceteam", "amkillvote", "amvstr", "amweather");
+    $jp_votesDisable = array("", "map_restart", "nextmap", "map", "g_gametype", "kick", "g_doWarmup", "timelimit", "fraglimit", "sleep", "ampoll", "silence");
+    $jp_teamLock = array("", "spectator", "ffa", "blue", "red");
+    $jp_emotDisallow = array("", "amkneel", "amdie", "amdie2", "amfinishinghim", "ampower", "amnod", "amshake", "amhiltThrow1", "amhiltThrow2", "amcomeon", "amwon", "amhello", "amhug", "sleep", "amatease", "amsurrender", "amsit", "amsit2", "amsit3", "amsit4", "ambeg", "amwait", "amhips", "amvictory", "amneo", "ambreakdance", "ambreakdance2", "amnoisy", "amkiss");
+    $jp_wordFilter = array("", "SAYALL", "SAYTEAM", "SAYTELL", "SAYCLAN", "AMSAY", "PlayerName");
+
     //If there are any bitflags to return, they must be returned last.
     //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
-    $BitFlagsIndex = array("dmflags", "g_weaponDisable", "g_forcePowerDisable");
+    $BitFlagsIndex = array("dmflags", "g_weaponDisable", "g_forcePowerDisable", "jp_councilAllowedCMD", "jp_knightAllowedCMD", "jp_instructorAllowedCMD", "jp_votesDisable", "jp_teamLock", "jp_emotDisallow", "jp_wordFilter");
 
     //Lastly, all data above MUST be returned in a specific order:
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
-    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_forcePowerDisable);
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_forcePowerDisable, $jp_councilAllowedCMD, $jp_knightAllowedCMD, $jp_instructorAllowedCMD, $jp_votesDisable, $jp_teamLock, $jp_emotDisallow, $jp_wordFilter);
 }
-
 
 
 function jedioutcast($cvars_hash, $cvars_hash_decolorized)
@@ -183,26 +220,44 @@ function jedioutcast($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("FFA", "", "", "Duel", "Power Duel", "Team FFA", "Siege", "CTF");
+if(isset($cvars_hash["g_gametype"]))
+{
     $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
+}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "jedi outcast";
 
     //The name of the map being played.
+if(isset($cvars_hash["mapname"]))
+{
     $mapname = $cvars_hash["mapname"];
+}
 
     //The name of the mod being run.
+if(isset($cvars_hash["gamename"]))
+{
     $modName = $cvars_hash["gamename"];
+}
 
     //The name of the server. Some games use a different variable.
+if(isset($cvars_hash["sv_hostname"]))
+{
     $sv_hostname = $cvars_hash["sv_hostname"];
+}
 
-    //The name of the server. Some games use a different variable.
+    //The maximum number of players the server can take.
+if(isset($cvars_hash["sv_maxclients"]))
+{
     $sv_maxclients = $cvars_hash["sv_maxclients"];
+}
 
     //All BitFlag arrays must be declared here
     $dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
     $g_weaponDisable = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "Golan Arms FC1 Flechette", "Merr-Sonn Portable Missile Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
+
+    //$g_duelweapondisable = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "Golan Arms FC1 Flechette", "Merr-Sonn Portable Missile Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
+
     $g_forcePowerDisable = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", "Grip", "Lightning", "Rage", "Protect", "Absorb", "Team Heal", "Team Force", "Drain", "Sight", "Saber Offense", "Saber Defense", "Saber Throw");
 
     //If there are any bitflags to return, they must be returned last.
@@ -213,6 +268,7 @@ function jedioutcast($cvars_hash, $cvars_hash_decolorized)
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_forcePowerDisable);
 }
+
 
 function tremulous($cvars_hash, $cvars_hash_decolorized)
 {
@@ -237,16 +293,25 @@ function tremulous($cvars_hash, $cvars_hash_decolorized)
     $levelshotFolder = "tremulous";
 
     //The name of the map being played.
+if(isset($cvars_hash["mapname"]))
+{
     $mapname = $cvars_hash["mapname"];
+}
 
     //The name of the mod being run.
     $modName = "Tremulous";
 
     //The name of the server. Some games use a different variable.
+if(isset($cvars_hash["sv_hostname"]))
+{
     $sv_hostname = $cvars_hash["sv_hostname"];
+}
 
-    //The name of the server. Some games use a different variable.
+    //The maximum number of players the server can take.
+if(isset($cvars_hash["sv_maxclients"]))
+{
     $sv_maxclients = $cvars_hash["sv_maxclients"];
+}
 
     //All BitFlag arrays must be declared here
 
@@ -258,6 +323,7 @@ function tremulous($cvars_hash, $cvars_hash_decolorized)
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex);
 }
+
 
 function quakeiiiarena($cvars_hash, $cvars_hash_decolorized)
 {
@@ -277,35 +343,57 @@ function quakeiiiarena($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("FFA", "1 on 1 Tournament", "Single Player", "Team Deathmatch", "CTF", "One Flag CTF", "Overload", "Harvester");
+if(isset($cvars_hash_decolorized["g_gametype"]))
+{
     $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
+}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "quake 3 arena";
 
     //The name of the map being played.
+if(isset($cvars_hash["mapname"]))
+{
     $mapname = $cvars_hash["mapname"];
+}
 
     //The name of the mod being run.
+if(isset($cvars_hash["gamename"]))
+{
     $modName = $cvars_hash["gamename"];
+}
 
     //The name of the server. Some games use a different variable.
+if(isset($cvars_hash["sv_hostname"]))
+{
     $sv_hostname = $cvars_hash["sv_hostname"];
+}
 
-    //The name of the server. Some games use a different variable.
+    //The maximum number of players the server can take.
+if(isset($cvars_hash["sv_maxclients"]))
+{
     $sv_maxclients = $cvars_hash["sv_maxclients"];
+}
 
     //All BitFlag arrays must be declared here
-    $dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
+    $dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "Winning team keeps their current armor/health/powerups (FT only)", "Winning teams frozen players are not thawed on a new round (FT only)");
     $item_disable = array("All Armor", "All Health", "BFG", "Machinegun", "Shotgun", "Grenade Launcher", "Rocket Launcher", "Lightning Gun", "Plasma Gun", "Railgun");
+
+    $server_availmodes = array("FFA", "1v1", "FFA", "Team DM", "CTF", "Clan Arena", "FreezeTag w/OSP settings", "FreezeTag w/vanilla settings");
+    $server_customclient = array("Enable 125Hz sampling", "Allow cg_truelightning usage", "Custom graphics used with cg_altPlasma and cg_altLightning is allowed", "Toggles client usage of OSP-based HUD", "Disables the drawing of the match clock", "Disables to clamp on com_maxfps for clients");
+    $server_record = array("Record Demos", "Take end-level screenshot", "Include server name in demo name", "Include server time for uniqueness", "Alternate recording style that does: SERVERNAME-PLAYERNAME-[#] For both demos and screenshots. All other bits will be ignored if this option is set.");
+    $powerup_disable = array("Quad Damage", "Battlesuit", "Haste", "Regeneration", "Invisibility", "Flight", "Teleporter", "Medkit");
+    $weapon_start = array("Machinegun", "Shotgun", "GrenadeLauncher", "RocketLauncher", "LightningGun", "Railgun", "Plasmagun", "BFG", "Gauntlet");
 
     //If there are any bitflags to return, they must be returned last.
     //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
-    $BitFlagsIndex = array("dmflags", "item_disable");
+    $BitFlagsIndex = array("dmflags", "item_disable", "server_availmodes", "server_customclient", "server_record", "powerup_disable", "weapon_start");
 
     //Lastly, all data above MUST be returned in a specific order:
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
-    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $item_disable);
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $item_disable, $server_availmodes, $server_customclient, $server_record, $powerup_disable, $weapon_start);
 }
+
 
 function xonotic($cvars_hash, $cvars_hash_decolorized)
 {
@@ -325,23 +413,38 @@ function xonotic($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     //The input has already been validated; so, to split this variable into an array with a colon being used as a delimiter, we have to use &#58;
+if(isset($cvars_hash_decolorized["qcstatus"]))
+{
     $qcstatusArray = explode("&#58;", $cvars_hash_decolorized["qcstatus"]);
     $gametype = ucwords($qcstatusArray[0]);
+}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "xonotic";
 
     //The name of the map being played.
+if(isset($cvars_hash["mapname"]))
+{
     $mapname = $cvars_hash["mapname"];
+}
 
     //The name of the mod being run.
+if(isset($cvars_hash["modname"]))
+{
     $modName = $cvars_hash["modname"];
+}
 
     //The name of the server. Some games use a different variable.
+if(isset($cvars_hash["hostname"]))
+{
     $sv_hostname = $cvars_hash["hostname"];
+}
 
-    //The name of the server. Some games use a different variable.
+    //The maximum number of players the server can take.
+if(isset($cvars_hash["sv_maxclients"]))
+{
     $sv_maxclients = $cvars_hash["sv_maxclients"];
+}
 
     //All BitFlag arrays must be declared here
 

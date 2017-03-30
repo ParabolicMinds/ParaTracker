@@ -59,7 +59,7 @@ else
 
     if(isset($_GET["ip"]))
     {
-        $output .= '?ip=' . ipAddressValidator($_GET["ip"], "");
+        $output .= '?ip=' . ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
 
         if(isset($_GET["port"]))
         {

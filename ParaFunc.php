@@ -15,10 +15,13 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    Return("ParaTracker 1.3.2");
+    return("ParaTracker 1.3.3");
 }
 
-//Define the default skin, to be used throughout this file. MAKE SURE it refers to an actual .css file in the skins folder, or it will break stuff. And do not include the file extension!
+//Define the default skin, to be used throughout this file.
+//This variable must reference an actual .css file in the skins/ folder, or it will break stuff. Do not include the file path or extension!
+//"JSON" is also a valid value.
+//Default value is "Metallic Console"
 $defaultSkin = "Metallic Console";
 
 
@@ -192,14 +195,22 @@ if($executeDynamicInstructionsPage == "0")
 }
 
 //If the skin parameter is not set, we need to set it to the default value
-if(isset($paraTrackerSkin))
+if($executeDynamicInstructionsPage == "0")
 {
-    $paraTrackerSkin = skinValidator($paraTrackerSkin);
+    if(isset($paraTrackerSkin))
+    {
+        $paraTrackerSkin = skinValidator($paraTrackerSkin);
+    }
+    else
+    {
+        $paraTrackerSkin = skinValidator($defaultSkin);
+    }
 }
 else
 {
-    $paraTrackerSkin = skinValidator($defaultSkin);
+    $paraTrackerSkin = "";
 }
+
 
 if($dynamicTrackerCalledFromCorrectFile == "1" || $calledFromParam == "1" || $calledFromRCon == "1")
 {
@@ -257,7 +268,14 @@ $newWindowSnapToCorner = booleanValidator($newWindowSnapToCorner, 0);
 
 //The IP address has already been validated, so we can use it for a directory name
 //Make sure we convert the path to lowercase when creating folders for it, or else the flood protection could be bypassed!
-$dynamicIPAddressPath = strtolower($serverIPAddress . "-" . $serverPort . "/");
+if($executeDynamicInstructionsPage == "1")
+{
+    $dynamicIPAddressPath = "";
+}
+else
+{
+    $dynamicIPAddressPath = strtolower($serverIPAddress . "-" . $serverPort . "/");
+}
 
 $enableGeoIP = booleanValidator($enableGeoIP, 0);
 
@@ -618,17 +636,16 @@ function dataParser($s)
 
 function removeOffendingServerNameCharacters($input)
 {
-
     //Check to see if the offending characters are to be removed
     if (filterOffendingServerNameSymbols == 1)
     {
-        //The following line removes the Euro symbol, �
-        $input = str_replace('�', '', $input);
+        //The following line removes the Euro symbol, €
+        $input = str_replace('€', '', $input);
 
         //The following line removes the newline symbol, 
-        $input = str_replace('', '', $input);
+        $input = str_replace("\n", '', $input);
 
-
+        //Any additional filters go here
     }
     return $input;
 }
@@ -662,14 +679,20 @@ if($gameName == "")
 return $gameName;
 }
 
+function makeFunctionSafeName($input)
+{
+	$input = preg_replace("/[^a-z0-9]/", "", strtolower($input));
+	return $input;
+}
+
 function ParseGameData($gameName, $cvars_hash, $cvars_hash_decolorized)
 {
     //Initialize this
-    $GameInfoData = "";
+    $GameInfoData = array("");
 
 	//We'll need a new copy of game name to toy with for this part
 	//Pull out invalid characters and make it lowercase
-	$GameInfoGameName = preg_replace("/[^a-z0-9]/", "", strtolower($gameName));
+	$GameInfoGameName = makeFunctionSafeName($gameName);
 
 	if(function_exists($GameInfoGameName) && is_callable($GameInfoGameName))
 	{
@@ -737,7 +760,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 
 			$buf .= '<tr class="cvars_row' . $c . '"><td class="nameColumnWidth">' . $cvar['name'] . '</td><td class="valueColumnWidth">';
 
-			if ((($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && ((strpos(colorize($cvar['value']), $cvar['value'])) == FALSE))
+			if ((($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && (colorize($cvar['value']) != $cvar['value']))
 			{
 				$buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
 			}
@@ -749,7 +772,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 
 			    $buf .= '<b>' . colorize($filteredName) . "</b>";
 
-				if ((strpos(colorize($cvar['value']), $filteredName)) == FALSE || $filteredName != $cvar['value'])
+				if ((colorize($filteredName)) != $filteredName || $filteredName != $cvar['value'])
 			    {
 			        $buf .= "<br />" . $cvar['value'];
 			    }
@@ -835,9 +858,7 @@ function playerList($player_array, $playerParseCount)
 				$player_name = str_replace(array("\n", "\r"), '', $player["name"]);
 				$player_count++;
 				$playerListbuffer .= "\n" . '
-<div class="playerRow' . $c . '"><div class="playerName playerNameSize">';
-//Since the colorizer does not add the color7 tags unless another color is found, let's force it here
-$playerListbuffer .= '<span class="color7">'. colorize($player_name) . '</span>';
+<div class="playerRow' . $c . '"><div class="playerName playerNameSize color7">'. colorize($player_name);
 				$playerListbuffer .= '</div><div class="playerScore playerScoreSize">' . $player["score"] . '</div><div class="playerPing playerPingSize">' . $player["ping"] . '</div></div>';
 				$c++;
 				if($c > 2) $c = 1;
@@ -846,7 +867,7 @@ $playerListbuffer .= '<span class="color7">'. colorize($player_name) . '</span>'
 		}
 		else
 		{
-			$playerListbuffer .= '<div class="noPlayersOnline">&nbsp;' . noPlayersOnlineMessage . '</div>';
+			$playerListbuffer .= '<div class="noPlayersOnline textColor">&nbsp;' . noPlayersOnlineMessage . '</div>';
 		}
 		$playerListbuffer .= '<div></div>';
 		$buf3='';
@@ -975,9 +996,7 @@ file_put_contents("info/" . dynamicIPAddressPath . "refreshCode.txt", $output);
 
 function levelshotJavascriptAndCSS()
 {
-    $output = '<script type="text/javascript">';
-
-    $output .= '
+    $output = '<script type="text/javascript">
     var timer = 0;  //Used for setting re-execution timeout
     var allowTransitions = ' . levelshotTransitionsEnabled . ';   //Used to test whether fading levelshots is disabled.
     var opac = 1;   //Opacity level for the top layer.
@@ -1015,9 +1034,16 @@ function passConfigValuesToJavascript()
 
 function checkTimeDelay()
 {
-echo " " . file_get_contents("info/" . dynamicIPAddressPath . "time.txt") . "\n";    //Debug line
+    $lastRefreshTime = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");
 
-$lastRefreshTime = numericValidator(file_get_contents("info/" . dynamicIPAddressPath . "time.txt"), "", "", "wait");
+    if($lastRefreshTime == "")
+    {
+        //If time.txt is empty, then this is the first time ParaTracker has ever connected to this server.
+        //We need to skip waiting, go back and update!
+        return;
+    }
+
+$lastRefreshTime = numericValidator($lastRefreshTime, "", "", "wait");
 
 $i = 0;
 $sleepTimer = "0.15"; //This variable sets the number of seconds PHP will wait before checking to see if the refresh is complete.
@@ -1030,8 +1056,6 @@ $fileInput = $checkWaitValue;
         //info/time.txt indicated that a refresh is in progress. Wait a little bit so it can finish. If it goes too long, we'll continue on, and force a refresh.
         usleep($sleepTimer * 1000000);
         $fileInput = file_get_contents("info/" . dynamicIPAddressPath . "time.txt");
-
-echo " " . file_get_contents("info/" . dynamicIPAddressPath . "time.txt") . "\n";    //Debug line
 
         if($checkWaitValue != $fileInput && stripos($fileInput, "wait" !== false))
         {
@@ -1266,7 +1290,7 @@ return $input;
 
 function skinValidator($paraTrackerSkin)
 {
-    //Remove slashes, periods, and colons. This will prevent anyone from adding a file extension, a URL, or a ../ into the file name
+    //Prevent slashes, periods, and colons. This will stop people from adding a file extension, a URL, or a ../ into the file name
     if(strpos($paraTrackerSkin, ".") !== false ||strpos($paraTrackerSkin, "/") !== false ||strpos($paraTrackerSkin, "\\") !== false ||strpos($paraTrackerSkin, ":") !== false)
     {
         echo " Invalid skin specified! Slashes, colons, and periods are forbidden in skin file names. Assuming default skin. ";
@@ -1351,7 +1375,11 @@ function htmlDeclarations($pageTitle, $filePath)
     <link rel="stylesheet" href="css/ParaStyle.css" type="text/css" />
     <link rel="stylesheet" href="css/LevelshotAnimations.css" type="text/css" />';
 
-    $output .= levelshotJavascriptAndCSS();
+    $test = dynamicIPAddressPath;
+    if(isset($test) && $test != "")
+    {
+        $output .= levelshotJavascriptAndCSS();
+    }
 
     //If a skin is defined, then include it here in the header
     if(paraTrackerSkin != "")
@@ -1396,6 +1424,7 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
     $gameList = detectGameName("");
     $gameOutput = "";
 
+
   for($i = 0; $i < count($gameList); $i++)
   {
     $gameOutput .= $gameList[$i] . ', ';
@@ -1406,9 +1435,12 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
 
     $output = htmlDeclarations("", "");
 
-    $output .= '<meta name="keywords" content="Free PHP server tracker, ID Tech 3, JediTracker, ' . $gameOutput .'Game Tracker, custom colors, JSON">
-  <meta name="description" content="Free Server Tracker for ' . $gameOutput . 'Written in PHP, with custom colors, JSON compatible">
+
+    $output .= '<meta name="keywords" content="Free PHP server tracker, ID Tech 3, JediTracker, ' . $gameOutput .'Game Tracker, custom colors, JSON, Bit Value Calculator">
+  <meta name="description" content="Free Server Tracker for ' . $gameOutput . 'Written in PHP, with custom colors, JSON compatible, Bit Value Calculator">
   <meta name="author" content="Parabolic Minds">
+
+    <script src="js/bitflags.js"></script>
 
     </head><body class="dynamicConfigPage dynamicConfigPageStyle">
 ';
@@ -1426,13 +1458,7 @@ $output .= '<h3>Supported Games:</h3><div class="centerTable"><table class="cent
     for($i = 0; $i < count($gameList); $i++)
     {
         //DO NOT make the directory list value lowercase here! It will make all dynamic game names appear in lowercase on the tracker
-        $output .= '<td class="gameColor' . $colorNumber . '">&nbsp;&nbsp;' . $gameList[$i] . '&nbsp;&nbsp;</td>';
-
-        $colorNumber++;
-        if($colorNumber > 9)
-        {
-            $colorNumber = 0;
-        }
+        $output .= '<td class="' . makeFunctionSafeName($gameList[$i]) . '">&nbsp;&nbsp;' . $gameList[$i] . '&nbsp;&nbsp;</td>';
 
         //Was this an even trip through the array, but also not the last trip? If so, start a new table row.
         if($i % 2 != 0 && $i + 1 != count($gameList))
@@ -1441,7 +1467,89 @@ $output .= '<h3>Supported Games:</h3><div class="centerTable"><table class="cent
         }
     }
 
-$output .= "</tr></table></div>";
+$output .= '</tr></table></div>';
+
+//Let's add a bit value calculator, just in case someone needs it in the future
+$output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButton" onclick="expandContractDiv(' . "'bitFlagCalculator'" . ')">Show/Hide Bit Value Calculator</a></p><div id="bitFlagCalculator" class="collapsedFrame">';
+
+    $firstTime = 1;
+    $JSONOutput = '<script type="text/javascript">var bitflags_raw = [';
+
+    //Let's add the bit value calculator feature here
+    foreach($gameList as $testName)
+    {
+        $bitFlagData = ParseGameData($testName, "", "");
+        //Remove the stuff we don't need. All we want right now is bit values.
+        $bitFlagData = array_slice($bitFlagData, 6);
+
+        if(count($bitFlagData) > 1)
+        {
+            if($firstTime != 1)
+            {
+                $JSONOutput .= ',';
+            }
+            $firstTime = 0;
+            //If we got here, there must be bitFlags in this game, so let's add it to the calculator list
+            $JSONOutput .= '{"gamename":"' . $testName . '","gameClassName":"game_' . makeFunctionSafeName($testName) . '","bitflags":[';
+
+            if(count($bitFlagData) > 1)
+            {
+		        $bitFlagsIndex = array_shift($bitFlagData);
+
+		        //Parse the arrays into variables named after the CVars
+		        for($i = 0; $i < count($bitFlagsIndex); $i++)
+		        {
+	                $$bitFlagsIndex[$i] = $bitFlagData[$i];
+		        }
+                usort($bitFlagsIndex, 'strnatcasecmp');
+            }
+
+            //Now we need to iterate through each of the bitflag arrays, and generate a working HTML form from them
+            $count = count($bitFlagsIndex);
+            for($i = 0; $i < $count; $i++)
+            {
+		        if($i > 0)
+		        {
+		            $JSONOutput .= ",";
+                }
+                $JSONOutput .= '{"setname":"' . stringValidator($bitFlagsIndex[$i], "", "") . '","flags":[';
+
+                $count2 = count($$bitFlagsIndex[$i]);
+
+                $testArray = array("");
+                $testArray = $$bitFlagsIndex[$i];
+                for($j = 0; $j < $count2; $j++)
+                {
+                    if($j > 0)
+                    {
+                        $JSONOutput .= ",";
+                    }
+                    if(empty($testArray[$j]))
+                    {
+                         $testArray[$j] = "(Unused)";
+                    }
+                    $JSONOutput .= '{"name":"' . stringValidator($testArray[$j], "", "") . '","value":' . pow(2, $j) . '}';
+                }
+            $JSONOutput .= ']}';
+            }
+        $JSONOutput .= ']}';
+        }
+    }
+    $JSONOutput .= '];
+</script>';
+
+//Add the HTML we need for the bit value calculator
+$output .= '<div id="bitflags_top" class="bitValueCalculator">
+<div id="bitflags_tabdisplay"></div>
+<select id="bitflags_bitselect" onchange="bitflags_setchange(this.selectedIndex)"></select>
+<div id="bitflags_tabregion"></div>
+</div>';
+
+//Add the JSON stuff to the HTML output
+$output .= $JSONOutput;
+
+$output .= '</div>';
+//End of bit value calculator
 
 $output .= '<br /><p>Current page URL:<br /><input type="text" size="80" id="currentURL" value="' . $currentURL . '" readonly /></p>
     <br />
@@ -1539,7 +1647,7 @@ $output .= '<br /><p>Current page URL:<br /><input type="text" size="80" id="cur
     $output .= '<option value="JSON:#:800:#:800">JSON (Text-only response for clientside Javascript parsing)</option>';
     $output .= '</select><br /><br /></p>';
 
-    $output .= '<p onclick="colorSelectionClick(' . "'colorSelections'" . ')"><span class="dynamicFormButtons dynamicFormButtonsStyle"> Show/hide color options </span></p>';
+    $output .= '<p onclick="expandContractDiv(' . "'colorSelections'" . ')"><span class="dynamicFormButtons dynamicFormButtonsStyle"> Show/Hide Color Options </span></p>';
 
     $output .= '<div id="colorSelections" class="collapsedFrame">';
     $output .= '<div class="colorSelections"><h3>All colors are in hexadecimal (#123456)</h3><p><span class="gameColor2">Background Color:</span>&nbsp;&nbsp;# <input id="backgroundColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
@@ -1754,19 +1862,22 @@ $output .= '<div class="ParaTrackerSize textColor">';
 //This adds the background color and image class to the page. It is an optional CSS feature that is only there for ease of use.
 $output .= '<div class="BackgroundColorImage textColor">';
 
-//This adds the ParaTracker logo to the page.
-$output .= '<div class="ParaTrackerLogo textColor"></div>';
-
-//This adds three custom DIVs to the page, to be used however the skin creator desires.
+//This adds six custom DIVs to the page, to be used however the skin creator desires.
 $output .= '<div class="CustomDiv1 textColor"></div>';
 $output .= '<div class="CustomDiv2 textColor"></div>';
 $output .= '<div class="CustomDiv3 textColor"></div>';
+$output .= '<div class="CustomDiv4 textColor"></div>';
+$output .= '<div class="CustomDiv5 textColor"></div>';
+$output .= '<div class="CustomDiv6 textColor"></div>';
+
+//This adds the ParaTracker logo to the page.
+$output .= '<div class="ParaTrackerLogo textColor"></div>';
 
 //This adds the ParaTracker text to the page.
 $output .= '<div class="ParaTrackerText textColor">' . versionNumber() . '</div>';
 
 //This adds the server name to the page.
-$output .= '<div class="serverName textColor">' . colorize(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt"));
+$output .= '<div class="serverName color7 textColor">' . colorize(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt"));
 
 if(enableGeoIP == 1)
 {
@@ -1869,13 +1980,16 @@ $output .= '<div class="ParaTrackerSize textColor">';
 //This adds the background color and image class to the page. It is an optional CSS feature that is only there for ease of use.
 $output .= '<div class="BackgroundColorImage textColor">';
 
-//This adds the ParaTracker logo to the page.
-$output .= '<div class="ParaTrackerLogo textColor"></div>';
-
-//This adds three custom DIVs to the page, to be used however the skin creator desires.
+//This adds six custom DIVs to the page, to be used however the skin creator desires.
 $output .= '<div class="CustomDiv1 textColor"></div>';
 $output .= '<div class="CustomDiv2 textColor"></div>';
 $output .= '<div class="CustomDiv3 textColor"></div>';
+$output .= '<div class="CustomDiv4 textColor"></div>';
+$output .= '<div class="CustomDiv5 textColor"></div>';
+$output .= '<div class="CustomDiv6 textColor"></div>';
+
+//This adds the ParaTracker logo to the page.
+$output .= '<div class="ParaTrackerLogo textColor"></div>';
 
 //This adds the ParaTracker text to the page.
 $output .= '<div class="ParaTrackerTextNoConnection textColor">' . versionNumber() . '</div>';
@@ -2325,4 +2439,3 @@ file_put_contents('ParaConfig.php', $configBuffer);
 }
 
 ?>
-
