@@ -262,12 +262,12 @@ $newWindowSnapToCorner = "0";
 // GEOIP MUST BE INSTALLED ON THE SERVER FOR THIS TO WORK.
 // If ParaTracker does not find GeoIP, it will ignore this setting and give a debug message.
 // Default is 0.
-$enableGeoIP = "1";
+$enableGeoIP = "0";
 
 // For GeoIP to work, ParaTracker needs to know where to find the country database. This path
 // needs to point to the GeoIP database file. Include the file name and extension.
 // default value is ""
-$geoIPPath = "/srv/GeoLite2-Country.mmdb";
+$geoIPPath = "";
 
 
 
