@@ -44,11 +44,11 @@ function setup() {
 			// ================
 			bitset.flags.forEach((flag)=>{
 				let flagobj = {}
-				flagobj.name = flag.name
+				flagobj.name = flag
 				let flagcont = document.createElement('div')
 				let span = document.createElement('span')
 				span.className = 'bitflags_container_flag'
-				span.appendChild(document.createTextNode(flag.name))
+				span.appendChild(document.createTextNode(flagobj.name))
 				flagcont.appendChild(span)
 				let cb = document.createElement('input')
 				cb.onclick = ()=>{cb.checked = !cb.checked; bitflags_recalculate_from_cbs()}

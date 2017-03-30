@@ -1528,7 +1528,7 @@ $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButt
                     {
                          $testArray[$j] = "(Unused)";
                     }
-                    $JSONOutput .= '{"name":"' . stringValidator($testArray[$j], "", "") . '","value":' . pow(2, $j) . '}';
+                    $JSONOutput .= '"' . stringValidator($testArray[$j], "", "") . '"';
                 }
             $JSONOutput .= ']}';
             }
@@ -2360,7 +2360,7 @@ $dynamicTrackerEnabled = "0";
 // up ParaTracker for their own use. By default, this is simply a link to our GitHub, where you can download the program
 // for free. The point is to encourage as many people as possible to run the software themselves, and not to rely on Dynamic
 // mode too much.
-// Default is: "ParaTracker is free, open-source software! Download your own at http://github.com/ParabolicMinds/ParaTracker"
+// Default is: "ParaTracker is a free, open-source server tracker for Quake 3 based games! Download your own at http://github.com/ParabolicMinds/ParaTracker"
 $personalDynamicTrackerMessage = "ParaTracker is a free, open-source server tracker for Quake 3 based games! Download your own at http://github.com/ParabolicMinds/ParaTracker";
 
 
