@@ -1501,7 +1501,7 @@ $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButt
 		        {
 	                $$bitFlagsIndex[$i] = $bitFlagData[$i];
 		        }
-                usort($bitFlagsIndex, 'strnatcasecmp');
+//                usort($bitFlagsIndex, 'strnatcasecmp');
             }
 
             //Now we need to iterate through each of the bitflag arrays, and generate a working HTML form from them
