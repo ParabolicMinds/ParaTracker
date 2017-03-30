@@ -1499,9 +1499,9 @@ $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButt
 		        //Parse the arrays into variables named after the CVars
 		        for($i = 0; $i < count($bitFlagsIndex); $i++)
 		        {
-	                $$bitFlagsIndex[$i] = $bitFlagData[$i];
+	                ${$bitFlagsIndex[$i]} = $bitFlagData[$i];
 		        }
-//                usort($bitFlagsIndex, 'strnatcasecmp');
+                usort($bitFlagsIndex, 'strnatcasecmp');
             }
 
             //Now we need to iterate through each of the bitflag arrays, and generate a working HTML form from them
@@ -1514,10 +1514,10 @@ $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButt
                 }
                 $JSONOutput .= '{"setname":"' . stringValidator($bitFlagsIndex[$i], "", "") . '","flags":[';
 
-                $count2 = count($$bitFlagsIndex[$i]);
+                $count2 = count(${$bitFlagsIndex[$i]});
 
                 $testArray = array("");
-                $testArray = $$bitFlagsIndex[$i];
+                $testArray = ${$bitFlagsIndex[$i]};
                 for($j = 0; $j < $count2; $j++)
                 {
                     if($j > 0)
