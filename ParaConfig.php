@@ -212,7 +212,7 @@ $dynamicTrackerEnabled = "0";
 // for free. The point is to encourage as many people as possible to run the software themselves, and not to rely on Dynamic
 // mode too much.
 // Default is: "ParaTracker is free, open-source software! Download your own at http://github.com/ParabolicMinds/ParaTracker"
-$personalDynamicTrackerMessage = "ParaTracker is free, open-source software! Download your own at http://github.com/ParabolicMinds/ParaTracker";
+$personalDynamicTrackerMessage = "ParaTracker is a free, open-source server tracker for Quake 3 based games! Download your own at http://github.com/ParabolicMinds/ParaTracker";
 
 
 // RCON SETTINGS
