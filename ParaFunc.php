@@ -11,6 +11,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 */
 
+include_once 'vendor/autoload.php';
+
 function versionNumber()
 {
     //Return a string of the version number
@@ -281,6 +283,12 @@ $enableGeoIP = booleanValidator($enableGeoIP, 0);
 
 if($enableGeoIP == "1")
 {
+	
+	if (!class_exists('GeoIp2\Database\Reader')) {
+        echo ' Maxmind GeoIP2 library does not seem to be present. ParaTracker expects this library to be installed via Composer. GeoIP has been disabled and will be ignored... ';
+        $enableGeoIP = 0;
+	}
+	
     //If GeoIP is enabled but the file is not found, disable it.
     if(!file_exists($geoIPPath))
     {
@@ -502,16 +510,15 @@ function doUpdate($lastRefreshTime)
 	    //Mark the time in microseconds so we can see how long this takes.
 	    $parseTimer = microtime(true);
 
-            //If GeoIP is enabled, let's get the flag and country data first, and write it to a file
-            if(enableGeoIP == 1)
-            {
-                require_once 'vendor/autoload.php';
-                $geoip_dbr = new GeoIp2\Database\Reader(geoIPPath);
-                $actualIP = gethostbyname(serverIPAddress);
-                $flag = stringValidator(strtolower($geoip_dbr->country($actualIP)->country->isoCode), "", "");
-                $countryName = stringValidator($geoip_dbr->country($actualIP)->country->name, "", "");
-                file_put_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt', $flag . ":#:" . $countryName);
-            }
+		//If GeoIP is enabled, let's get the flag and country data first, and write it to a file
+		if(enableGeoIP == 1)
+		{
+			$geoip_dbr = new GeoIp2\Database\Reader(geoIPPath);
+			$actualIP = gethostbyname(serverIPAddress);
+			$flag = stringValidator(strtolower($geoip_dbr->country($actualIP)->country->isoCode), "", "");
+			$countryName = stringValidator($geoip_dbr->country($actualIP)->country->name, "", "");
+			file_put_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt', $flag . ":#:" . $countryName);
+		}
 
 	    //Now, we call a function to parse the data
 	    $dataParserReturn = dataParser($s);
