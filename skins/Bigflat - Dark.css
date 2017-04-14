@@ -208,7 +208,6 @@ font-size: 10pt;
 font-family: "Verdana", sans-serif;
 font-style: italic;
 overflow: hidden;
-text-align: center;
 padding-left: 7px;
 }
 
@@ -599,6 +598,7 @@ font-size: 12pt;
 font-family: monospace;
 overflow: hidden;
 padding-left: 7px;
+display: none;
 }
 
 
