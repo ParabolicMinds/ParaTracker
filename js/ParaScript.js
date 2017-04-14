@@ -82,13 +82,13 @@ function detectLevelshotClasses()
 //Let's detect all levelshot transition animation classes currently in memory.
 //If levelshot transitions are set to random, we'll pick one at random from this list.
 
-    for (let sheeti = 0; sheeti < document.styleSheets.length; sheeti++)
+    for (sheeti = 0; sheeti < document.styleSheets.length; sheeti++)
     {
-      let sheet = document.styleSheets[sheeti]
-      for (let rulei = 0; rulei < sheet.cssRules.length; rulei++)
+      sheet = document.styleSheets[sheeti]
+      for (rulei = 0; rulei < sheet.cssRules.length; rulei++)
         {
-            let rule = sheet.cssRules[rulei]
-            if (rule.cssText.startsWith("@keyframes") && rule.name.startsWith("levelshotTransition"))
+            rule = sheet.cssRules[rulei]
+            if (rule.cssText.substring(0, 10) == "@keyframes" && rule.name.substring(0, 19) == "levelshotTransition")
             {
                 animationList.push(rule.name)
             }
@@ -290,6 +290,12 @@ function createURL()
     var playerListColor1Opacity = "";
     var playerListColor2 = "";
     var playerListColor2Opacity = "";
+    var levelshotsEnabled = "";
+    var font = "";
+    var enableAutoRefresh = "";
+    var levelshotTransitionTime = "";
+    var levelshotDisplayTime = "";
+
 
     outputURL += document.getElementById("currentURL").value;
     outputURL += "?ip=";
@@ -316,6 +322,23 @@ function createURL()
 
     outputURL += skinFile;
 
+
+    outputURL += "&filterOffendingServerNameSymbols=" + document.getElementById("filterOffendingServerNameSymbols").checked;
+    outputURL += "&displayGameName=" + document.getElementById("displayGameName").checked;
+    outputURL += "&enableAutoRefresh=" + document.getElementById("enableAutoRefresh").checked;
+    outputURL += "&levelshotsEnabled=" + document.getElementById("levelshotsEnabled").checked;
+    outputURL += "&enableGeoIP=" + document.getElementById("levelshotsEnabled").checked;
+
+    if(document.getElementById("levelshotDisplayTime").value != "")
+    {
+        outputURL += "&levelshotDisplayTime=" + document.getElementById("levelshotDisplayTime").value;
+    }
+
+    if(document.getElementById("levelshotTransitionTime").value != "")
+    {
+        outputURL += "&levelshotTransitionTime=" + document.getElementById("levelshotTransitionTime").value;
+    }
+
     if(document.getElementById("backgroundColor").value != "")
     {
         outputURL += "&backgroundColor=" + document.getElementById("backgroundColor").value;
@@ -323,11 +346,6 @@ function createURL()
         {
             outputURL += "&backgroundOpacity=" + document.getElementById("backgroundOpacity").value;
         }
-    }
-
-    if(document.getElementById("textColor").value != "")
-    {
-        outputURL += "&textColor=" + document.getElementById("textColor").value;
     }
 
     if(document.getElementById("playerListColor1").value != "")
@@ -346,6 +364,16 @@ function createURL()
         {
             outputURL += "&playerListColor2Opacity=" + document.getElementById("playerListColor2Opacity").value;
         }
+    }
+
+    if(document.getElementById("textColor").value != "")
+    {
+        outputURL += "&textColor=" + document.getElementById("textColor").value;
+    }
+
+    if(document.getElementById("font").value != "")
+    {
+        outputURL += "&font=" + document.getElementById("font").value;
     }
 
     outputURL= encodeURI(outputURL);

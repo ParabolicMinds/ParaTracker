@@ -1,13 +1,12 @@
-﻿<?php
+<?php
 ///////////////////////////////
 // ParaTracker Configuration //
 ///////////////////////////////
 
 // This is the configuration file for ParaTracker.
-// If you want to edit fonts and colors, they are found
+// If you want to edit fonts and colors, you should edit them
 // in the css files found in the /skins folder.
-// You can change the skin used in static mode here and override a few
-// colors, but there are no other visual settings.
+// The visual settings found here are overrides only and should be used with caution!
 
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
@@ -59,6 +58,8 @@ $refreshTimeout = "3";
 // VISUAL SETTINGS
 // VISUAL SETTINGS
 
+// These settings are OVERRIDES ONLY. Use with caution!
+
 // This line specifies which skin file to load. Skins are found in the skins/ folder, and they are all
 // simple CSS files. The name is case sensitive.
 // ParaTracker will automatically search in the skins/ folder for the file specified, and it will automatically
@@ -77,12 +78,6 @@ $backgroundColor = "";
 // Default value is "100".
 $backgroundOpacity = "100";
 
-// This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
-// It will not change the color of server names, mod names, map names, or player names.
-// The skin chosen will already have it's own color; this value will override it, if desired.
-// Default value is "".
-$textColor = "";
-
 // This is a 6 character hexadecimal value that specifies the color of the odd rows on the player list.
 // The skin chosen will already have it's own color; this value will override it, if desired.
 // Default value is "".
@@ -100,6 +95,17 @@ $playerListColor2 = "";
 // This value is a percentage, from 0 to 100, of how opaque the color of the even rows on the player list will be.
 // Default value is "100".
 $playerListColor2Opacity = "100";
+
+// This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
+// It will not change the color of server names, mod names, map names, or player names.
+// The skin chosen will already have it's own color; this value will override it, if desired.
+// Default value is "".
+$textColor = "";
+
+// This value specifies a font to be used on the tracker page. Font families are also accepted.
+// Make sure you use a common font so everyone can see it!
+// Default value is "".
+$customFont = "";
 
 
 // LEVELSHOT SETTINGS
@@ -163,6 +169,11 @@ $maximumLevelshots = "20";
 
 // TRACKER SETTINGS
 // TRACKER SETTINGS
+
+// This value is boolean. When this variable is set to Yes or 1, the game name will be displayed
+// in the tracker. Otherwise, it will be hidden.
+// Default is 1.
+$displayGameName = "1";
 
 // This value is boolean. When this variable is set to Yes or 1, offending symbols will be
 // filtered from the server name. Frequently, people will put unreadable symbols into their

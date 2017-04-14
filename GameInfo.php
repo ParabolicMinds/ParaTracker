@@ -181,6 +181,7 @@ if(isset($cvars_hash["sv_maxclients"]))
     //All BitFlag arrays must be declared here
     $dmflags = array("", "", "", "No Fall Damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
     $g_weaponDisable = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "Golan Arms FC1 Flechette", "Merr-Sonn Portable Missile Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
+    $g_duelWeaponDisable = array("", "Stun Baton", "Melee", "Lightsaber", "Bryar Blaster Pistol", "E-11 Blaster", "Tenloss Disruptor Rifle", "Wookiee Bowcaster", "Imperial Heavy Repeater", "DEMP 2", "Golan Arms FC1 Flechette", "Merr-Sonn Portable Missile Launcher", "Thermal Detonator", "Trip Mine", "Detonation Pack", "Stouker Concussion Rifle", "Bryar Blaster Pistol (Old)", "Emplaced Gun", "Turret");
     $g_forcePowerDisable = array("Heal", "Jump", "Speed", "Push", "Pull", "Mind Trick", "Grip", "Lightning", "Rage", "Protect", "Absorb", "Team Heal", "Team Force", "Drain", "Sight", "Saber Offense", "Saber Defense", "Saber Throw");
 
     //These values should never be returned by the server, but they will be used for the bit calculator
@@ -194,11 +195,11 @@ if(isset($cvars_hash["sv_maxclients"]))
 
     //If there are any bitflags to return, they must be returned last.
     //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
-    $BitFlagsIndex = array("dmflags", "g_weaponDisable", "g_forcePowerDisable", "jp_councilAllowedCMD", "jp_knightAllowedCMD", "jp_instructorAllowedCMD", "jp_votesDisable", "jp_teamLock", "jp_emotDisallow", "jp_wordFilter");
+    $BitFlagsIndex = array("dmflags", "g_weaponDisable", "g_duelWeaponDisable", "g_forcePowerDisable", "jp_councilAllowedCMD", "jp_knightAllowedCMD", "jp_instructorAllowedCMD", "jp_votesDisable", "jp_teamLock", "jp_emotDisallow", "jp_wordFilter");
 
     //Lastly, all data above MUST be returned in a specific order:
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
-    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_forcePowerDisable, $jp_councilAllowedCMD, $jp_knightAllowedCMD, $jp_instructorAllowedCMD, $jp_votesDisable, $jp_teamLock, $jp_emotDisallow, $jp_wordFilter);
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_duelWeaponDisable, $g_forcePowerDisable, $jp_councilAllowedCMD, $jp_knightAllowedCMD, $jp_instructorAllowedCMD, $jp_votesDisable, $jp_teamLock, $jp_emotDisallow, $jp_wordFilter);
 }
 
 

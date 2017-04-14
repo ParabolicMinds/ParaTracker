@@ -11,13 +11,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 */
 
-include_once 'vendor/autoload.php';
-
 function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    return("ParaTracker 1.3.3");
+    return("ParaTracker 1.3.4");
 }
 
 //Define the default skin, to be used throughout this file.
@@ -44,6 +42,7 @@ $playerListColor1 = "";
 $playerListColor1Opacity = "100";
 $playerListColor2 = "";
 $playerListColor2Opacity = "100";
+$customFont = "";
 $geoipCountryCode = "";
 
 define("defaultSkin", $defaultSkin);
@@ -52,7 +51,6 @@ define("defaultSkin", $defaultSkin);
 //If the file is executed from one of the skin files, then this will end up in an HTML comment and will not be visible.
 //Either way, the version number will be visible.
 echo " " . versionNumber() . " ";
-
 
 if (file_exists("ParaConfig.php"))
 {
@@ -132,35 +130,6 @@ if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
         {
             $serverPort = $_GET["port"];
         }
-
-        if(isset($_GET["backgroundColor"]))
-        {
-            $backgroundColor = colorValidator($_GET["backgroundColor"]);
-        }
-        if(isset($_GET["backgroundOpacity"]))
-        {
-            $backgroundOpacity = numericValidator($_GET["backgroundOpacity"], 0, 100, 100);
-        }
-        if(isset($_GET["textColor"]))
-        {
-            $textColor = colorValidator($_GET["textColor"]);
-        }
-        if(isset($_GET["playerListColor1"]))
-        {
-            $playerListColor1 = colorValidator($_GET["playerListColor1"]);
-        }
-        if(isset($_GET["playerListColor1Opacity"]))
-        {
-            $playerListColor1Opacity = numericValidator($_GET["playerListColor1Opacity"], 0, 100, 100);
-        }
-        if(isset($_GET["playerListColor2"]))
-        {
-            $playerListColor2 = colorValidator($_GET["playerListColor2"]);
-        }
-        if(isset($_GET["playerListColor2Opacity"]))
-        {
-            $playerListColor2Opacity = numericValidator($_GET["playerListColor2Opacity"], 0, 100, 100);
-        }
     }
 }
 else
@@ -224,23 +193,20 @@ if($dynamicTrackerCalledFromCorrectFile == "1" || $calledFromParam == "1" || $ca
     }
 }
 
-//If we are running in static mode, we need to validate the color overrides as well
-if($dynamicTrackerEnabled == "0")
-{
-    $backgroundColor = colorValidator($backgroundColor);
-    $backgroundOpacity = numericValidator($backgroundOpacity, 0, 100, 100);
-    $textColor = colorValidator($textColor);
-    $playerListColor1 = colorValidator($playerListColor1);
-    $playerListColor1Opacity = numericValidator($playerListColor1Opacity, 0, 100, 100);
-    $playerListColor2 = colorValidator($playerListColor2);
-    $playerListColor2Opacity = numericValidator($playerListColor2Opacity, 0, 100, 100);
-}
-
 $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
 $floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 15);
 //Have to validate this one twice to make sure it isn't lower than connectionTimeout
 $floodProtectTimeout = numericValidator($floodProtectTimeout, $connectionTimeout, 1200, 10);
 $refreshTimeout = numericValidator($refreshTimeout, 1, 15, 3);
+
+$backgroundColor = colorValidator($backgroundColor);
+$backgroundOpacity = numericValidator($backgroundOpacity, 0, 100, 100);
+$playerListColor1 = colorValidator($playerListColor1);
+$playerListColor1Opacity = numericValidator($playerListColor1Opacity, 0, 100, 100);
+$playerListColor2 = colorValidator($playerListColor2);
+$playerListColor2Opacity = numericValidator($playerListColor2Opacity, 0, 100, 100);
+$textColor = colorValidator($textColor);
+$customFont = stringValidator($customFont, "50", "");
 
 $levelshotTransitionsEnabled = booleanValidator($levelshotTransitionsEnabled, 1);
 $levelshotDisplayTime = numericValidator($levelshotDisplayTime, 1, 15, 3);
@@ -248,6 +214,7 @@ $levelshotTransitionTime = numericValidator($levelshotTransitionTime, 0.1, 5, 1)
 $levelshotTransitionAnimation = numericValidator(round($levelshotTransitionAnimation), 0, 999, 0);
 $maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
 
+$displayGameName = booleanValidator($displayGameName, 1);
 $filterOffendingServerNameSymbols = booleanValidator($filterOffendingServerNameSymbols, 1);
 
 $noPlayersOnlineMessage = stringValidator($noPlayersOnlineMessage, "", "No players online.");
@@ -283,7 +250,7 @@ $enableGeoIP = booleanValidator($enableGeoIP, 0);
 
 if($enableGeoIP == "1")
 {
-	
+    include_once 'vendor/autoload.php';
 	if (!class_exists('GeoIp2\Database\Reader')) {
         echo ' Maxmind GeoIP2 library does not seem to be present. ParaTracker expects this library to be installed via Composer. GeoIP has been disabled and will be ignored... ';
         $enableGeoIP = 0;
@@ -298,6 +265,87 @@ if($enableGeoIP == "1")
     }
 }
 
+//If we are running in dynamic mode and we are not running the setup page, let's check for override values on a few more settings.
+if($dynamicTrackerCalledFromCorrectFile == "1" && $executeDynamicInstructionsPage != "1")
+{
+    //If the config file has disabled levelshot transitions, we must abide by it. Otherwise, override it.
+    if(isset($_GET["levelshotsEnabled"]) && $levelshotTransitionsEnabled == "1")
+    {
+        $levelshotTransitionsEnabled = booleanValidator($_GET["levelshotsEnabled"], 1);
+    }
+
+    if(isset($_GET["levelshotDisplayTime"]))
+    {
+        $levelshotDisplayTime = numericValidator($_GET["levelshotDisplayTime"], 1, 15, $levelshotDisplayTime);
+    }
+
+    if(isset($_GET["levelshotTransitionTime"]))
+    {
+        $levelshotTransitionTime = numericValidator($_GET["levelshotTransitionTime"], 0.1, 5, $levelshotTransitionTime);
+    }
+
+    if(isset($_GET["enableAutoRefresh"]) && $enableAutoRefresh == "1")
+    {
+        $enableAutoRefresh = booleanValidator($_GET["enableAutoRefresh"], $enableAutoRefresh);
+    }
+
+    if(isset($_GET["font"]))
+    {
+        $customFont = stringValidator(rawurldecode($_GET["font"]), "", "");
+    }
+
+    if(isset($_GET["backgroundColor"]))
+    {
+        $backgroundColor = colorValidator($_GET["backgroundColor"]);
+    }
+
+    if(isset($_GET["backgroundOpacity"]))
+    {
+        $backgroundOpacity = numericValidator($_GET["backgroundOpacity"], 0, 100, 100);
+    }
+
+    if(isset($_GET["textColor"]))
+    {
+        $textColor = colorValidator($_GET["textColor"]);
+    }
+
+    if(isset($_GET["playerListColor1"]))
+    {
+        $playerListColor1 = colorValidator($_GET["playerListColor1"]);
+    }
+
+    if(isset($_GET["playerListColor1Opacity"]))
+    {
+        $playerListColor1Opacity = numericValidator($_GET["playerListColor1Opacity"], 0, 100, 100);
+    }
+
+    if(isset($_GET["playerListColor2"]))
+    {
+        $playerListColor2 = colorValidator($_GET["playerListColor2"]);
+    }
+
+    if(isset($_GET["playerListColor2Opacity"]))
+    {
+        $playerListColor2Opacity = numericValidator($_GET["playerListColor2Opacity"], 0, 100, 100);
+    }
+
+    if(isset($_GET["displayGameName"]))
+    {
+        $displayGameName = booleanValidator($_GET["displayGameName"], $displayGameName);
+    }
+
+    if(isset($_GET["enableGeoIP"]) && $enableGeoIP == "1")
+    {
+        $enableGeoIP = booleanValidator($_GET["enableGeoIP"], $enableGeoIP);
+    }
+
+    if(isset($_GET["filterOffendingServerNameSymbols"]))
+    {
+        $filterOffendingServerNameSymbols = booleanValidator($_GET["filterOffendingServerNameSymbols"], $filterOffendingServerNameSymbols);
+    }
+}
+
+
 //Now that everything has been validated, let's define all ParaConfig values as global constants to make things easier.
 define("dynamicIPAddressPath", $dynamicIPAddressPath);
 define("serverIPAddress", $serverIPAddress);
@@ -311,6 +359,7 @@ define("levelshotDisplayTime", $levelshotDisplayTime);
 define("levelshotTransitionTime", $levelshotTransitionTime);
 define("levelshotTransitionAnimation", $levelshotTransitionAnimation);
 define("maximumLevelshots", $maximumLevelshots);
+define("displayGameName", $displayGameName);
 define("filterOffendingServerNameSymbols", $filterOffendingServerNameSymbols);
 define("noPlayersOnlineMessage", $noPlayersOnlineMessage);
 define("enableAutoRefresh", $enableAutoRefresh);
@@ -333,6 +382,8 @@ define("playerListColor1", $playerListColor1);
 define("playerListColor1Opacity", $playerListColor1Opacity);
 define("playerListColor2", $playerListColor2);
 define("playerListColor2Opacity", $playerListColor2Opacity);
+define("customFont", $customFont);
+
 
 if($executeDynamicInstructionsPage == "1")
 {
@@ -565,7 +616,7 @@ function doUpdate($lastRefreshTime)
             file_put_contents('info/' . dynamicIPAddressPath . 'mapname_raw.txt', $mapname);
             file_put_contents('info/' . dynamicIPAddressPath . 'modname.txt', $modName);
             file_put_contents("info/" . dynamicIPAddressPath . "playerCount.txt", $player_count);
-            file_put_contents('info/' . dynamicIPAddressPath . 'sv_hostname.txt', removeOffendingServerNameCharacters($sv_hostname));
+            file_put_contents('info/' . dynamicIPAddressPath . 'sv_hostname.txt', $sv_hostname);
             file_put_contents('info/' . dynamicIPAddressPath . 'sv_maxclients.txt', $sv_maxclients);
 
 
@@ -646,13 +697,26 @@ function removeOffendingServerNameCharacters($input)
     //Check to see if the offending characters are to be removed
     if (filterOffendingServerNameSymbols == 1)
     {
-        //The following line removes the Euro symbol, €
-        $input = str_replace('€', '', $input);
+        //The following line trims leading white space
+        $input = ltrim($input);
 
-        //The following line removes the newline symbol, 
-        $input = str_replace("\n", '', $input);
+        //The following line removes whatever this nonsense is: ¬â‚
+        $input = ltrim($input, "¬â‚");
+
+        //The following line removes the Euro symbol, €
+        $input = ltrim($input, "€");
+
+        //The following line removes whatever this is: â
+        $input = ltrim($input, "â");
+
+        //The following line removes whatever this is: ¬
+        $input = ltrim($input, "¬");
 
         //Any additional filters go here
+
+
+        //The following line trims remaining white space
+        $input = ltrim($input);
     }
     return $input;
 }
@@ -841,7 +905,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
 		$buf = htmlDeclarations("Server CVars", "") . $buf;
 
-		$buf3 .= '],"serverInfo":{"servername":"' . file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt") . '","gamename":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt') .  '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"},';
+		$buf3 .= '],';
 		file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
 		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . $buf2 . "},");
 }
@@ -969,7 +1033,7 @@ function levelshotFinder($mapName, $levelshotFolder)
 	            $levelshotBuffer = implode(":#:", explode("\n", trim($levelshotBuffer)));
 	        }
 
-		} While ($foundLevelshot == 1 && $levelshotCount < maximumLevelshots && levelshotTransitionsEnabled == 1);
+		} While ($foundLevelshot == 1 && $levelshotCount < maximumLevelshots);
 
 //This code prevents the Javascript that follows from seeing a value of 0 levelshots when none are found.
 //There will always be a minimum of one levelshot. A placeholder is used if none is found.
@@ -1101,7 +1165,7 @@ function booleanValidator($input, $defaultValue)
     //The config file allows for a value of 1 or the string "yes" to be used for booleans.
     //Everything else must evaluate to false.
 
-    if ($input == "1" || strtolower($input) == "yes")
+    if ($input == "1" || strtolower($input) == "yes" || strtolower($input) == "true")
         {
             $input = 1;
         }
@@ -1109,11 +1173,9 @@ function booleanValidator($input, $defaultValue)
         {
             if($input == "" && $defaultValue == "1")
             {
-                //Not $input = $defaultValue - Same as above
                 $input = 1;
             }
             {
-                //Not $input = $defaultValue - Same as above
                 $input = 0;
             }
         }
@@ -1404,6 +1466,9 @@ function htmlDeclarations($pageTitle, $filePath)
 
 function colorize($input)
 {
+    //We need to force spaces or some things won't work correctly.
+    $input = str_replace(' ', '&nbsp;', $input);
+
     //Check for any color inputs, and replace them with HTML tags
     $colorized_string = str_replace('^0', '</span><span class="color0">', $input);
     $colorized_string = str_replace('^1', '</span><span class="color1">', $colorized_string);
@@ -1443,7 +1508,7 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
     $output = htmlDeclarations("", "");
 
 
-    $output .= '<meta name="keywords" content="Free PHP server tracker, ID Tech 3, JediTracker, ' . $gameOutput .'Game Tracker, custom colors, JSON, Bit Value Calculator">
+    $output .= '<meta name="keywords" content="Free PHP server tracker, server, tracker, ID Tech 3, JediTracker, Jedi Tracker, ' . $gameOutput .'Game Tracker, Custom Colors, JSON, Bit Value Calculator">
   <meta name="description" content="Free Server Tracker for ' . $gameOutput . 'Written in PHP, with custom colors, JSON compatible, Bit Value Calculator">
   <meta name="author" content="Parabolic Minds">
 
@@ -1455,7 +1520,7 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
     $output .= '<div class="paraTrackerTestFrameTexturePreload"></div>';
     $output .= '<div class="dynamicPageContainer"><div class="dynamicPageWidth"><h1>' . versionNumber() . ' - Dynamic Mode</h1>
     <i>' . $personalDynamicTrackerMessage . '</i>
-    <h6>ParaConfig.php settings still apply, so for instance, if you want to enable RCon, or change levelshot options, it must be changed in ParaConfig.php, by the server owner.<br />For a full set of options, you can (and should) host your own ParaTracker.</h6>';
+    <h6>ParaConfig.php settings still apply, so for instance, if you want to enable RCon, or change the auto refresh delay, it must be changed in ParaConfig.php,<br />by the server owner. For a full set of options, you can host your own ParaTracker.</h6>';
 
 $output .= '<h3>Supported Games:</h3><div class="centerTable"><table class="centerTable"><tr>';
 
@@ -1474,7 +1539,7 @@ $output .= '<h3>Supported Games:</h3><div class="centerTable"><table class="cent
         }
     }
 
-$output .= '</tr></table></div>';
+$output .= '</tr></table></div><br />';
 
 //Let's add a bit value calculator, just in case someone needs it in the future
 $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButton" onclick="expandContractDiv(' . "'bitFlagCalculator'" . ')">Show/Hide Bit Value Calculator</a></p><div id="bitFlagCalculator" class="collapsedFrame">';
@@ -1558,18 +1623,18 @@ $output .= $JSONOutput;
 $output .= '</div>';
 //End of bit value calculator
 
-$output .= '<br /><p>Current page URL:<br /><input type="text" size="80" id="currentURL" value="' . $currentURL . '" readonly /></p>
+$output .= '<p class="collapsedFrame">Current page URL:<br /><input type="text" size="80" id="currentURL" value="' . $currentURL . '" readonly /></p>
     <br />
     <h3>Enter the data below to get a URL you can use for ParaTracker Dynamic:</h3>
 
     <form>
 
-    <p><span class="gameColor1">Server IP Address:</span> <input type="text" size="46" onchange="createURL()" id="IPAddress" value="" /></p>
-    <p><span class="gameColor1">Server port number:</span> <input type="text" size="15" onchange="createURL()" id="PortNumber" value="" /></p>';
+    <h3><span class="gameColor1">Server IP Address:</span> <input type="text" size="46" onchange="createURL()" id="IPAddress" value="" /></h3>
+    <h3><span class="gameColor1">Server port number:</span> <input type="text" size="15" onchange="createURL()" id="PortNumber" value="" /></h3>';
 
 
     //Let's dynamically find the CSS files, and parse the resolution of the tracker from them
-    $output .= '<p><span class="gameColor3">Skin:</span><br />';
+    $output .= '<h3><span class="gameColor3">Skin:</span><br />';
     $directoryList = scandir("skins/");
 
     //Sort the array in a readable fashion
@@ -1652,18 +1717,44 @@ $output .= '<br /><p>Current page URL:<br /><input type="text" size="80" id="cur
     }
 
     $output .= '<option value="JSON:#:800:#:800">JSON (Text-only response for clientside Javascript parsing)</option>';
-    $output .= '</select><br /><br /></p>';
+    $output .= '</select><br /><br /></h3>';
 
-    $output .= '<p onclick="expandContractDiv(' . "'colorSelections'" . ')"><span class="dynamicFormButtons dynamicFormButtonsStyle"> Show/Hide Color Options </span></p>';
+    $output .= '<p><a onclick="expandContractDiv(' . "'colorSelections'" . ')" class="dynamicFormButtons dynamicFormButtonsStyle"> Show/Hide Visual Adjustments </a></p>';
 
     $output .= '<div id="colorSelections" class="collapsedFrame">';
-    $output .= '<div class="colorSelections"><h3>All colors are in hexadecimal (#123456)</h3><p><span class="gameColor2">Background Color:</span>&nbsp;&nbsp;# <input id="backgroundColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
+    $output .= '<div class="colorSelections">';
+
+    $output .= '<h2 class="gameColor3">Tracker Settings</h2>';
+        $output .= '<p><input type="checkbox" id="displayGameName" onchange="createURL()" checked /> <span class="gameColor7">Display game name</span></p>';
+
+        $output .= '<p><input type="checkbox" id="filterOffendingServerNameSymbols" onchange="createURL()" checked /> <span class="gameColor7">Filter outrageous server names</span></p>';
+
+    if(enableAutoRefresh == "1")
+    {
+        $output .= '<p><input type="checkbox" id="enableAutoRefresh" onchange="createURL()" checked /> <span class="gameColor7">Enable Auto-Refresh</span></p>';
+    }
+
+    if(enableGeoIP == "1")
+    {
+        $output .= '<p><input type="checkbox" id="enableGeoIP" onchange="createURL()" checked /> <span class="gameColor7">Enable GeoIP Country Flags</span></p>';
+    }
+
+    if(levelshotTransitionsEnabled == "1")
+    {
+//        $output .= '<h4 class="gameColor3">Levelshot Transitions</h4>';
+        $output .= '<p><input type="checkbox" id="levelshotsEnabled" onchange="createURL()" checked /> <span class="gameColor7">Enable levelshot transitions</span></p>';
+        $output .= '<span class="gameColor2">Display Time:&nbsp;</span><input id="levelshotDisplayTime" maxlength="5" size="3" type="text" value="" onchange="createURL()" />';
+        $output .= '&nbsp;&nbsp;&nbsp;<span class="gameColor1">Transition Time:&nbsp;</span><input id="levelshotTransitionTime" maxlength="5" size="3" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Times are given in seconds. Decimals are accepted.)</span>';
+    }
+
+    $output .= '<h2 class="gameColor3">Colors</h2><h4>All colors are in hexadecimal (#123456).<br /><span class="smallText">These settings do not apply to JSON skins.</span></h4><p><span class="gameColor2">Background Color:</span>&nbsp;&nbsp;# <input id="backgroundColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
     $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="backgroundOpacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
-    $output .= '<p><span class="gameColor7">Text Color:</span>&nbsp;&nbsp;# <input id="textColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Does not affect colorized text)</span></p>';
     $output .= '<p><span class="gameColor0">Player List Color 1:</span>&nbsp;&nbsp;# <input id="playerListColor1" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
     $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor1Opacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
     $output .= '<p><span class="gameColor9">Player List Color 2:</span>&nbsp;&nbsp;# <input id="playerListColor2" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
     $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor2Opacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
+        $output .= '<h2><span class="gameColor3">Text</span><br /><span class="smallText">These settings do not apply to JSON skins.</span></h2>';
+    $output .= '<p><span class="gameColor7">Text Color:</span>&nbsp;&nbsp;# <input id="textColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /><span class="gameColor7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Font:</span>&nbsp;&nbsp;<input id="font" maxlength="50" size="30" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Color changes do not affect colorized text)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Font families are also acceptable)</span></p>';
 
     $output .= '</div></div>';
     $output .= '<p><br /><button type="button" class="dynamicFormButtons dynamicFormButtonsStyle" onclick="createURL()"> Generate! </button></p>
@@ -1847,6 +1938,10 @@ if(textColor != "")
 {
     $output .= '<style>.textColor{color: #' . textColor . ';}</style>';
 }
+if(customFont != "")
+{
+    $output .= '<style>.textColor{font-family: ' . customFont . ';}</style>';
+}
 if(playerListColor1 != "")
 {
     //background: none; removes the old background (Gradient, for instance) before applying the new color.
@@ -1884,7 +1979,7 @@ $output .= '<div class="ParaTrackerLogo textColor"></div>';
 $output .= '<div class="ParaTrackerText textColor">' . versionNumber() . '</div>';
 
 //This adds the server name to the page.
-$output .= '<div class="serverName color7 textColor">' . colorize(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt"));
+$output .= '<div class="serverName color7 textColor">' . colorize(removeOffendingServerNameCharacters(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt")));
 
 if(enableGeoIP == 1)
 {
@@ -1894,8 +1989,11 @@ if(enableGeoIP == 1)
 
 $output .= '</div>';
 
-//This adds the game name to the page.
-$output .= '<div class="gameTitle textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "gamename.txt") . '</div>';
+if(displayGameName == 1)
+{
+    //This adds the game name to the page.
+    $output .= '<div class="gameTitle textColor">' . file_get_contents("info/" . dynamicIPAddressPath . "gamename.txt") . '</div>';
+}
 
 //This adds the column headers for name, score and ping to the page.
 $output .= '<div class="nameScorePing textColor"><div class="playerNameSize playerNameHeader textColor"></div><div class="playerScoreSize playerScoreHeader textColor"></div><div class="playerPingSize playerPingHeader textColor"></div></div>';
@@ -1945,7 +2043,7 @@ $output .= '<div class="TrackerFrame textColor"></div>';
 if(enableAutoRefresh == "1")
 {
     //This adds the refresh timer and the timer script to the page.
-    $output .= '<div onclick="toggleReload()"><div class="reloadTimer" title="Click to cancel auto-refresh" id="refreshTimerDiv"></div></div>' . file_get_contents("info/" . dynamicIPAddressPath . "refreshCode.txt");
+    $output .= '<div onclick="toggleReload()"><div class="reloadTimer textColor" title="Click to cancel auto-refresh" id="refreshTimerDiv"></div></div>' . file_get_contents("info/" . dynamicIPAddressPath . "refreshCode.txt");
 }
 
 $output .= '</div></div>
@@ -1974,6 +2072,10 @@ if(backgroundColor != "")
 if(textColor != "")
 {
     $output .= '<style>.textColor{color: #' . textColor . ';}</style>';
+}
+if(customFont != "")
+{
+    $output .= '<style>.textColor{font-family: ' . customFont . ';}</style>';
 }
 
 $output .= '</head>';
@@ -2033,6 +2135,18 @@ function renderJSONPage()
     //Add the version number to the output
     $output = '{"version":"' . versionNumber() . '",';
 
+    //Add the server info
+    $output .= '"serverInfo":{';
+    $output .= '"servername":"' . removeOffendingServerNameCharacters(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt")) . '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"';
+    $output .= ',"gamename":"';
+
+    if(displayGameName == 1)
+    {
+        $output .= file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt');
+    }
+
+    $output .= '"},';
+
     //Add the relevant config data and the server ping to the output
     $output .= '"serverIPAddress":"' . serverIPAddress . '",';
     $output .= '"serverPort":"' . serverPort . '",';
@@ -2065,6 +2179,19 @@ function renderJSONPage()
     {
         $output .= '"textColor":"' . textColor . '",';
     }
+    if(customFont != "")
+    {
+        $output .= '"customFont":"' . customFont . '",';
+    }
+    if(playerListColor1 != "")
+    {
+        $output .= '"playerListColor1":"rgba(' . convertToRGBA(playerListColor1) . ', ' . playerListColor1Opacity / 100  . ')",';
+    }
+    if(playerListColor2 != "")
+    {
+        $output .= '"playerListColor2":"rgba(' . convertToRGBA(playerListColor2) . ', ' . playerListColor2Opacity / 100  . ')",';
+    }
+
 
 
     //Time for levelshot stuff. Get the array from the file and explode it
@@ -2160,10 +2287,9 @@ $configBuffer = '<?php
 ///////////////////////////////
 
 // This is the configuration file for ParaTracker.
-// If you want to edit fonts and colors, they are found
+// If you want to edit fonts and colors, you should edit them
 // in the css files found in the /skins folder.
-// You can change the skin used in static mode here and override a few
-// colors, but there are no other visual settings.
+// The visual settings found here are overrides only and should be used with caution!
 
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
@@ -2215,6 +2341,8 @@ $refreshTimeout = "3";
 // VISUAL SETTINGS
 // VISUAL SETTINGS
 
+// These settings are OVERRIDES ONLY. Use with caution!
+
 // This line specifies which skin file to load. Skins are found in the skins/ folder, and they are all
 // simple CSS files. The name is case sensitive.
 // ParaTracker will automatically search in the skins/ folder for the file specified, and it will automatically
@@ -2233,12 +2361,6 @@ $backgroundColor = "";
 // Default value is "100".
 $backgroundOpacity = "100";
 
-// This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
-// It will not change the color of server names, mod names, map names, or player names.
-// The skin chosen will already have it\'s own color; this value will override it, if desired.
-// Default value is "".
-$textColor = "";
-
 // This is a 6 character hexadecimal value that specifies the color of the odd rows on the player list.
 // The skin chosen will already have it\'s own color; this value will override it, if desired.
 // Default value is "".
@@ -2256,6 +2378,17 @@ $playerListColor2 = "";
 // This value is a percentage, from 0 to 100, of how opaque the color of the even rows on the player list will be.
 // Default value is "100".
 $playerListColor2Opacity = "100";
+
+// This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
+// It will not change the color of server names, mod names, map names, or player names.
+// The skin chosen will already have it\'s own color; this value will override it, if desired.
+// Default value is "".
+$textColor = "";
+
+// This value specifies a font to be used on the tracker page. Font families are also accepted.
+// Make sure you use a common font so everyone can see it!
+// Default value is "".
+$customFont = "";
 
 
 // LEVELSHOT SETTINGS
@@ -2319,6 +2452,11 @@ $maximumLevelshots = "20";
 
 // TRACKER SETTINGS
 // TRACKER SETTINGS
+
+// This value is boolean. When this variable is set to Yes or 1, the game name will be displayed
+// in the tracker. Otherwise, it will be hidden.
+// Default is 1.
+$displayGameName = "1";
 
 // This value is boolean. When this variable is set to Yes or 1, offending symbols will be
 // filtered from the server name. Frequently, people will put unreadable symbols into their

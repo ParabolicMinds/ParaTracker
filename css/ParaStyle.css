@@ -45,7 +45,7 @@ font-family: monospace;
 color: #EEEEEE;
 }
 
-/* This class is for the "Generate!" button on ParaTrackerDynamic.php */
+/* This class is for the buttons on ParaTrackerDynamic.php */
 .dynamicFormButtonsStyle
 {
 background-color: #292929;
@@ -53,6 +53,16 @@ cursor: pointer;
 color: #EEEEEE;
 font-family: inherit;
 font-size: 12pt;
+border: 1px solid #369;
+}
+
+/* This class is for the buttons on ParaTrackerDynamic.php */
+.dynamicFormButtonsStyle:hover
+{
+color: #F63;
+background: linear-gradient(to bottom, #990, #DD0, #990);
+text-shadow: -1px 1px #000000;
+border: 1px solid #900;
 }
 
 /* This class is used to center the list of supported games on ParaTrackerDynamic.php */
@@ -64,11 +74,10 @@ text-align: center;
 width: 500px;
 }
 
-/* This class is for the "Generate!" button on ParaTrackerDynamic.php */
+/* This class is for the buttons on ParaTrackerDynamic.php */
 .dynamicFormButtons
 {
 padding: 10px 10px;
-border: 1px;
 cursor: pointer;
 }
 
@@ -251,7 +260,7 @@ BITVALUE CALCULATOR CLASSES
 
 
 #bitflags_top {
-	width: 600px;
+	width: 750px;
 	height: 600px;
 	display: flex;
 	flex-direction: column;
