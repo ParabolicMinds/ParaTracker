@@ -317,8 +317,8 @@ overflow: hidden;
 background: linear-gradient(#1C1C1C, #1C1C1C, #1C1C1C, #000000, #000000);
 font-family: monospace;
 color: #EFEFEF;
-padding-top: 10px;
-padding-bottom: 10px;
+padding-top: 6px;
+padding-bottom: 6px;
 padding-left: 13px;
 padding-right: 5px;
 }
@@ -329,8 +329,8 @@ padding-right: 5px;
 background: linear-gradient(#333333, #333333, #333333, #222222, #222222);
 font-family: monospace;
 color: #EFEFEF;
-padding-top: 10px;
-padding-bottom: 10px;
+padding-top: 6px;
+padding-bottom: 6px;
 padding-left: 13px;
 padding-right: 5px;
 }

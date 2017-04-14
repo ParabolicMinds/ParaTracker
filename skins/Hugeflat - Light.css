@@ -318,8 +318,8 @@ background: linear-gradient(#BBBBBB, #BBBBBB, #BBBBBB, #AAAAAA, #AAAAAA);
 background-color: #BBBBBB;
 font-family: monospace;
 color: #000000;
-padding-top: 10px;
-padding-bottom: 10px;
+padding-top: 6px;
+padding-bottom: 6px;
 padding-left: 13px;
 padding-right: 5px;
 }
@@ -331,8 +331,8 @@ background: linear-gradient(#BBBBBB, #BBBBBB, #BBBBBB, #AAAAAA, #AAAAAA);
 background-color: #CCCCCC;
 font-family: monospace;
 color: #000000;
-padding-top: 10px;
-padding-bottom: 10px;
+padding-top: 6px;
+padding-bottom: 6px;
 padding-left: 13px;
 padding-right: 5px;
 }
