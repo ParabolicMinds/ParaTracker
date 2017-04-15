@@ -317,8 +317,8 @@ background: linear-gradient(#BBBBBB, #BBBBBB, #BBBBBB, #AAAAAA, #AAAAAA);
 background-color: #BBBBBB;
 font-family: monospace;
 color: #000000;
-padding-top: 10px;
-padding-bottom: 10px;
+padding-top: 6px;
+padding-bottom: 6px;
 padding-left: 13px;
 padding-right: 5px;
 }
@@ -330,8 +330,8 @@ background: linear-gradient(#BBBBBB, #BBBBBB, #BBBBBB, #AAAAAA, #AAAAAA);
 background-color: #CCCCCC;
 font-family: monospace;
 color: #000000;
-padding-top: 10px;
-padding-bottom: 10px;
+padding-top: 6px;
+padding-bottom: 6px;
 padding-left: 13px;
 padding-right: 5px;
 }
@@ -1034,9 +1034,9 @@ The following values are used for colorizing things like player names and the se
 
 .color0
 /* Black (Gray is used for readability)
-Default is #6F6F6F */
+Default is #141414 */
 {
-color: #6F6F6F;
+color: #141414;
 }
 
 .color1
@@ -1065,6 +1065,7 @@ color: #FFFF00;
 Default is #2222FF */
 {
 color: #2222FF;
+font-weight: bold;
 }
 
 .color5
@@ -1086,21 +1087,20 @@ color: #FF00FF;
 Default is #FFFFFF */
 {
 color: #FFFFFF;
-text-shadow: -1px 1px #444444;
 }
 
 .color8
 /* Orange
-Default is #FF4400 */
+Default is #FF6605 */
 {
-color: #FF4400;
+color: #FF6605;
 }
 
 .color9
 /* Gray
-Default is #8A8A8A */
+Default is #5E5E5E */
 {
-color: #8A8A8A;
+color: #5E5E5E;
 }
 
 

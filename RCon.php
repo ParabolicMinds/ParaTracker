@@ -56,20 +56,13 @@ else
     }
 
     $output .= '<form action="RCon.php';
+    $output .= '?ip=' . serverIPAddress;
+    $output .= '&port=' . serverPort;
+    $output .= '&skin=' . paraTrackerSkin;
 
-    if(isset($_GET["ip"]))
+    if(isset($_GET["customSkin"]))
     {
-        $output .= '?ip=' . ipAddressValidator($_GET["ip"], "", $dynamicTrackerEnabled);
-
-        if(isset($_GET["port"]))
-        {
-            $output .= '&port=' . numericValidator($_GET["port"], 1, 65535, 29070);
-        }
-
-        if(isset($_GET["skin"]))
-        {
-            $output .= '&skin=' . skinValidator($_GET["skin"]);
-        }
+        $output .= '&customSkin=' . customSkin;
     }
 
     $output .= '" method="post" onsubmit="disableRConForm()">

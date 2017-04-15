@@ -3,11 +3,11 @@ function param_window()
 {
 	if (newWindowSnapToCorner == "1")
 	{
-	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700,left=0,top=0");
+	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin + "&customSkin=" + customSkin, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700,left=0,top=0");
 	}
 	else
 	{
-	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700");
+	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin + "&customSkin=" + customSkin, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700");
 	}
 }
 
@@ -16,11 +16,11 @@ function rcon_window()
 {
 	if (newWindowSnapToCorner == "1")
 	{
-		rconWindow = window.open("RCon.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin, "rconWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375,left=0,top=0");
+		rconWindow = window.open("RCon.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin + "&customSkin=" + customSkin, "rconWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375,left=0,top=0");
 	}
 	else
 	{
-		rconWindow = window.open("RCon.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin, "rconWindow" ,"resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375");
+		rconWindow = window.open("RCon.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin + "&customSkin=" + customSkin, "rconWindow" ,"resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=780,height=375");
 	}
 }
 
@@ -82,15 +82,21 @@ function detectLevelshotClasses()
 //Let's detect all levelshot transition animation classes currently in memory.
 //If levelshot transitions are set to random, we'll pick one at random from this list.
 
+    var sheet = "";
+
     for (sheeti = 0; sheeti < document.styleSheets.length; sheeti++)
     {
       sheet = document.styleSheets[sheeti]
-      for (rulei = 0; rulei < sheet.cssRules.length; rulei++)
-        {
-            rule = sheet.cssRules[rulei]
-            if (rule.cssText.substring(0, 10) == "@keyframes" && rule.name.substring(0, 19) == "levelshotTransition")
+
+      if(sheet.cssRules)
+      {
+        for (rulei = 0; rulei < sheet.cssRules.length; rulei++)
             {
-                animationList.push(rule.name)
+                rule = sheet.cssRules[rulei]
+                if (rule.cssText.substring(0, 10) == "@keyframes" && rule.name.substring(0, 19) == "levelshotTransition")
+                {
+                    animationList.push(rule.name)
+                }
             }
         }
     }
@@ -148,14 +154,23 @@ function bitValueClick(cvarName)
 
 function expandContractDiv(divID)
 {
-    if (document.getElementById(divID).className == "collapsedFrame")
+    var test = document.getElementById(divID).className
+        test = test.replace("  ", " ")
+
+    if (test.search("collapsedFrame") > -1)
     {
-        document.getElementById(divID).className = "expandedFrame"
+        test = test.replace("collapsedFrame", "")
+        test = test.replace("expandedFrame", "")
+        test += " expandedFrame"
     }
     else
     {
-        document.getElementById(divID).className = "collapsedFrame"
+        test = test.replace("collapsedFrame", "")
+        test = test.replace("expandedFrame", "")
+        test += " collapsedFrame"
     }
+    test = test.replace("  ", " ")
+    document.getElementById(divID).className = test
 }
 
 function expandBitValueCalculator()
@@ -264,10 +279,21 @@ function toggleTextureBackground()
 
 function createURL()
 {
+    if(document.getElementById("skinID").value == "Custom")
+    {
+        document.getElementById("externalSkinFile").className = "customSkinSelections expandedFrame";
+    }
+    else
+    {
+        document.getElementById("externalSkinFile").className = "customSkinSelections collapsedFrame";
+    }
+
+
     if(document.getElementById("IPAddress").value == "")
     {
         document.getElementById("finalURL").value = "Please enter an IP address!";
         document.getElementById("finalURLHTML").value = "Please enter an IP address!";
+        return;
     }
     else
     {
@@ -275,12 +301,15 @@ function createURL()
         {
             document.getElementById("finalURL").value = "Please enter a port number!";
             document.getElementById("finalURLHTML").value = "Please enter a port number!";
+            return;
         }
         else
         {
     var outputURL = "http://";
     var width = "";
     var height = "";
+//    var skinWidth = "";
+    var skinHeight = "";
     var skinFile = "";
     var skinFieldValue = "";
     var backgroundColor = "";
@@ -313,12 +342,64 @@ function createURL()
 
     outputURL += "&skin=";
 
-    skinFieldValue = document.getElementById("skinID").value;
-    skinFieldValue = skinFieldValue.split(":#:");
-    skinFile = skinFieldValue[0];
+    if(document.getElementById("skinID").value == "Custom")
+    {
+        if(document.getElementById("customSkin").value == "")
+        {
+            document.getElementById("finalURL").value = "Please enter a custom skin file!";
+            document.getElementById("finalURLHTML").value = "Please enter a custom skin file!";
+        }
 
-    skinWidth = skinFieldValue[1];
-    skinHeight = skinFieldValue[2];
+        skinFile = document.getElementById("skinID").value + "&customSkin=" + document.getElementById("customSkin").value;
+
+        if(document.getElementById("customWidth").value != "")
+        {
+            if(isNaN(document.getElementById("customWidth").value))
+            {
+                document.getElementById("finalURL").value = "Invalid custom width!";
+                document.getElementById("finalURLHTML").value = "Invalid custom width!";
+            }
+            else
+            {
+                skinWidth = document.getElementById("customWidth").value;
+            }
+
+            if(document.getElementById("customHeight").value != "")
+            {
+                if(isNaN(document.getElementById("customHeight").value))
+                {
+                    document.getElementById("finalURL").value = "Invalid custom height!";
+                    document.getElementById("finalURLHTML").value = "Invalid custom height!";
+                }
+                else
+                {
+                    skinHeight = document.getElementById("customHeight").value;
+                }
+            }
+            else
+            {
+                document.getElementById("finalURL").value = "Please enter a custom height!";
+                document.getElementById("finalURLHTML").value = "Please enter a custom height!";
+                return;
+            }
+
+        }
+        else
+        {
+            document.getElementById("finalURL").value = "Please enter a custom width!";
+            document.getElementById("finalURLHTML").value = "Please enter a custom width!";
+            return;
+        }
+    }
+    else
+    {
+        skinFieldValue = document.getElementById("skinID").value;
+        skinFieldValue = skinFieldValue.split(":#:");
+        skinFile = skinFieldValue[0];
+
+        skinWidth = skinFieldValue[1];
+        skinHeight = skinFieldValue[2];
+    }
 
     outputURL += skinFile;
 
@@ -406,7 +487,7 @@ function checkForOtherValue()
 
 function testURL()
 {
-window.open(outputURL);
+    window.open(outputURL);
 }
 
 function clearOutputFields()

@@ -43,7 +43,10 @@ $playerListColor1Opacity = "100";
 $playerListColor2 = "";
 $playerListColor2Opacity = "100";
 $customFont = "";
+$customSkin = "";
 $geoipCountryCode = "";
+$paraTrackerSkin = "";
+
 
 define("defaultSkin", $defaultSkin);
 
@@ -112,16 +115,23 @@ $dynamicTrackerCalledFromCorrectFile = booleanValidator($dynamicTrackerCalledFro
 $dynamicTrackerEnabled = booleanValidator($dynamicTrackerEnabled, 0);
 $personalDynamicTrackerMessage = stringValidator($personalDynamicTrackerMessage, "", "");
 
-if($dynamicTrackerEnabled == "1" && $dynamicTrackerCalledFromCorrectFile == "1")
+if($dynamicTrackerCalledFromCorrectFile == "1")
 {
-    if(isset($_GET["ip"]))
+    if($dynamicTrackerEnabled == "1")
     {
-        $serverIPAddress = $_GET["ip"];
+        if(isset($_GET["ip"]))
+        {
+            $serverIPAddress = $_GET["ip"];
+        }
+        else
+        {
+        //Terminate the script with an instruction page if no IP address was given!
+            $executeDynamicInstructionsPage = "1";
+        }
     }
     else
     {
-    //Terminate the script with an instruction page if no IP address was given!
-        $executeDynamicInstructionsPage = "1";
+        displayError("ParaTracker Dynamic mode is disabled! Dynamic mode must be enabled in ParaConfig.php.", "");
     }
 
     if($executeDynamicInstructionsPage == "0")
@@ -163,22 +173,12 @@ if($executeDynamicInstructionsPage == "0")
     //The port must be validated first, because it is used in IP address validation.
     $serverPort = numericValidator($serverPort, 1, 65535, 29070);
     $serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
-}
 
-//If the skin parameter is not set, we need to set it to the default value
-if($executeDynamicInstructionsPage == "0")
-{
-    if(isset($paraTrackerSkin))
-    {
-        $paraTrackerSkin = skinValidator($paraTrackerSkin);
-    }
-    else
-    {
-        $paraTrackerSkin = skinValidator($defaultSkin);
-    }
+    $paraTrackerSkin = skinValidator($paraTrackerSkin, $customSkin);
 }
 else
 {
+    //This line prevents a skin file from being mistakenly applied to the dynamic instructions page.
     $paraTrackerSkin = "";
 }
 
@@ -188,8 +188,19 @@ if($dynamicTrackerCalledFromCorrectFile == "1" || $calledFromParam == "1" || $ca
     //We are running in Dynamic mode. Check to see if a skin file was specified in the URL.
     if(isset($_GET["skin"]))
     {
-        //A skin was specified - load it in and validate it.
-        $paraTrackerSkin = skinValidator(rawurldecode($_GET["skin"]));
+        //A skin was specified - load it in.
+        $paraTrackerSkin = rawurldecode($_GET["skin"]);
+
+        if(trim(strtolower($paraTrackerSkin)) == "custom" && isset($_GET["customSkin"]))
+        {
+            //A custom skin was specified - load it in as well.
+            $customSkin = rawurldecode($_GET["customSkin"]);
+            $customSkin = skinValidator($paraTrackerSkin, $customSkin);
+        }
+        else
+        {
+            $paraTrackerSkin = skinValidator($paraTrackerSkin, "");
+        }
     }
 }
 
@@ -383,6 +394,7 @@ define("playerListColor1Opacity", $playerListColor1Opacity);
 define("playerListColor2", $playerListColor2);
 define("playerListColor2Opacity", $playerListColor2Opacity);
 define("customFont", $customFont);
+define("customSkin", $customSkin);
 
 
 if($executeDynamicInstructionsPage == "1")
@@ -700,20 +712,22 @@ function removeOffendingServerNameCharacters($input)
         //The following line trims leading white space
         $input = ltrim($input);
 
-        //The following line removes whatever this nonsense is: ¬â‚
-        $input = ltrim($input, "¬â‚");
+        //This is an array of garbage characters to be removed
+        $filterArray = array("¬â‚", "€", "â", "¬");
 
-        //The following line removes the Euro symbol, €
-        $input = ltrim($input, "€");
+        $count = count($filterArray);
 
-        //The following line removes whatever this is: â
-        $input = ltrim($input, "â");
+        //Loop forward
+        for($i = 0; $i < $count; $i++)
+        {
+            $input = ltrim($input, $filterArray[$i]);
+        }
 
-        //The following line removes whatever this is: ¬
-        $input = ltrim($input, "¬");
-
-        //Any additional filters go here
-
+        //Loop backward
+        for($i = $count - 1; $i < 0; $i--)
+        {
+            $input = ltrim($input, $filterArray[$i]);
+        }
 
         //The following line trims remaining white space
         $input = ltrim($input);
@@ -903,7 +917,6 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			if($c > 2) $c = 1;
 		}
 		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
-		$buf = htmlDeclarations("Server CVars", "") . $buf;
 
 		$buf3 .= '],';
 		file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
@@ -1098,6 +1111,7 @@ function passConfigValuesToJavascript()
 		var serverIPAddress = "' . serverIPAddress . '";
 		var serverPort = "' . serverPort . '";
 		var paraTrackerSkin = "' . paraTrackerSkin . '";
+		var customSkin = "' . customSkin . '";
 		</script>';
 
     return($output);
@@ -1357,31 +1371,57 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 return $input;
 }
 
-function skinValidator($paraTrackerSkin)
+function skinValidator($paraTrackerSkin, $customSkin)
 {
+    //First and foremost, we'll check custom skins first, to avoid unnecessary error messages.
+    if(trim(strtolower($paraTrackerSkin)) == "custom" && $customSkin != "")
+    {
+        $customSkin = trim($customSkin);
+        //If an external skin file was specified, we need to check for double quotes to prevent exploits.
+        if(substr(strtolower($customSkin), -4) == ".css")
+        {
+            $customSkin = substr($customSkin, 0, count($customSkin) - 5);
+        }
+
+        if(strpos($customSkin, '"') !== 0)
+        {
+            return $customSkin;
+        }
+        else
+        {
+            echo " Double quotes can not be used in a custom skin path! Ignoring... ";
+            $customSkin == "";
+        }
+    }
+
     //Prevent slashes, periods, and colons. This will stop people from adding a file extension, a URL, or a ../ into the file name
     if(strpos($paraTrackerSkin, ".") !== false ||strpos($paraTrackerSkin, "/") !== false ||strpos($paraTrackerSkin, "\\") !== false ||strpos($paraTrackerSkin, ":") !== false)
     {
-        echo " Invalid skin specified! Slashes, colons, and periods are forbidden in skin file names. Assuming default skin. ";
+        echo " Invalid skin specified! Slashes, colons, and periods are forbidden in skin file names. Assuming default skin... ";
+        $paraTrackerSkin = defaultSkin;
+    }
+
+    if(strtolower($paraTrackerSkin) == "json" || strtolower($paraTrackerSkin) == "custom")
+    {
+        echo " '". $paraTrackerSkin . "' is a reserved value, and cannot be used as a skin name! Assuming default skin...  ";
         $paraTrackerSkin = defaultSkin;
     }
 
     $paraTrackerSkin = stringValidator($paraTrackerSkin, "", defaultSkin);
 
-    if(!file_exists("skins/" . $paraTrackerSkin . ".css") && strtolower($paraTrackerSkin) != "json")
+    if(!file_exists("skins/" . $paraTrackerSkin . ".css"))
     {
+        echo " Invalid skin specified! Skin names must have a lowercase file extension, cannot have slashes ( '\' or '/' ) and must refer to an actual CSS file. Assuming default skin... ";
         $paraTrackerSkin = defaultSkin;
-        echo " Invalid skin specified! Skin names must have a lowercase file extension, cannot have slashes ( '\' or '/' ) and must refer to an actual CSS file. Assuming default skin. ";
 
-        if(!file_exists("skins/" . defaultSkin . ".css"))
+        if(!file_exists("skins/" . $paraTrackerSkin . ".css"))
         {
-            displayError("Invalid skin specified!<br />Default skin could not be found!", $lastRefreshTime);
+            displayError(" Invalid skin specified!\nDefault skin could not be found! ", $lastRefreshTime);
         }
         else
         {
-        //Non-fatal error; revert to default skin and give a debug message.
+        //Non-fatal error; revert to default skin.
         $paraTrackerSkin = defaultSkin;
-        echo " Invalid skin specified! Assuming default skin. ";
         }
     }
     return $paraTrackerSkin;
@@ -1420,7 +1460,7 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
                 {
                     if ($cvarValue & (1 << $i))
                     {
-                        if($arrayList[$i] != "")
+                        if(trim($arrayList[$i]) != "")
                         {
                             //Make sure the value isn't blank before adding it. Otherwise we'll end up with spaces in the list.
                             $toBeExploded = "\n" . $arrayList[$i] . $toBeExploded;
@@ -1451,9 +1491,16 @@ function htmlDeclarations($pageTitle, $filePath)
     }
 
     //If a skin is defined, then include it here in the header
-    if(paraTrackerSkin != "")
+    if(paraTrackerSkin)
     {
-        $output .= '<link rel="stylesheet" href="skins/' . paraTrackerSkin . '.css" type="text/css" />';
+        if(strtolower(paraTrackerSkin) == "custom")
+        {
+            $output .= '<link rel="stylesheet" href="' . customSkin . '.css" type="text/css" />';
+        }
+        else
+        {
+            $output .= '<link rel="stylesheet" href="skins/' . paraTrackerSkin . '.css" type="text/css" />';
+        }
     }
 
     $output .= '<title>' . $pageTitle . '</title>
@@ -1643,11 +1690,11 @@ $output .= '<p class="collapsedFrame">Current page URL:<br /><input type="text" 
     $skinList = array("");
     $skinCount = 0;
 
-    //Loop through the array of stuff listed, and see if there's anything that matches the given game name
+    //Loop through the array of stuff given
     for($i = 2; $i < count($directoryList); $i++)
     {
-        //Ignore Template.css, json.css (which cannot exist), and make sure the file extension on the detected file is ".css"
-        if(strtolower($directoryList[$i]) != "template.css" && strtolower($directoryList[$i]) != "json.css" && substr(strtolower($directoryList[$i]), -4) == ".css")
+        //Ignore Template.css, json.css and custom.css (which cannot exist), and make sure the file extension on the detected file is ".css"
+        if(strtolower($directoryList[$i]) != "template.css" && strtolower($directoryList[$i]) != "custom.css" && strtolower($directoryList[$i]) != "json.css" && substr(strtolower($directoryList[$i]), -4) == ".css")
         {
             $skinList[$skinCount] = substr($directoryList[$i], 0, count($directoryList[$i]) - 5);
             $skinCount ++;
@@ -1717,7 +1764,28 @@ $output .= '<p class="collapsedFrame">Current page URL:<br /><input type="text" 
     }
 
     $output .= '<option value="JSON:#:800:#:800">JSON (Text-only response for clientside Javascript parsing)</option>';
-    $output .= '</select><br /><br /></h3>';
+    $output .= '<option value="Custom">Custom (External file and width/height must be specified)</option>';
+    $output .= '</select></h3><div id="externalSkinFile" class="customSkinSelections collapsedFrame">';
+
+        $output .= '<h3><span class="gameColor5">External file URL:<br /></span><input id="customSkin" maxlength="150" size="70" type="text" value="" placeholder="http://" onchange="createURL()" /></h3>';
+        $output .= '<h3><span class="gameColor5">Width: </span><input id="customWidth" maxlength="7" size="7" type="text" value="" placeholder="300" onchange="createURL()" />';
+        $output .= '&nbsp;&nbsp;&nbsp;<span class="gameColor5">Height: </span><input id="customHeight" maxlength="7" size="7" type="text" value="" placeholder="300" onchange="createURL()" /></h3><h4><span class="gameColor1">Warning:</span> <span class="gameColor3">ParaTracker cannot detect problems with custom skins!</span></h4>';
+
+        $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle" onclick="expandContractDiv(\'skinDownloadList\')">Downloadable skin list</a></p>';
+        $output .= '<div id="skinDownloadList" class="skinDownloadSelections collapsedFrame">';
+
+    //Loop through the array of stuff again, this time to assemble a downloadable list of skins
+    for($i = 2; $i < count($directoryList); $i++)
+    {
+        //Ignore json.css and custom.css (which cannot exist), and make sure the file extension on the detected file is ".css"
+        if(strtolower($directoryList[$i]) != "json.css" && strtolower($directoryList[$i]) != "custom.css" && substr(strtolower($directoryList[$i]), -4) == ".css")
+        {
+            $output .= '<a href="skins/' . rawurlencode($directoryList[$i]) . '" class="skinDownloadLink" download>' . $directoryList[$i] . '</a><br />';
+        }
+    }
+
+
+        $output .= '</div></div><br />';
 
     $output .= '<p><a onclick="expandContractDiv(' . "'colorSelections'" . ')" class="dynamicFormButtons dynamicFormButtonsStyle"> Show/Hide Visual Adjustments </a></p>';
 
@@ -1727,7 +1795,7 @@ $output .= '<p class="collapsedFrame">Current page URL:<br /><input type="text" 
     $output .= '<h2 class="gameColor3">Tracker Settings</h2>';
         $output .= '<p><input type="checkbox" id="displayGameName" onchange="createURL()" checked /> <span class="gameColor7">Display game name</span></p>';
 
-        $output .= '<p><input type="checkbox" id="filterOffendingServerNameSymbols" onchange="createURL()" checked /> <span class="gameColor7">Filter outrageous server names</span></p>';
+        $output .= '<p><input type="checkbox" id="filterOffendingServerNameSymbols" onchange="createURL()" checked /> <span class="gameColor7">Trim nonsense characters from server names</span></p>';
 
     if(enableAutoRefresh == "1")
     {
@@ -1743,16 +1811,16 @@ $output .= '<p class="collapsedFrame">Current page URL:<br /><input type="text" 
     {
 //        $output .= '<h4 class="gameColor3">Levelshot Transitions</h4>';
         $output .= '<p><input type="checkbox" id="levelshotsEnabled" onchange="createURL()" checked /> <span class="gameColor7">Enable levelshot transitions</span></p>';
-        $output .= '<span class="gameColor2">Display Time:&nbsp;</span><input id="levelshotDisplayTime" maxlength="5" size="3" type="text" value="" onchange="createURL()" />';
-        $output .= '&nbsp;&nbsp;&nbsp;<span class="gameColor1">Transition Time:&nbsp;</span><input id="levelshotTransitionTime" maxlength="5" size="3" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Times are given in seconds. Decimals are accepted.)</span>';
+        $output .= '<span class="gameColor2">Display Time:&nbsp;</span><input id="levelshotDisplayTime" maxlength="5" size="3" type="text" value="" placeholder="' . levelshotDisplayTime . '" onchange="createURL()" />';
+        $output .= '&nbsp;&nbsp;&nbsp;<span class="gameColor1">Transition Time:&nbsp;</span><input id="levelshotTransitionTime" maxlength="5" size="3" type="text" value="" placeholder="' . levelshotTransitionTime . '" onchange="createURL()" /><br /><span class="smallText">(Times are given in seconds. Decimals are accepted.)</span>';
     }
 
     $output .= '<h2 class="gameColor3">Colors</h2><h4>All colors are in hexadecimal (#123456).<br /><span class="smallText">These settings do not apply to JSON skins.</span></h4><p><span class="gameColor2">Background Color:</span>&nbsp;&nbsp;# <input id="backgroundColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
-    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="backgroundOpacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
+    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="backgroundOpacity" maxlength="3" size="3" type="text" value="" placeholder="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
     $output .= '<p><span class="gameColor0">Player List Color 1:</span>&nbsp;&nbsp;# <input id="playerListColor1" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
-    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor1Opacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
+    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor1Opacity" maxlength="3" size="3" type="text" value="" placeholder="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
     $output .= '<p><span class="gameColor9">Player List Color 2:</span>&nbsp;&nbsp;# <input id="playerListColor2" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
-    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor2Opacity" maxlength="3" size="3" type="text" value="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
+    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor2Opacity" maxlength="3" size="3" type="text" value="" placeholder="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
         $output .= '<h2><span class="gameColor3">Text</span><br /><span class="smallText">These settings do not apply to JSON skins.</span></h2>';
     $output .= '<p><span class="gameColor7">Text Color:</span>&nbsp;&nbsp;# <input id="textColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /><span class="gameColor7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Font:</span>&nbsp;&nbsp;<input id="font" maxlength="50" size="30" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Color changes do not affect colorized text)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Font families are also acceptable)</span></p>';
 

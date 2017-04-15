@@ -30,6 +30,6 @@ else
 //If it isn't, the response will end up being parsed from the old data anyhow.
 checkForAndDoUpdateIfNecessary();
 
-echo "-->" . file_get_contents("info/" . dynamicIPAddressPath . "param.txt");
+echo "-->" . htmlDeclarations("", "") . file_get_contents("info/" . dynamicIPAddressPath . "param.txt");
 
 ?>

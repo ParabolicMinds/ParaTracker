@@ -145,7 +145,7 @@ function jediacademy($cvars_hash, $cvars_hash_decolorized)
     //If you are adding a custom game, the stuff below is what to change.
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
-    $gametypeArray = array("FFA", "", "", "Duel", "Power Duel", "Team FFA", "Siege", "CTF");
+    $gametypeArray = array("FFA", "", "", "Duel", "Power Duel", "", "Team FFA", "Siege", "CTF");
 if(isset($cvars_hash_decolorized["g_gametype"]))
 {
     $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];

@@ -54,6 +54,7 @@ color: #EEEEEE;
 font-family: inherit;
 font-size: 12pt;
 border: 1px solid #369;
+user-select: none;
 }
 
 /* This class is for the buttons on ParaTrackerDynamic.php */
@@ -169,6 +170,43 @@ display: block;
 display: none;
 }
 
+.skinDownloadLink
+{
+color: #BBE;
+}
+
+.skinDownloadLink:hover
+{
+color: #E44;
+}
+
+.customSkinSelections
+{
+margin: 0 auto;
+margin-top: 30px;
+text-align: center;
+padding-left: 10px;
+padding-right: 10px;
+padding-top: 10px;
+padding-bottom: 10px;
+box-shadow: 0px 0px 20px #4F4, inset 0px 0px 10px #4F4;
+border: 2px solid #4F4;
+width: 600px;
+}
+
+.skinDownloadSelections
+{
+margin: 0 auto;
+margin-top: 30px;
+text-align: center;
+padding-left: 10px;
+padding-right: 10px;
+padding-top: 10px;
+padding-bottom: 10px;
+box-shadow: 0px 0px 20px #F22, inset 0px 0px 10px #F22;
+border: 2px solid #F22;
+width: 400px;
+}
 
 
 /* The following values are used for colorizing the list of supported games. */
@@ -395,7 +433,7 @@ BITVALUE CALCULATOR CLASSES
 
 .bitflags_container_flagcont_selected {
 	background-color: #333;
-	background: linear-gradient(to right, #363636, #444);
+	background: linear-gradient(to right, #404040, #555);
 }
 
 .bitflags_container_flagcont_selected:hover {
