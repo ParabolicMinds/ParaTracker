@@ -30,6 +30,13 @@ else
 //If it isn't, the response will end up being parsed from the old data anyhow.
 checkForAndDoUpdateIfNecessary();
 
-echo "-->" . htmlDeclarations("", "") . file_get_contents("info/" . dynamicIPAddressPath . "param.txt");
+if (file_exists("info/" . dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . dynamicIPAddressPath . "serverDump.txt") != "")
+{
+    echo "-->" . htmlDeclarations("", "") . file_get_contents("info/" . dynamicIPAddressPath . "param.txt");
+}
+else
+{
+    echo "-->" . htmlDeclarations("", "") . "</head><body><h3>Could not connect to game server!</h3><h4>" . $serverIPAddress . ":" . $serverPort . "</h4></body></html>";
+}
 
 ?>

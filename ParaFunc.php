@@ -1363,12 +1363,12 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
         if($dynamicTrackerEnabled == "0")
         {
             //We are in static mode, so ParaConfic.php is the problem
-            displayError("No server address specified in ParaConfig.php!", $lastRefreshTime);
+            displayError("No server address specified in ParaConfig.php!", "");
         }
         else
         {
             //We are in Dynamic mode, so the user did not give an address
-            displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Please specify an IP Address.', $lastRefreshTime);
+            displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Please specify an IP Address.', "");
         }
     }
 
@@ -1473,7 +1473,7 @@ function displayError($errorMessage, $lastRefreshTime)
     $errorMessage = '<!-- --><h3 class="errorMessage">' . $errorMessage . '</h3>';
 
     //Error detected and ParaTracker is terminating. Check to see if we have a file path and refresh time data.
-    if(dynamicIPAddressPath != "" && $lastRefreshTime != "")
+    if($lastRefreshTime != "" && dynamicIPAddressPath != "")
     {
         //We have a file path! Write the error message to a file, update both of the refresh timers, and terminate!
         file_put_contents("info/" . dynamicIPAddressPath . "errorMessage.txt", $errorMessage);
@@ -2021,7 +2021,7 @@ if ($RConPassword != "" && $RConCommand != "")
     return $output;
 }
 
-function renderNormalHTMLPage($gameName)
+function renderNormalHTMLPage()
 {
     $GeoIPInput = file_get_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt');
     if(enableGeoIP == 1 && $GeoIPInput != "")
