@@ -32,6 +32,7 @@ Function detectGameName($input)
 
             "CoD4" => "Call of Duty 4: Modern Warfare",
             "JAmp" => "Jedi Academy",
+            "galaxies" => "Jedi Knight Galaxies",
             "JK2MP" => "Jedi Outcast",
             "Q3" => "Quake III Arena",
             "Tremulous" => "Tremulous",
@@ -202,6 +203,11 @@ if(isset($cvars_hash["sv_maxclients"]))
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_duelWeaponDisable, $g_forcePowerDisable, $jp_councilAllowedCMD, $jp_knightAllowedCMD, $jp_instructorAllowedCMD, $jp_votesDisable, $jp_teamLock, $jp_emotDisallow, $jp_wordFilter);
 }
 
+function jediknightgalaxies($cvars_hash, $cvars_hash_decolorized)
+{
+    //Parsing Jedi Knight Galaxies is easy. Just call the JA function and return it.
+    return jediacademy($cvars_hash, $cvars_hash_decolorized);
+}
 
 function jedioutcast($cvars_hash, $cvars_hash_decolorized)
 {
