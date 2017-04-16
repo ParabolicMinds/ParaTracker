@@ -1062,7 +1062,7 @@ The following values are used for colorizing things like player names and the se
 Default is #141414 */
 {
 color: #141414;
-text-shadow: -1px 1px #EEE;
+text-shadow: -1px 1px #444;
 }
 
 .color1
