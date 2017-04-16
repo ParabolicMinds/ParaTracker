@@ -46,7 +46,7 @@ $customFont = "";
 $customSkin = "";
 $geoipCountryCode = "";
 $paraTrackerSkin = "";
-$displayGameName = "1";
+$displayGameName = "";
 
 define("defaultSkin", $defaultSkin);
 
@@ -743,22 +743,31 @@ function parseGameName($cvars_hash, $cvars_hash_decolorized, $lastRefreshTime)
     $gameName = "";
 
     //Most games use the 'version' variable to identify which game is running. Try that first.
-    $gameName = detectGameName($cvars_hash_decolorized["gamename"]);
-    if($gameName == false)
+    if(isset($cvars_hash_decolorized["gamename"]) && $cvars_hash_decolorized["gamename"] != "")
+    {
+        $gameName = detectGameName($cvars_hash_decolorized["gamename"]);
+    }
+    if($gameName == "")
     {
         //Some games, like Jedi Academy and Jedi Outcast, use a 'version' variable to identify the game. Try that next.
         //This can only be checked for AFTER the 'gamename' variable, because some games use both variables.
-        $gameName = detectGameName($cvars_hash_decolorized["version"]);
-        if($gameName == false)
+        if(isset($cvars_hash_decolorized["version"]) && $cvars_hash_decolorized["version"] != "")
+        {
+            $gameName = detectGameName($cvars_hash_decolorized["version"]);
+        }
+        if($gameName == "")
         {
             //Tremulous uses 'com_gamename' to identify the game. Try that next.
+            if(isset($cvars_hash_decolorized["com_gamename"]) && $cvars_hash_decolorized["com_gamename"] != "")
+            {
 	            $gameName = detectGameName($cvars_hash_decolorized["com_gamename"]);
+            }
 	    }
     }
 
 if($gameName == "")
 {
-    displayError("The game name could not be detected!", $lastRefreshTime);
+    return "Unrecognized Game";
 }
 
 return $gameName;
