@@ -46,7 +46,7 @@ $customFont = "";
 $customSkin = "";
 $geoipCountryCode = "";
 $paraTrackerSkin = "";
-
+$displayGameName = "1";
 
 define("defaultSkin", $defaultSkin);
 
@@ -1375,8 +1375,16 @@ return $input;
 
 function skinValidator($paraTrackerSkin, $customSkin)
 {
+    $paraTrackerSkin = trim($paraTrackerSkin);
+    $customSkin = trim($customSkin);
+
+    if(strtolower($paraTrackerSkin) == "json")
+    {
+        return "json";
+    }
+
     //First and foremost, we'll check custom skins first, to avoid unnecessary error messages.
-    if(trim(strtolower($paraTrackerSkin)) == "custom" && $customSkin != "")
+    if(strtolower($paraTrackerSkin) == "custom" && $customSkin != "")
     {
         $customSkin = trim($customSkin);
         //If an external skin file was specified, we need to check for double quotes to prevent exploits.
@@ -1403,7 +1411,7 @@ function skinValidator($paraTrackerSkin, $customSkin)
         $paraTrackerSkin = defaultSkin;
     }
 
-    if(strtolower($paraTrackerSkin) == "json" || strtolower($paraTrackerSkin) == "custom")
+    if(strtolower($paraTrackerSkin) == "custom")
     {
         echo " '". $paraTrackerSkin . "' is a reserved value, and cannot be used as a skin name! Assuming default skin...  ";
         $paraTrackerSkin = defaultSkin;
