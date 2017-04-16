@@ -767,7 +767,25 @@ function parseGameName($cvars_hash, $cvars_hash_decolorized, $lastRefreshTime)
 
 if($gameName == "")
 {
-    return "Unrecognized Game";
+    $error = "";
+    if(isset($cvars_hash_decolorized["gamename"]))
+    {
+        $error .= "<br />gamename: " . $cvars_hash_decolorized["gamename"];
+    }
+    if(isset($cvars_hash_decolorized["gamename"]))
+    {
+        $error .= "<br />version: " . $cvars_hash_decolorized["version"];
+    }
+    if(isset($cvars_hash_decolorized["com_gamename"]))
+    {
+        $error .= "<br />com_gamename: " . $cvars_hash_decolorized["com_gamename"];
+    }
+    if($error == "")
+    {
+        $error = "No data!";
+    }
+
+    displayError("Unrecognized Game:" . $error, $lastRefreshTime);
 }
 
 return $gameName;
