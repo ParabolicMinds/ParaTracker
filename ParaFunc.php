@@ -824,7 +824,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 		    //Parse the arrays into variables named after the CVars
 		    for($i = 0; $i < count($BitFlagsIndex); $i++)
 		    {
-	            $$BitFlagsIndex[$i] = $BitFlags[$i];
+	            ${$BitFlagsIndex[$i]} = $BitFlags[$i];
 		    }
 		}
 		else
@@ -873,7 +873,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			        if($cvar['name'] == strtolower($BitFlagsIndex[$i]))
 			        {
 			            $foundMatch = 1;
-			            $returnArray = bitvalueCalculator($cvar['name'], $cvar['value'], $$BitFlagsIndex[$i]);
+			            $returnArray = bitvalueCalculator($cvar['name'], $cvar['value'], ${$BitFlagsIndex[$i]});
 			            array_shift($returnArray);
 
 			            $buf .= '<div class="CVarExpandList" onclick="bitValueClick(' . "'" . $cvar['name'] . "'" .  ')"><i><b>' . $cvar['value'] . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i><div id="' . $cvar['name'] .  '" class="collapsedList"><br />';
@@ -892,7 +892,7 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 			                $buf .= '<i>None</i>';
 			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":[""]}';
 			            }
-			            elseif ($cvar['value'] >= pow(2, count($$BitFlagsIndex[$i])))
+			            elseif ($cvar['value'] >= pow(2, count(${$BitFlagsIndex[$i]})))
 			            {
 			                //Miscount detected! Array does not have enough values
 			                $buf .= "<br />Miscount detected! Not enough values in the array for " . $cvar['name'] . ". Check GameInfo.php and add the missing values!</i></div></div>";
@@ -1093,6 +1093,8 @@ function levelshotJavascriptAndCSS()
     var animationList = []; //This initializes an array to be used for detecting the number of levelshot transitions
 
     var levelshots = "' . file_get_contents('info/' . dynamicIPAddressPath . 'levelshots.txt') . '";
+
+    var filterOffendingServerNameSymbols = "' . filterOffendingServerNameSymbols . '";
 
     levelshots = levelshots.split(":#:");
     var maxLevelshots = levelshots.length;

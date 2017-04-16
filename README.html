@@ -337,6 +337,8 @@ If you find a bug, report it at:
 &bull; New options added to dynamic mode. Users can disable auto refresh, disable the game name, disable server name filtering, disable levelshot transitions, adjust the levelshot display and transition times, and specify a font or font family.<br />
 &bull; Dynamic mode will now allow users to use an external CSS skin file. All skin files loaded onto ParaTracker can be downloaded and modified to the user's liking.<br />
 &bull; Fixed a bug where enabling GeoIP without having it installed broke the tracker (Thanks, <span class="red">Cagelight</span>).<br />
+&bull; Fixed the array to string conversion error messages. The error was caused by PHP updating how it handles variable variables.<br />
+&bull; Fixed a bug in the levelshot code that caused levelshots to fail in Safari.<br />
 &bull; Removed the &quot;Current page URL&quot; line from the dynamic setup page, since it served no visual purpose.<br />
 &bull; Added g_duelWeaponDisable to Jedi Academy's bit flags.<br />
 </p>

@@ -3,11 +3,11 @@ function param_window()
 {
 	if (newWindowSnapToCorner == "1")
 	{
-	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin + "&customSkin=" + customSkin, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700,left=0,top=0");
+	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin + "&customSkin=" + customSkin + "&filterOffendingServerNameSymbols=" + filterOffendingServerNameSymbols, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700,left=0,top=0");
 	}
 	else
 	{
-	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin + "&customSkin=" + customSkin, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700");
+	    paramWindow = window.open("Param.php?ip=" + serverIPAddress + "&port=" + serverPort + "&skin=" + paraTrackerSkin + "&customSkin=" + customSkin + "&filterOffendingServerNameSymbols=" + filterOffendingServerNameSymbols, "paramWindow", "resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=600,height=700");
 	}
 }
 
@@ -37,11 +37,11 @@ function animateLevelshot()
 
         if(levelshotTransitionAnimation == "0")
         {
-            document.getElementById("topLayerFade").style = originalStyleData + "animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: " + animationList[Math.floor((Math.random() * animationList.length))] + ";";
+            document.getElementById("topLayerFade").style.cssText = originalStyleData + " animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: " + animationList[Math.floor((Math.random() * animationList.length))] + ";";
         }
         else
         {
-            document.getElementById("topLayerFade").style = originalStyleData + "animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: levelshotTransition" + levelshotTransitionAnimation + ";";
+            document.getElementById("topLayerFade").style.cssText = originalStyleData + " animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: levelshotTransition" + levelshotTransitionAnimation + ";";
         }
         timer = setTimeout("swapLevelshots()", levelshotTransitionTime * 1000);
     }
@@ -59,10 +59,10 @@ function swapLevelshots()
 
         if(shot > maxLevelshots) shot = 1;
         {
-            document.getElementById("topLayerFade").style = document.getElementById("bottomLayerFade").style.cssText;
-            document.getElementById("bottomLayerFade").style = document.getElementById("levelshotPreload1").style.cssText;
-            document.getElementById("levelshotPreload1").style = document.getElementById("levelshotPreload2").style.cssText;
-            document.getElementById("levelshotPreload2").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+            document.getElementById("topLayerFade").style.cssText = document.getElementById("bottomLayerFade").style.cssText;
+            document.getElementById("bottomLayerFade").style.cssText = document.getElementById("levelshotPreload1").style.cssText;
+            document.getElementById("levelshotPreload1").style.cssText = document.getElementById("levelshotPreload2").style.cssText;
+            document.getElementById("levelshotPreload2").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
 
             originalStyleData = "";
             opac = 1;
@@ -108,20 +108,20 @@ function firstExecution()
    if (maxLevelshots > 1 && allowTransitions == 1);
         {
             detectLevelshotClasses();
-            document.getElementById("topLayerFade").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+            document.getElementById("topLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
             shot++;
-            document.getElementById("bottomLayerFade").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+            document.getElementById("bottomLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
  
             //let's set up a pre-loader in case there are more than 2 levelshots
             shot++;
             //In case there are only two levelshots, then we will just go back to shot 1
             if(shot > maxLevelshots) shot = 1;
-            document.getElementById("levelshotPreload1").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+            document.getElementById("levelshotPreload1").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
 
             shot++;
             //In case there are only three levelshots, then we will just go back to shot 1
             if(shot > maxLevelshots) shot = 1;
-            document.getElementById("levelshotPreload2").style = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+            document.getElementById("levelshotPreload2").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
  
             opac = 1;
             count = 0;
@@ -348,6 +348,7 @@ function createURL()
         {
             document.getElementById("finalURL").value = "Please enter a custom skin file!";
             document.getElementById("finalURLHTML").value = "Please enter a custom skin file!";
+            return;
         }
 
         skinFile = document.getElementById("skinID").value + "&customSkin=" + document.getElementById("customSkin").value;
@@ -356,8 +357,9 @@ function createURL()
         {
             if(isNaN(document.getElementById("customWidth").value))
             {
-                document.getElementById("finalURL").value = "Invalid custom width!";
-                document.getElementById("finalURLHTML").value = "Invalid custom width!";
+                document.getElementById("finalURL").value = "Invalid custom skin width!";
+                document.getElementById("finalURLHTML").value = "Invalid custom skin width!";
+                return;
             }
             else
             {
@@ -368,8 +370,9 @@ function createURL()
             {
                 if(isNaN(document.getElementById("customHeight").value))
                 {
-                    document.getElementById("finalURL").value = "Invalid custom height!";
-                    document.getElementById("finalURLHTML").value = "Invalid custom height!";
+                    document.getElementById("finalURL").value = "Invalid custom skin height!";
+                    document.getElementById("finalURLHTML").value = "Invalid custom skin height!";
+                    return;
                 }
                 else
                 {
