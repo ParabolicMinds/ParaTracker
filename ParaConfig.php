@@ -281,6 +281,26 @@ $enableGeoIP = "0";
 $geoIPPath = "";
 
 
+// POSTGRESQL SETTINGS
+// POSTGRESQL SETTINGS
+
+// Default is 0
+$enablePGSQL = "0";
+
+// Default is "postgres"
+$pgUser = "postgres";
+
+// Default is ""
+$pgPass = "";
+
+// Default is "paratracker"
+$pgName = "paratracker";
+
+// Default is "localhost"
+$pgHost = "localhost";
+
+// Default is "" (uses the default port of pg_connect)
+$pgPort = ""
 
 // End of config file
 
