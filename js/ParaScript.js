@@ -411,7 +411,11 @@ function createURL()
     outputURL += "&displayGameName=" + document.getElementById("displayGameName").checked;
     outputURL += "&enableAutoRefresh=" + document.getElementById("enableAutoRefresh").checked;
     outputURL += "&levelshotsEnabled=" + document.getElementById("levelshotsEnabled").checked;
-    outputURL += "&enableGeoIP=" + document.getElementById("enableGeoIP").checked;
+
+    if(document.getElementById("enableGeoIP"))
+    {
+        outputURL += "&enableGeoIP=" + document.getElementById("enableGeoIP").checked;
+    }
 
     if(document.getElementById("levelshotDisplayTime").value != "")
     {

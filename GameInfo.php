@@ -40,17 +40,48 @@ Function detectGameName($input)
 
             );
 
-
             //Was this function called with no input? If so, we need to simply return the list of supported games, and do nothing else.
             //This feature is used by ParaTrackerDynamic's setup page to display a list of supported games to the users.
             if($input == "")
             {
-                $output = array();
+
+                //This array is a blacklist for keeping unwanted games from the list. Use the full game name from the array above.
+                $removal = array(
+
+                "Jedi Knight Galaxies",
+
+            );
+                $output1 = array();
+                $output2 = array();
+
                 foreach ($gamestrs as $key => $value)
                 {
-                    array_push($output, $value);
+                    array_push($output1, $value);
                 }
-                usort($output, 'strnatcasecmp');
+
+                foreach ($gamestrs as $key => $value)
+                {
+                    //Declare this here
+                    $match = "0";
+
+                    for($i = 0; $i < count($removal); $i++)
+                    {
+                        if(stristr($value, $removal[$i]))
+                        {
+                            $match = "1";
+                            $i = count($removal);
+                        }
+                    }
+                    if($match == "0")
+                    {
+                        array_push($output2, $value);
+                    }
+                }
+                $output = array($output1, $output2);
+
+                usort($output1, 'strnatcasecmp');
+                usort($output2, 'strnatcasecmp');
+
                 return $output;
             }
 

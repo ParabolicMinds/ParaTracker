@@ -31,6 +31,7 @@ if (!isset($safeToExecuteParaFunc))
 }
 
 //This block is here to suppress error messages
+$personalDynamicTrackerMessage = "";
 $lastRefreshTime = "";
 $floodProtectTimeout = "";
 $serverPort = "";
@@ -47,11 +48,16 @@ $customSkin = "";
 $geoipCountryCode = "";
 $paraTrackerSkin = "";
 $displayGameName = "";
+$dbhost = "";
+$dbname = "";
+$dbuser = "";
+$dbpass = "";
+$dbport = "";
+
 
 define("defaultSkin", $defaultSkin);
 
 //If this file is executed directly, then echoing this value here will display the version number before exiting.
-//If the file is executed from one of the skin files, then this will end up in an HTML comment and will not be visible.
 //Either way, the version number will be visible.
 echo " " . versionNumber() . " ";
 
@@ -106,6 +112,9 @@ $variableName = numericValidator($variableName, minValue, maxValue, defaultValue
 
 To evaluate strings:
 $variableName = stringValidator($variableName, maxLength, defaultValue);
+
+To check a value for null:
+$variableName = basicValidator($variableName, defaultValue);
 */
 
 //These values MUST be evaluated first, because they are used in the IP address validation.
@@ -113,7 +122,9 @@ $variableName = stringValidator($variableName, maxLength, defaultValue);
 //and what to do about it.
 $dynamicTrackerCalledFromCorrectFile = booleanValidator($dynamicTrackerCalledFromCorrectFile, 0);
 $dynamicTrackerEnabled = booleanValidator($dynamicTrackerEnabled, 0);
-$personalDynamicTrackerMessage = stringValidator($personalDynamicTrackerMessage, "", "");
+
+//For now, I am commenting out the validation on this variable. It can only be modified from ParaConfig.php, and the risk is small.
+//$personalDynamicTrackerMessage = stringValidator($personalDynamicTrackerMessage, "", "");
 
 if($dynamicTrackerCalledFromCorrectFile == "1")
 {
@@ -246,6 +257,15 @@ $RConLogSize = numericValidator($RConLogSize, 100, 100000, 1000);
 
 $newWindowSnapToCorner = booleanValidator($newWindowSnapToCorner, 0);
 
+
+//Last, let's validate the database stuff
+$dbhost = basicValidator($dbhost, "localhost");
+$dbname = basicValidator($dbname, "paratracker");
+$dbuser = basicValidator($dbuser, "postgres");
+$dbpass = basicValidator($dbpass, "");
+$dbport = basicValidator($dbport, "");
+
+
 //The IP address has already been validated, so we can use it for a directory name
 //Make sure we convert the path to lowercase when creating folders for it, or else the flood protection could be bypassed!
 if($executeDynamicInstructionsPage == "1")
@@ -262,11 +282,11 @@ $enableGeoIP = booleanValidator($enableGeoIP, 0);
 if($enableGeoIP == "1")
 {
     include_once 'vendor/autoload.php';
-	if (!class_exists('GeoIp2\Database\Reader')) {
+        if (!class_exists('GeoIp2\Database\Reader')) {
         echo ' Maxmind GeoIP2 library does not seem to be present. ParaTracker expects this library to be installed via Composer. GeoIP has been disabled and will be ignored... ';
         $enableGeoIP = 0;
-	}
-	
+        }
+        
     //If GeoIP is enabled but the file is not found, disable it.
     if(!file_exists($geoIPPath))
     {
@@ -396,6 +416,11 @@ define("playerListColor2Opacity", $playerListColor2Opacity);
 define("customFont", $customFont);
 define("customSkin", $customSkin);
 
+define("dbhost", $dbhost);
+define("dbname", $dbname);
+define("dbuser", $dbuser);
+define("dbpass", $dbpass);
+define("dbport", $dbport);
 
 if($executeDynamicInstructionsPage == "1")
 {
@@ -566,27 +591,27 @@ function doUpdate($lastRefreshTime)
     //This file is used for determining if the server connection was successful and regenerating dynamic content, plus it's good for debugging
     file_put_contents("info/" . dynamicIPAddressPath . "serverDump.txt", $s);
 
-	if(strlen($s))
-	{
-	    //Server responded!
+        if(strlen($s))
+        {
+            //Server responded!
 
-	    //Mark the time in microseconds so we can see how long this takes.
-	    $parseTimer = microtime(true);
+            //Mark the time in microseconds so we can see how long this takes.
+            $parseTimer = microtime(true);
 
-		//If GeoIP is enabled, let's get the flag and country data first, and write it to a file
-		if(enableGeoIP == 1)
-		{
-			$geoip_dbr = new GeoIp2\Database\Reader(geoIPPath);
-			$actualIP = gethostbyname(serverIPAddress);
-			$flag = stringValidator(strtolower($geoip_dbr->country($actualIP)->country->isoCode), "", "");
-			$countryName = stringValidator($geoip_dbr->country($actualIP)->country->name, "", "");
-			file_put_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt', $flag . ":#:" . $countryName);
-		}
+                //If GeoIP is enabled, let's get the flag and country data first, and write it to a file
+                if(enableGeoIP == 1)
+                {
+                        $geoip_dbr = new GeoIp2\Database\Reader(geoIPPath);
+                        $actualIP = gethostbyname(serverIPAddress);
+                        $flag = stringValidator(strtolower($geoip_dbr->country($actualIP)->country->isoCode), "", "");
+                        $countryName = stringValidator($geoip_dbr->country($actualIP)->country->name, "", "");
+                        file_put_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt', $flag . ":#:" . $countryName);
+                }
 
-	    //Now, we call a function to parse the data
-	    $dataParserReturn = dataParser($s);
+            //Now, we call a function to parse the data
+            $dataParserReturn = dataParser($s);
 
-	    //Organize the data that came back in the array
+            //Organize the data that came back in the array
             $cvar_array_single = $dataParserReturn[0];
             $cvars_hash = $dataParserReturn[1];
             $player_array = $dataParserReturn[2];
@@ -602,21 +627,21 @@ function doUpdate($lastRefreshTime)
             //Insert game-specific function execution here
             $gameFunctionParserReturn = ParseGameData($gameName, $cvars_hash, $cvars_hash_decolorized);
 
-	    //Remove the variables that were returned.
-	    //We must assume that they were returned in the correct order!
-	    $gametype = array_shift($gameFunctionParserReturn);
-	    $levelshotFolder = array_shift($gameFunctionParserReturn);
-	    $mapname = array_shift($gameFunctionParserReturn);
-	    $modName = colorize(array_shift($gameFunctionParserReturn));
-	    $sv_hostname = array_shift($gameFunctionParserReturn);
-	    $sv_maxclients = array_shift($gameFunctionParserReturn);
+            //Remove the variables that were returned.
+            //We must assume that they were returned in the correct order!
+            $gametype = array_shift($gameFunctionParserReturn);
+            $levelshotFolder = array_shift($gameFunctionParserReturn);
+            $mapname = array_shift($gameFunctionParserReturn);
+            $modName = colorize(array_shift($gameFunctionParserReturn));
+            $sv_hostname = array_shift($gameFunctionParserReturn);
+            $sv_maxclients = array_shift($gameFunctionParserReturn);
 
 
             //Next, let's check and make sure the $levelshotFolder value we were given is accurate.
             $levelshotFolder = checkLevelshotDirectoriesAndConvertToLowercase($levelshotFolder);
 
-	    //The rest is all BitFlag data.
-	    $BitFlags = $gameFunctionParserReturn;
+            //The rest is all BitFlag data.
+            $BitFlags = $gameFunctionParserReturn;
 
             $player_count = playerList($player_array, $playerParseCount);
 
@@ -637,7 +662,7 @@ function doUpdate($lastRefreshTime)
 
             //This has to be last, because the timer will output on this page
             cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags);
-	}
+        }
 }
 
 function decolorizeArray($input)
@@ -675,33 +700,33 @@ function dataParser($s)
         array_pop($sections);
         $cvars_array = explode('\\', $sections[1]);
 
-		//This block parses the CVars from each other
-		$cvarCount = 0;
-		for($i = 1; $i < count($cvars_array) - 1; $i += 2)
-		{
-			$cvar_name = str_replace(array("\n", "\r"), '', $cvars_array[$i]);
-			$cvar_value = str_replace(array("\n", "\r"), '', $cvars_array[$i+1]);
-			//As we put them into the new array, let's validate them as well
+                //This block parses the CVars from each other
+                $cvarCount = 0;
+                for($i = 1; $i < count($cvars_array) - 1; $i += 2)
+                {
+                        $cvar_name = str_replace(array("\n", "\r"), '', $cvars_array[$i]);
+                        $cvar_value = str_replace(array("\n", "\r"), '', $cvars_array[$i+1]);
+                        //As we put them into the new array, let's validate them as well
             $cvar_name = stringValidator($cvar_name, "", "");
             $cvar_value = stringValidator($cvar_value, "", "");
-			$cvar_array_single[$cvarCount++] = array("name" => $cvar_name, "value" => $cvar_value);
-			$cvars_hash[$cvar_name] = $cvar_value; 
-		}
-		//Now, let's alphabetize the CVars so the list is easier to read
-		$cvar_array_single = array_sort($cvar_array_single, "name", false);
+                        $cvar_array_single[$cvarCount++] = array("name" => $cvar_name, "value" => $cvar_value);
+                        $cvars_hash[$cvar_name] = $cvar_value; 
+                }
+                //Now, let's alphabetize the CVars so the list is easier to read
+                $cvar_array_single = array_sort($cvar_array_single, "name", false);
 
 
-		//This loop parses the players from each other
-		$playerParseCount = 0;
+                //This loop parses the players from each other
+                $playerParseCount = 0;
 
-		for($i = 2; $i < count($sections); $i++)
-		{
-        		$player_split = explode(' ', $sections[$i], 3);
-			//As we put them into the new array, let's validate them as well
-			$player_array[$i] = array("score" => stringValidator($player_split[0], "", ""), "ping" => stringValidator($player_split[1], "", ""), "name" => stringValidator(trim($player_split[2],'"'), "", ""));
-			$playerParseCount++;
-		}
-		return(array($cvar_array_single, $cvars_hash, $player_array, $playerParseCount));
+                for($i = 2; $i < count($sections); $i++)
+                {
+                        $player_split = explode(' ', $sections[$i], 3);
+                        //As we put them into the new array, let's validate them as well
+                        $player_array[$i] = array("score" => stringValidator($player_split[0], "", ""), "ping" => stringValidator($player_split[1], "", ""), "name" => stringValidator(trim($player_split[2],'"'), "", ""));
+                        $playerParseCount++;
+                }
+                return(array($cvar_array_single, $cvars_hash, $player_array, $playerParseCount));
 }
 
 function removeOffendingServerNameCharacters($input)
@@ -760,9 +785,9 @@ function parseGameName($cvars_hash, $cvars_hash_decolorized, $lastRefreshTime)
             //Tremulous uses 'com_gamename' to identify the game. Try that next.
             if(isset($cvars_hash_decolorized["com_gamename"]) && $cvars_hash_decolorized["com_gamename"] != "")
             {
-	            $gameName = detectGameName($cvars_hash_decolorized["com_gamename"]);
+                    $gameName = detectGameName($cvars_hash_decolorized["com_gamename"]);
             }
-	    }
+            }
     }
 
 if($gameName == "")
@@ -785,7 +810,7 @@ if($gameName == "")
         $error = "No data!";
     }
 
-    displayError("Unrecognized Game:" . $error, $lastRefreshTime);
+    displayError("Unrecognized Game:" . $error . "<br />Please contact the ParaTracker team and request support!", $lastRefreshTime);
 }
 
 return $gameName;
@@ -793,42 +818,42 @@ return $gameName;
 
 function makeFunctionSafeName($input)
 {
-	$input = preg_replace("/[^a-z0-9]/", "", strtolower($input));
-	return $input;
+        $input = preg_replace("/[^a-z0-9]/", "", strtolower($input));
+        return $input;
 }
 
 function ParseGameData($gameName, $cvars_hash, $cvars_hash_decolorized)
 {
     //Initialize this
-    $GameInfoData = array("");
+    $GameInfoData = array();
 
-	//We'll need a new copy of game name to toy with for this part
-	//Pull out invalid characters and make it lowercase
-	$GameInfoGameName = makeFunctionSafeName($gameName);
+        //We'll need a new copy of game name to toy with for this part
+        //Pull out invalid characters and make it lowercase
+        $GameInfoGameName = makeFunctionSafeName($gameName);
 
-	if(function_exists($GameInfoGameName) && is_callable($GameInfoGameName))
-	{
-	    //Call the function
-	    $GameInfoData = $GameInfoGameName($cvars_hash, $cvars_hash_decolorized);
-	}
-	else
-	{
-	    if(!is_callable($GameInfoGameName))
-	    {
-	        echo " Could not load bit flag data for " . $gameName . " due to an invalid function name! This error is not fatal, but ParaTracker cannot parse gametypes or GameInfo. Contact the ParaTracker team with the game name, as this is a bug that must be fixed. ";
-	    }
-	    else
-	    {
-	        echo " Could not find bit flag data for " . $gameName . "! This error is not fatal, but ParaTracker cannot parse gametypes or GameInfo. ";
-	    }
-	}
-	return $GameInfoData;
+        if(function_exists($GameInfoGameName) && is_callable($GameInfoGameName))
+        {
+            //Call the function
+            $GameInfoData = $GameInfoGameName($cvars_hash, $cvars_hash_decolorized);
+        }
+        else
+        {
+            if(!is_callable($GameInfoGameName))
+            {
+                echo " Could not load bit flag data for " . $gameName . " due to an invalid function name! This error is not fatal, but ParaTracker cannot parse gametypes or GameInfo. Contact the ParaTracker team with the game name, as this is a bug that must be fixed. ";
+            }
+            else
+            {
+                echo " Could not find bit flag data for " . $gameName . "! This error is not fatal, but ParaTracker cannot parse gametypes or GameInfo. ";
+            }
+        }
+        return $GameInfoData;
 }
 
 function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
 {
-        $returnArray = array("");
-        $BitFlagsIndex = array("");
+        $returnArray = array();
+        $BitFlagsIndex = array();
         //$buf2 and $buf3 are used for JSON stuff.
         $buf2 = '"info":{';
         $buf3 = '"parsedInfo":[';
@@ -836,244 +861,244 @@ function cvarList($gameName, $cvar_array_single, $parseTimer, $BitFlags)
         $firstBitFlag = "1";
 
         $buf = '
-		</head>
-		<body class="cvars_page">
-		<span class="CVarHeading">Server Cvars</span><br />
-		<span class="CVarServerAddress">' . serverIPAddress . ":" . serverPort . '</span><br /><span class="CVarServerPing">Ping: ' . file_get_contents("info/" . dynamicIPAddressPath . "serverPing.txt") . ' ms</span><br /><br />
-		<table class="FullSizeCenter"><tr><td><table><tr class="cvars_titleRow cvars_titleRowSize"><td class="nameColumnWidth">Name</td><td class="valueColumnWidth">Value</td></tr>' . "\n";
-		$c = 1;
+                </head>
+                <body class="cvars_page">
+                <span class="CVarHeading">Server Cvars</span><br />
+                <span class="CVarServerAddress">' . serverIPAddress . ":" . serverPort . '</span><br /><span class="CVarServerPing">Ping: ' . file_get_contents("info/" . dynamicIPAddressPath . "serverPing.txt") . ' ms</span><br /><br />
+                <table class="FullSizeCenter"><tr><td><table><tr class="cvars_titleRow cvars_titleRowSize"><td class="nameColumnWidth">Name</td><td class="valueColumnWidth">Value</td></tr>' . "\n";
+                $c = 1;
 
-		//See if there is any BitFlag data to parse.
-		if(count($BitFlags) > 1)
-		{
-		    $BitFlagsIndex = array_shift($BitFlags);
+                //See if there is any BitFlag data to parse.
+                if(count($BitFlags) > 1)
+                {
+                    $BitFlagsIndex = array_shift($BitFlags);
 
-		    //Parse the arrays into variables named after the CVars
-		    for($i = 0; $i < count($BitFlagsIndex); $i++)
-		    {
-	            ${$BitFlagsIndex[$i]} = $BitFlags[$i];
-		    }
-		}
-		else
-		{
-		    //There is no BitFlag data to parse, so we will just declare an empty array for the index.
-		    $BitFlagsIndex = array("");
-		}
+                    //Parse the arrays into variables named after the CVars
+                    for($i = 0; $i < count($BitFlagsIndex); $i++)
+                    {
+                    ${$BitFlagsIndex[$i]} = $BitFlags[$i];
+                    }
+                }
+                else
+                {
+                    //There is no BitFlag data to parse, so we will just declare an empty array for the index.
+                    $BitFlagsIndex = array();
+                }
 
-		foreach($cvar_array_single as $cvar)
-		{
-			if($firstExecution == "0")
-		    {
-		        //If this not our first time going through the array, let's add a comma to the JSON output
-		        $buf2 .= ',';
-		    }
-		    $firstExecution = "0";
-		    $buf2 .= '"' . $cvar['name'] . '":"' . $cvar['value'] . '"';
+                foreach($cvar_array_single as $cvar)
+                {
+                        if($firstExecution == "0")
+                    {
+                        //If this not our first time going through the array, let's add a comma to the JSON output
+                        $buf2 .= ',';
+                    }
+                    $firstExecution = "0";
+                    $buf2 .= '"' . $cvar['name'] . '":"' . $cvar['value'] . '"';
 
-			$buf .= '<tr class="cvars_row' . $c . '"><td class="nameColumnWidth">' . $cvar['name'] . '</td><td class="valueColumnWidth">';
+                        $buf .= '<tr class="cvars_row' . $c . '"><td class="nameColumnWidth">' . $cvar['name'] . '</td><td class="valueColumnWidth">';
 
-			if ((($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && (colorize($cvar['value']) != $cvar['value']))
-			{
-				$buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
-			}
-			else if (($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'hostname'))
-			{
-			    //Need to check for offending symbols and remove them from server names, since it's obnoxious and everybody does it.
-			    //There is no need to check if the filter is enabled or not, since the function handles that on it's own
-			    $filteredName = removeOffendingServerNameCharacters($cvar['value']);
+                        if ((($cvar['name'] == 'gamename') || ($cvar['name'] == 'mapname')) && (colorize($cvar['value']) != $cvar['value']))
+                        {
+                                $buf .= '<b>' . colorize($cvar['value']) . "</b><br />" . $cvar['value'];
+                        }
+                        else if (($cvar['name'] == 'sv_hostname') || ($cvar['name'] == 'hostname'))
+                        {
+                            //Need to check for offending symbols and remove them from server names, since it's obnoxious and everybody does it.
+                            //There is no need to check if the filter is enabled or not, since the function handles that on it's own
+                            $filteredName = removeOffendingServerNameCharacters($cvar['value']);
 
-			    $buf .= '<b>' . colorize($filteredName) . "</b>";
+                            $buf .= '<b>' . colorize($filteredName) . "</b>";
 
-				if ((colorize($filteredName)) != $filteredName || $filteredName != $cvar['value'])
-			    {
-			        $buf .= "<br />" . $cvar['value'];
-			    }
-			}
-			else
-			{
-			    //We need to check for the BitFlag variables here, and calculate them if there is a match
-			    $foundMatch = 0;
-			    for($i = 0; $i < count($BitFlagsIndex) && $foundMatch == 0; $i++)
-			    {
-			        $cvar['name'] = strtolower($cvar['name']);
+                                if ((colorize($filteredName)) != $filteredName || $filteredName != $cvar['value'])
+                            {
+                                $buf .= "<br />" . $cvar['value'];
+                            }
+                        }
+                        else
+                        {
+                            //We need to check for the BitFlag variables here, and calculate them if there is a match
+                            $foundMatch = 0;
+                            for($i = 0; $i < count($BitFlagsIndex) && $foundMatch == 0; $i++)
+                            {
+                                $cvar['name'] = strtolower($cvar['name']);
 
-			        if($cvar['name'] == strtolower($BitFlagsIndex[$i]))
-			        {
-			            $foundMatch = 1;
-			            $returnArray = bitvalueCalculator($cvar['name'], $cvar['value'], ${$BitFlagsIndex[$i]});
-			            array_shift($returnArray);
+                                if($cvar['name'] == strtolower($BitFlagsIndex[$i]))
+                                {
+                                    $foundMatch = 1;
+                                    $returnArray = bitvalueCalculator($cvar['name'], $cvar['value'], ${$BitFlagsIndex[$i]});
+                                    array_shift($returnArray);
 
-			            $buf .= '<div class="CVarExpandList" onclick="bitValueClick(' . "'" . $cvar['name'] . "'" .  ')"><i><b>' . $cvar['value'] . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i><div id="' . $cvar['name'] .  '" class="collapsedList"><br />';
+                                    $buf .= '<div class="CVarExpandList" onclick="bitValueClick(' . "'" . $cvar['name'] . "'" .  ')"><i><b>' . $cvar['value'] . '</b><br /><i class="expandCollapse">(Click to expand/collapse)</i><div id="' . $cvar['name'] .  '" class="collapsedList"><br />';
 
-		                if($firstBitFlag == "0")
-		                {
-		                    $buf3 .= ',';
-		                }
-		                $firstBitFlag = "0";
+                                if($firstBitFlag == "0")
+                                {
+                                    $buf3 .= ',';
+                                }
+                                $firstBitFlag = "0";
 
 
-			            $index = count($returnArray);
+                                    $index = count($returnArray);
 
-			            if ($index < 1 || $cvar['value'] == "0")
-			            {
-			                $buf .= '<i>None</i>';
-			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":[""]}';
-			            }
-			            elseif ($cvar['value'] >= pow(2, count(${$BitFlagsIndex[$i]})))
-			            {
-			                //Miscount detected! Array does not have enough values
-			                $buf .= "<br />Miscount detected! Not enough values in the array for " . $cvar['name'] . ". Check GameInfo.php and add the missing values!</i></div></div>";
-			                $buf3 .= '{"name":"' . $cvar['name'] . '","Error: Miscount detected"}';
-			            }
-			            else
-			            {
-			                $buf .=  implode("<br />", $returnArray);
-			                $buf .= '</i></div></div>';
-			                $buf3 .= '{"name":"' . $cvar['name'] . '","flags":["' . implode('","', $returnArray) . '"]}';
-			            }
+                                    if ($index < 1 || $cvar['value'] == "0")
+                                    {
+                                        $buf .= '<i>None</i>';
+                                        $buf3 .= '{"name":"' . $cvar['name'] . '","flags":[""]}';
+                                    }
+                                    elseif ($cvar['value'] >= pow(2, count(${$BitFlagsIndex[$i]})))
+                                    {
+                                        //Miscount detected! Array does not have enough values
+                                        $buf .= "<br />Miscount detected! Not enough values in the array for " . $cvar['name'] . ". Check GameInfo.php and add the missing values!</i></div></div>";
+                                        $buf3 .= '{"name":"' . $cvar['name'] . '","Error: Miscount detected"}';
+                                    }
+                                    else
+                                    {
+                                        $buf .=  implode("<br />", $returnArray);
+                                        $buf .= '</i></div></div>';
+                                        $buf3 .= '{"name":"' . $cvar['name'] . '","flags":["' . implode('","', $returnArray) . '"]}';
+                                    }
 
-			        }
-			    }
-			    if($foundMatch == 0)
-			    {
-			        $buf .= $cvar['value'];
-			    }
-			}
-			$buf .= '</td></tr>' . "\n";
-			$c++;
-			if($c > 2) $c = 1;
-		}
-		$buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
+                                }
+                            }
+                            if($foundMatch == 0)
+                            {
+                                $buf .= $cvar['value'];
+                            }
+                        }
+                        $buf .= '</td></tr>' . "\n";
+                        $c++;
+                        if($c > 2) $c = 1;
+                }
+                $buf .= '</table></td></tr></table><h4 class="center">' . versionNumber() . ' - Server info parsed in ' . number_format(((microtime(true) - $parseTimer) * 1000), 3) . ' milliseconds.</h4><h5>Copyright &copy; 1837 Rick Astley. No rights reserved. Batteries not included. Void where prohibited.<br />Your mileage may vary. Please drink and drive responsibly.</h5><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></body></html>';
 
-		$buf3 .= '],';
-		file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
-		file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . $buf2 . "},");
+                $buf3 .= '],';
+                file_put_contents('info/' . dynamicIPAddressPath . 'param.txt', $buf);
+                file_put_contents('info/' . dynamicIPAddressPath . 'JSONParams.txt', $buf3 . $buf2 . "}");
 }
 
 function playerList($player_array, $playerParseCount)
 {
 
-		$playerListbuffer = '';
-		$player_count = 0;
+                $playerListbuffer = '';
+                $player_count = 0;
 
-		if($playerParseCount > 0)
-		{
-		    //Sort by ping first, to move bots to the bottom. Higher pings go on top.
-			$player_array = array_sort($player_array, "ping", true);
-			//Now, sort by score. If a bot has a higher score than a player, they will be on top. But at least real players are more visible this way
-			$player_array = array_sort($player_array, "score", true);
+                if($playerParseCount > 0)
+                {
+                    //Sort by ping first, to move bots to the bottom. Higher pings go on top.
+                        $player_array = array_sort($player_array, "ping", true);
+                        //Now, sort by score. If a bot has a higher score than a player, they will be on top. But at least real players are more visible this way
+                        $player_array = array_sort($player_array, "score", true);
 
-			$c = 1;
-			foreach($player_array as &$player)
-			{
-				$player_name = str_replace(array("\n", "\r"), '', $player["name"]);
-				$player_count++;
-				$playerListbuffer .= "\n" . '
+                        $c = 1;
+                        foreach($player_array as &$player)
+                        {
+                                $player_name = str_replace(array("\n", "\r"), '', $player["name"]);
+                                $player_count++;
+                                $playerListbuffer .= "\n" . '
 <div class="playerRow' . $c . '"><div class="playerName playerNameSize color7">'. colorize($player_name);
-				$playerListbuffer .= '</div><div class="playerScore playerScoreSize">' . $player["score"] . '</div><div class="playerPing playerPingSize">' . $player["ping"] . '</div></div>';
-				$c++;
-				if($c > 2) $c = 1;
-			}
-			$playerListbuffer .= "\n";
-		}
-		else
-		{
-			$playerListbuffer .= '<div class="noPlayersOnline textColor">&nbsp;' . noPlayersOnlineMessage . '</div>';
-		}
-		$playerListbuffer .= '<div></div>';
-		$buf3='';
-		file_put_contents('info/' . dynamicIPAddressPath . 'playerList.txt', $playerListbuffer);
+                                $playerListbuffer .= '</div><div class="playerScore playerScoreSize">' . $player["score"] . '</div><div class="playerPing playerPingSize">' . $player["ping"] . '</div></div>';
+                                $c++;
+                                if($c > 2) $c = 1;
+                        }
+                        $playerListbuffer .= "\n";
+                }
+                else
+                {
+                        $playerListbuffer .= '<div class="noPlayersOnline textColor">&nbsp;' . noPlayersOnlineMessage . '</div>';
+                }
+                $playerListbuffer .= '<div></div>';
+                $buf3='';
+                file_put_contents('info/' . dynamicIPAddressPath . 'playerList.txt', $playerListbuffer);
 
-		return $player_count;
+                return $player_count;
 }
 
 function levelshotFinder($mapName, $levelshotFolder)
 {
-		$levelshotCheckName = strtolower($mapName);
-		$levelshotBuffer = '';
+                $levelshotCheckName = strtolower($mapName);
+                $levelshotBuffer = '';
 
-		$levelshotCount = 0;
-		$levelshotIndex = 1;
-	    $foundLevelshot = 0;
-		do
-		{
+                $levelshotCount = 0;
+                $levelshotIndex = 1;
+            $foundLevelshot = 0;
+                do
+                {
 
-		    //Reset this value every iteration so we can check to see if levelshots are being found
-		    $foundLevelshot = 0;
+                    //Reset this value every iteration so we can check to see if levelshots are being found
+                    $foundLevelshot = 0;
 
-		    //Check for a PNG first
-		    if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png'))
-		    {
-		        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png';
-        		$foundLevelshot = 1;
-		    }
-		    else
-		    {
-		    //Failed to find a PNG, so let's check for a JPG
-		        if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg'))
-		        {
-		            $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg';
-		            $foundLevelshot = 1;
-		        }
-		        else
-		        {
-		            //Also failed to find a JPG, so let's check for a GIF
-		            if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif'))
-		            {
-		                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif';
-		                $foundLevelshot = 1;
-		            }
-		            else
-		            {
-		            //Could not find any images. One last check - is this the first iteration of the loop?
-		            //If so, we need to try and find a levelshot no matter what. Let's see if the user was
-		            //silly and forgot to add an underscore and number to the file name, and if so, we'll
-		            //just use that one. If not, we'll have to default to a placeholder for missing images.
-		                if ($levelshotCount == 0)
-		                {
-		                //Checking for a PNG again:
-		                	if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.png'))
-		            		{
-		                        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.png';
-        				    }
-        				    else
-        				    {
-        				        //And checking for a JPG again:
-		                	    if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.jpg'))
-		                	    {
-		                	        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.jpg';
-		                	    }
-		                	    else
-		                	    {
-		                	        //Lastly...checking for a GIF.
-		                	        if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.gif'))
-		                	        {
-		                                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.gif';
-		                	        }
-		                	        else
-		                	        {
-		                	            //Could not find a levelshot! Use the default 'missing picture' image and close out
-		                	            $levelshotBuffer .= "images/missing.gif";
-		                	        }
-		                	    }
-        				    }
-		                }
-		            }
-		        }
-		    }
+                    //Check for a PNG first
+                    if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png'))
+                    {
+                        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png';
+                        $foundLevelshot = 1;
+                    }
+                    else
+                    {
+                    //Failed to find a PNG, so let's check for a JPG
+                        if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg'))
+                        {
+                            $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg';
+                            $foundLevelshot = 1;
+                        }
+                        else
+                        {
+                            //Also failed to find a JPG, so let's check for a GIF
+                            if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif'))
+                            {
+                                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif';
+                                $foundLevelshot = 1;
+                            }
+                            else
+                            {
+                            //Could not find any images. One last check - is this the first iteration of the loop?
+                            //If so, we need to try and find a levelshot no matter what. Let's see if the user was
+                            //silly and forgot to add an underscore and number to the file name, and if so, we'll
+                            //just use that one. If not, we'll have to default to a placeholder for missing images.
+                                if ($levelshotCount == 0)
+                                {
+                                //Checking for a PNG again:
+                                        if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.png'))
+                                        {
+                                        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.png';
+                                            }
+                                            else
+                                            {
+                                                //And checking for a JPG again:
+                                            if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.jpg'))
+                                            {
+                                                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.jpg';
+                                            }
+                                            else
+                                            {
+                                                //Lastly...checking for a GIF.
+                                                if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.gif'))
+                                                {
+                                                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.gif';
+                                                }
+                                                else
+                                                {
+                                                    //Could not find a levelshot! Use the default 'missing picture' image and close out
+                                                    $levelshotBuffer .= "images/missing.gif";
+                                                }
+                                            }
+                                            }
+                                }
+                            }
+                        }
+                    }
 
-	        if ($foundLevelshot == 1)
-	        {
-	            $levelshotBuffer .= "\n";
-	            $levelshotCount++;
-	            $levelshotIndex++;
-	        }
-	        else
-	        {
-	            $levelshotBuffer = implode(":#:", explode("\n", trim($levelshotBuffer)));
-	        }
+                if ($foundLevelshot == 1)
+                {
+                    $levelshotBuffer .= "\n";
+                    $levelshotCount++;
+                    $levelshotIndex++;
+                }
+                else
+                {
+                    $levelshotBuffer = implode(":#:", explode("\n", trim($levelshotBuffer)));
+                }
 
-		} While ($foundLevelshot == 1 && $levelshotCount < maximumLevelshots);
+                } While ($foundLevelshot == 1 && $levelshotCount < maximumLevelshots);
 
 //This code prevents the Javascript that follows from seeing a value of 0 levelshots when none are found.
 //There will always be a minimum of one levelshot. A placeholder is used if none is found.
@@ -1134,14 +1159,14 @@ return $output;
 
 function passConfigValuesToJavascript()
 {
-		$output = '<script type="text/javascript">
-		var RConEnable = "' . RConEnable . '";
-		var newWindowSnapToCorner = "' . newWindowSnapToCorner . '";
-		var serverIPAddress = "' . serverIPAddress . '";
-		var serverPort = "' . serverPort . '";
-		var paraTrackerSkin = "' . paraTrackerSkin . '";
-		var customSkin = "' . customSkin . '";
-		</script>';
+                $output = '<script type="text/javascript">
+                var RConEnable = "' . RConEnable . '";
+                var newWindowSnapToCorner = "' . newWindowSnapToCorner . '";
+                var serverIPAddress = "' . serverIPAddress . '";
+                var serverPort = "' . serverPort . '";
+                var paraTrackerSkin = "' . paraTrackerSkin . '";
+                var customSkin = "' . customSkin . '";
+                </script>';
 
     return($output);
 }
@@ -1302,6 +1327,18 @@ function numericValidator($input, $minValue, $maxValue, $defaultValue)
         $input = $defaultValue;
     }
     return $input;
+}
+
+function basicValidator($input, $defaultValue)
+{
+    if(!$input)
+    {
+        return $defaultValue;
+    }
+    else
+    {
+        return $input;
+    }
 }
 
 function stringValidator($input, $maxLength, $defaultValue)
@@ -1488,7 +1525,7 @@ function displayError($errorMessage, $lastRefreshTime)
 
 function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
 {
-            $iBlewItUp = array("");
+            $iBlewItUp = array();
             $toBeExploded = "";
 
                 $index = count($arrayList);
@@ -1577,7 +1614,9 @@ function colorize($input)
 
 function dynamicInstructionsPage($personalDynamicTrackerMessage)
 {
-    $gameList = detectGameName("");
+    $gameListArray = detectGameName("");
+    //The output returned will be an array. Position 0 is a full game list, position 1 is a filtered game list (Useful for hiding duplicate game entries)
+    $gameList = $gameListArray[1];
     $gameOutput = "";
 
 
@@ -1628,6 +1667,12 @@ $output .= '</tr></table></div><br />';
 //Let's add a bit value calculator, just in case someone needs it in the future
 $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButton" onclick="expandContractDiv(' . "'bitFlagCalculator'" . ')">Show/Hide Bit Value Calculator</a></p><div id="bitFlagCalculator" class="collapsedFrame">';
 
+$gameList = $gameListArray[1];
+
+/*
+    //OLD FUNCTION
+    //OLD FUNCTION
+
     $firstTime = 1;
     $JSONOutput = '<script type="text/javascript">var bitflags_raw = [';
 
@@ -1650,13 +1695,13 @@ $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButt
 
             if(count($bitFlagData) > 1)
             {
-		        $bitFlagsIndex = array_shift($bitFlagData);
+                        $bitFlagsIndex = array_shift($bitFlagData);
 
-		        //Parse the arrays into variables named after the CVars
-		        for($i = 0; $i < count($bitFlagsIndex); $i++)
-		        {
-	                ${$bitFlagsIndex[$i]} = $bitFlagData[$i];
-		        }
+                        //Parse the arrays into variables named after the CVars
+                        for($i = 0; $i < count($bitFlagsIndex); $i++)
+                        {
+                        ${$bitFlagsIndex[$i]} = $bitFlagData[$i];
+                        }
                 usort($bitFlagsIndex, 'strnatcasecmp');
             }
 
@@ -1664,15 +1709,15 @@ $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButt
             $count = count($bitFlagsIndex);
             for($i = 0; $i < $count; $i++)
             {
-		        if($i > 0)
-		        {
-		            $JSONOutput .= ",";
+                        if($i > 0)
+                        {
+                            $JSONOutput .= ",";
                 }
                 $JSONOutput .= '{"setname":"' . stringValidator($bitFlagsIndex[$i], "", "") . '","flags":[';
 
                 $count2 = count(${$bitFlagsIndex[$i]});
 
-                $testArray = array("");
+                $testArray = array();
                 $testArray = ${$bitFlagsIndex[$i]};
                 for($j = 0; $j < $count2; $j++)
                 {
@@ -1693,6 +1738,73 @@ $output .= '<p><a class="dynamicFormButtons dynamicFormButtonsStyle bitValueButt
     }
     $JSONOutput .= '];
 </script>';
+*/
+
+
+    $JSONOutput = array();
+    $JSONOutputArray = array();
+    $JSONIteratorArray = array();
+
+    //Let's add the bit value calculator feature here
+    foreach($gameList as $testName)
+    {
+        $JSONOutputArray = array();
+        $testArray = array();
+
+        $bitFlagData = ParseGameData($testName, "", "");
+        //Remove the stuff we don't need. All we want right now is bit values.
+        $bitFlagData = array_slice($bitFlagData, 6);
+
+        if(count($bitFlagData) > 1)
+        {
+            $JSONIteratorArray = array();
+
+            //If we got here, there must be bitFlags in this game.
+            //This next chunk unpacks the individual game data and declares the variables
+            if(count($bitFlagData) > 1)
+            {
+                        $bitFlagsIndex = array_shift($bitFlagData);
+
+                        //Parse the arrays into variables named after the CVars
+                        for($i = 0; $i < count($bitFlagsIndex); $i++)
+                        {
+                        ${$bitFlagsIndex[$i]} = $bitFlagData[$i];
+                        }
+                        //Now that the arrays are defined as variables, sort them alphanumerically
+                usort($bitFlagsIndex, 'strnatcasecmp');
+            }
+
+            //Next, we need to parse the arrays looking for empty data
+            $count = count($bitFlagsIndex);
+            for($i = 0; $i < $count; $i++)
+            {
+                $bitFlagsIteratorArray = array();
+
+                $count2 = count(${$bitFlagsIndex[$i]});
+
+                $testArray = ${$bitFlagsIndex[$i]};
+
+                for($j = 0; $j < $count2; $j++)
+                {
+                    if(empty(trim($testArray[$j])))
+                    {
+                         $testArray[$j] = "(Unused)";
+                    }
+                }
+                array_push($bitFlagsIteratorArray, JSONString("setname", $bitFlagsIndex[$i]));
+                array_push($bitFlagsIteratorArray,  JSONArray("flags", $testArray, 3));
+                array_push($JSONIteratorArray, JSONObject("", $bitFlagsIteratorArray, 0));
+            }
+            array_push($JSONOutputArray, JSONString("gamename", $testName));
+            array_push($JSONOutputArray, JSONString("gameClassName", "game_" . makeFunctionSafeName($testName)));
+            array_push($JSONOutputArray, JSONArray("bitflags", $JSONIteratorArray, 0));
+            array_push($JSONOutput, $JSONOutputArray);
+        }
+    }
+
+
+    $JSONOutput = '<script type="text/javascript">var bitflags_raw = ' . JSONArray("", $JSONOutput, 4) . '</script>';
+
 
 //Add the HTML we need for the bit value calculator
 $output .= '<div id="bitflags_top" class="bitValueCalculator">
@@ -1724,7 +1836,7 @@ $output .= '<p class="collapsedFrame">Current page URL:<br /><input type="text" 
     //Sort the array in a readable fashion
     usort($directoryList, 'strnatcasecmp');
 
-    $skinList = array("");
+    $skinList = array();
     $skinCount = 0;
 
     //Loop through the array of stuff given
@@ -1891,46 +2003,46 @@ WE COMPLY WITH ALL LAWS AND REGULATIONS REGARDING THE USE OF LAWS AND REGULATION
 
 function connectToServerAndGetResponse($messageToSend, $lastRefreshTime)
 {
-	$s = "";
-	$errstr = "";
+        $s = "";
+        $errstr = "";
 
-	//Empty the server's previous ping from the file
-	file_put_contents("info/" . dynamicIPAddressPath . "serverPing.txt", "");
+        //Empty the server's previous ping from the file
+        file_put_contents("info/" . dynamicIPAddressPath . "serverPing.txt", "");
 
-	//Set this value to measure the server's ping
-	$serverPing = microtime(true);
+        //Set this value to measure the server's ping
+        $serverPing = microtime(true);
     $fp = fsockopen("udp://" . serverIPAddress, serverPort, $errno, $errstr, 30);
-	if(!fwrite($fp, $messageToSend))
-	{
-	    $errstr = "Could not open the connection to the game server!\nMake sure your web host allows outgoing connections.";
-	}
-	else
-	{
-	    stream_set_timeout($fp, connectionTimeout);
+        if(!fwrite($fp, $messageToSend))
+        {
+            $errstr = "Could not open the connection to the game server!\nMake sure your web host allows outgoing connections.";
+        }
+        else
+        {
+            stream_set_timeout($fp, connectionTimeout);
         $s = fread($fp, maximumServerInfoSize);
-	    fclose($fp);
-	}
+            fclose($fp);
+        }
 
-	file_put_contents("info/" . dynamicIPAddressPath . "serverPing.txt", number_format(((microtime(true) - $serverPing) * 1000), 0));
+        file_put_contents("info/" . dynamicIPAddressPath . "serverPing.txt", number_format(((microtime(true) - $serverPing) * 1000), 0));
 
     if(strlen($s) >= maximumServerInfoSize)
     {
      displayError('Received maximum data allowance!<br />' . strlen($s) . ' bytes received, the limit is ' . maximumServerInfoSize . '<br />Check to see if you are connected to the correct server or increase $maximumServerInfoSize in ParaConfig.php.', $lastRefreshTime);
     }
 
-	if($errstr == "" && $s == "")
-	{
-	    $errstr = "No response in " . connectionTimeout . " seconds.";
-	}
-	file_put_contents("info/" . dynamicIPAddressPath . "connectionErrorMessage.txt", stringValidator($errstr, "", ""));
+        if($errstr == "" && $s == "")
+        {
+            $errstr = "No response in " . connectionTimeout . " seconds.";
+        }
+        file_put_contents("info/" . dynamicIPAddressPath . "connectionErrorMessage.txt", stringValidator($errstr, "", ""));
 
-	//Convert encoding from ANSI to ASCII. If this fails due to illegal characters, leave it as-is.
-	if($s !== false)
-	{
-	    $s = convertFromANSI($s);
-	}
+        //Convert encoding from ANSI to ASCII. If this fails due to illegal characters, leave it as-is.
+        if($s !== false)
+        {
+            $s = convertFromANSI($s);
+        }
 
-	return($s);
+        return($s);
 }
 
 function convertFromANSI($input)
@@ -1940,11 +2052,11 @@ function convertFromANSI($input)
 
     $convertedEncoding = mb_convert_encoding($input, "UTF-8", "Windows-1252");
 
-	if($convertedEncoding !== false)
-	{
-	    $input = $convertedEncoding;
-	}
-	return $input;
+        if($convertedEncoding !== false)
+        {
+            $input = $convertedEncoding;
+        }
+        return $input;
 }
 
 function sendRecieveRConCommand($lastRefreshTime, $RConPassword, $RConCommand)
@@ -1956,41 +2068,41 @@ $RConLog = "";
 $RConLog2 = "";
 
 if ($RConPassword != "" && $RConCommand != "")
-	{
-		$output .= '';
+        {
+                $output .= '';
 
-		$s = connectToServerAndGetResponse(str_repeat(chr(255),4) . 'RCon ' . $RConPassword . ' ' . $RConCommand, $lastRefreshTime);
+                $s = connectToServerAndGetResponse(str_repeat(chr(255),4) . 'RCon ' . $RConPassword . ' ' . $RConCommand, $lastRefreshTime);
 
-		if($s != "")
-		{
-		    $serverResponse = $s;
-		    //Check for exploits in the response that might trigger some PHP code
-		    $serverResponse = RConRemoveExploits($serverResponse);
+                if($s != "")
+                {
+                    $serverResponse = $s;
+                    //Check for exploits in the response that might trigger some PHP code
+                    $serverResponse = RConRemoveExploits($serverResponse);
 
-			//Replace line breaks for the RCon log only
-			$newRConLogEntry = str_replace(chr(0x0A), '\n', $serverResponse);
+                        //Replace line breaks for the RCon log only
+                        $newRConLogEntry = str_replace(chr(0x0A), '\n', $serverResponse);
 
-		    //Validate the rest!
-		    $serverResponse = stringValidator($serverResponse, "", "");
+                    //Validate the rest!
+                    $serverResponse = stringValidator($serverResponse, "", "");
 
-		    //Now we format the remaining data in a readable fashion
-			$serverResponse = str_replace('ÿÿÿÿprint', '', $serverResponse);
-			$serverResponse = str_replace(chr(0x0A), '<br />', trim($serverResponse));
-			//This next line apparently replaces spaces with....spaces? Not sure who added that but I'm commenting it out
-			//$serverResponse = str_replace(chr(0x20), ' ', $serverResponse);
+                    //Now we format the remaining data in a readable fashion
+                        $serverResponse = str_replace('ÿÿÿÿprint', '', $serverResponse);
+                        $serverResponse = str_replace(chr(0x0A), '<br />', trim($serverResponse));
+                        //This next line apparently replaces spaces with....spaces? Not sure who added that but I'm commenting it out
+                        //$serverResponse = str_replace(chr(0x20), ' ', $serverResponse);
 
-		}
-		else
-		{
-		    $serverResponse = 'No response from server at ' . serverIPAddress . ':' . serverPort . '!';
-		    $newRConLogEntry = $serverResponse;
-		}
+                }
+                else
+                {
+                    $serverResponse = 'No response from server at ' . serverIPAddress . ':' . serverPort . '!';
+                    $newRConLogEntry = $serverResponse;
+                }
 
-		$output .= $serverResponse;
-	}
+                $output .= $serverResponse;
+        }
 
 
-	//Log time!
+        //Log time!
     $RConLog2 = file_get_contents("logs/" . dynamicIPAddressPath . "RConLog.php");
 
     //Trim off the PHP tags and comment markers at the beginning and end of the file
@@ -2010,7 +2122,7 @@ if ($RConPassword != "" && $RConCommand != "")
     $RConLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  Command: " . $RConCommand . "  Response: " . $newRConLogEntry . $RConLog2;
 
     //Check for exploits before writing the new entry to the log. The command hasn't been validated, so this *must* happen a second time.
-	$RConLog = RConRemoveExploits($RConLog);
+        $RConLog = RConRemoveExploits($RConLog);
 
     //Assemble the new log entry. This is the log, so validating anything other than what was already validated is a bad idea.
     $RConLog = RConLogHeader() . "\n" . $RConLog . RConLogFooter();
@@ -2237,89 +2349,69 @@ function renderJSONPage()
 {
     header("Content-Type: application/json");
 
-    //Add the version number to the output
-    $output = '{"version":"' . versionNumber() . '",';
-
-    //Add the server info
-    $output .= '"serverInfo":{';
-    $output .= '"servername":"' . removeOffendingServerNameCharacters(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt")) . '","gametype":"' . file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt') . '"';
-    $output .= ',"gamename":"';
-
     if(displayGameName == 1)
     {
-        $output .= file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt');
+        $gameName = file_get_contents('info/' . dynamicIPAddressPath . 'gamename.txt');
+    }
+    else
+    {
+        $gameName = "";
     }
 
-    $output .= '"},';
+
+    $outputArray = array();
+    $serverInfoArray = array();
+    $parsedInfoArray = array();
+    $infoArray = array();
+    $playersArray = array();
+
+    //Add the version number to the output array
+    array_push($outputArray, JSONString("version", versionNumber()));
+
+    //Add the server info
+    array_push($serverInfoArray, JSONString("servername", removeOffendingServerNameCharacters(file_get_contents("info/" . dynamicIPAddressPath . "sv_hostname.txt"))));
+    array_push($serverInfoArray, JSONString("gametype", file_get_contents('info/' . dynamicIPAddressPath . 'gametype.txt')));
+    array_push($serverInfoArray, JSONString("gamename", $gameName));
+
+    //Add the server info to the output array
+    array_push($outputArray, JSONObject("serverInfo", $serverInfoArray, 0));
 
     //Add the relevant config data and the server ping to the output
-    $output .= '"serverIPAddress":"' . serverIPAddress . '",';
-    $output .= '"serverPort":"' . serverPort . '",';
-    $output .= '"serverPing":"' . file_get_contents("info/" . dynamicIPAddressPath . "serverPing.txt") . '",';
-    $output .= '"paraTrackerSkin":"' . paraTrackerSkin . '",';
-    $output .= '"levelshotTransitionsEnabled":' . convertBooleansToString(levelshotTransitionsEnabled) . ',';
-    $output .= '"levelshotDisplayTime":"' . levelshotDisplayTime . '",';
-    $output .= '"levelshotTransitionTime":"' . levelshotTransitionTime . '",';
-    $output .= '"levelshotTransitionAnimation":"' . levelshotTransitionAnimation . '",';
-    $output .= '"noPlayersOnlineMessage":"' . noPlayersOnlineMessage . '",';
-    $output .= '"enableAutoRefresh":' . convertBooleansToString(enableAutoRefresh) . ',';
-    $output .= '"autoRefreshTimer":"' . autoRefreshTimer . '",';
-    $output .= '"RConEnable":' . convertBooleansToString(RConEnable) . ',';
-    $output .= '"RConFloodProtect":"' . RConFloodProtect . '",';
-    $output .= '"newWindowSnapToCorner":' . convertBooleansToString(newWindowSnapToCorner) . ',';
+    array_push($outputArray, JSONString("serverIPAddress", serverIPAddress));
+    array_push($outputArray, JSONString("serverPort", serverPort));
+    array_push($outputArray, JSONString("serverPing", file_get_contents("info/" . dynamicIPAddressPath . "serverPing.txt")));
+    array_push($outputArray, JSONString("paraTrackerSkin", paraTrackerSkin));
+    array_push($outputArray, JSONBoolean("levelshotTransitionsEnabled", levelshotTransitionsEnabled));
+    array_push($outputArray, JSONNumber("levelshotDisplayTime", levelshotDisplayTime));
+    array_push($outputArray, JSONNumber("levelshotTransitionTime", levelshotTransitionTime));
+    array_push($outputArray, JSONString("levelshotTransitionAnimation", levelshotTransitionAnimation));
+    array_push($outputArray, JSONString("noPlayersOnlineMessage", noPlayersOnlineMessage));
+    array_push($outputArray, JSONBoolean("enableAutoRefresh", enableAutoRefresh));
+    array_push($outputArray, JSONNumber("autoRefreshTimer", autoRefreshTimer));
+    array_push($outputArray, JSONBoolean("RConEnable", RConEnable));
+    array_push($outputArray, JSONNumber("RConFloodProtect", RConFloodProtect));
+    array_push($outputArray, JSONBoolean("newWindowSnapToCorner", newWindowSnapToCorner));
 
     $GeoIPInput = file_get_contents('info/' . dynamicIPAddressPath . 'GeoIPData.txt');
     if(enableGeoIP == 1 && $GeoIPInput != "")
     {
         $GeoIPInput = explode(":#:", $GeoIPInput);
-        $output .= '"geoipCountryCode":' . '"' . $GeoIPInput[0] . '"' . ',';
-        $output .= '"geoipCountryName":' . '"' . $GeoIPInput[1] . '"' . ',';
+        array_push($outputArray, JSONString("geoipCountryCode", $GeoIPInput[0]));
+        array_push($outputArray, JSONString("geoipCountryName", $GeoIPInput[1]));
     }
 
-    if(backgroundColor != "")
-    {
-        $output .= '"customRGBA":"' . convertToRGBA(backgroundColor) . ', ' . backgroundOpacity / 100 . '",';
-    }
-    if(textColor != "")
-    {
-        $output .= '"textColor":"' . textColor . '",';
-    }
-    if(customFont != "")
-    {
-        $output .= '"customFont":"' . customFont . '",';
-    }
-    if(playerListColor1 != "")
-    {
-        $output .= '"playerListColor1":"rgba(' . convertToRGBA(playerListColor1) . ', ' . playerListColor1Opacity / 100  . ')",';
-    }
-    if(playerListColor2 != "")
-    {
-        $output .= '"playerListColor2":"rgba(' . convertToRGBA(playerListColor2) . ', ' . playerListColor2Opacity / 100  . ')",';
-    }
-
-
+    array_push($outputArray, JSONString("customBackgroundColor", convertToRGBA(backgroundColor) . ', ' . backgroundOpacity / 100));
+    array_push($outputArray, JSONString("customTextColor", textColor));
+    array_push($outputArray, JSONString("customFont", customFont));
+    array_push($outputArray, JSONString("customPlayerListColor1", convertToRGBA(playerListColor1) . ', ' . playerListColor1Opacity / 100));
+    array_push($outputArray, JSONString("customPlayerListColor2", convertToRGBA(playerListColor2) . ', ' . playerListColor2Opacity / 100));
 
     //Time for levelshot stuff. Get the array from the file and explode it
-    $levelshots = file_get_contents("info/" . dynamicIPAddressPath . "levelshots.txt");
+    array_push($outputArray, JSONArray("levelshotsArray", explode(":#:", file_get_contents("info/" . dynamicIPAddressPath . "levelshots.txt")), 3));
 
-    $levelshots = explode(":#:", $levelshots);
-
-    //Declare the levelshot array name
-    $output .= '"levelshotsArray":[';
-    for($i = 0; $i < count($levelshots); $i++)
-    {
-        if($i != 0)
-        {
-            $output .= ",";
-        }
-        $output .= '"' . $levelshots[$i] . '"';
-    }
-    //End the levelshot array
-    $output .= '],';
 
     //Now let's include the bitflags (They are already parsed correctly in a text file)
-    $decent = html_entity_decode(file_get_contents("info/" . dynamicIPAddressPath . "JSONParams.txt"));
-    $output .= $decent;
+    array_push($outputArray, html_entity_decode(file_get_contents("info/" . dynamicIPAddressPath . "JSONParams.txt")));
 
     //Now, we call a function to parse the server response, then put it in JSON format
     $dump = file_get_contents("info/" . dynamicIPAddressPath . "serverDump.txt");
@@ -2343,7 +2435,10 @@ function renderJSONPage()
     $output .= '"score":"' . $player_array[$i]["score"] . '",';
     $output .= '"ping":"' . $player_array[$i]["ping"] . '"}';
     }
-$output .= ']}';
+$output .= ']';
+
+array_push($outputArray, $output);
+$output = JSONObject("", $outputArray, 0);
 
 ob_end_clean();
 
@@ -2353,338 +2448,580 @@ exit();
 
 }
 
-function convertBooleansToString($input)
+function JSONVariable($input)
 {
-    if($input == "0")
+    //If this function was called with no input, it means there was no variable name.
+    //So, let's give nothing back.
+    if($input == "")
     {
-        return "false";
+        return "";
+    }
+
+    //Double quotes must be removed from variable names, the name must be wrapped in double quotes,
+    //and a colon must be added at the end.
+    return '"' . replaceQuotes($input) . '":';
+}
+
+function removeStrings($input)
+{
+    $output = "";
+    $test = array();
+
+    if(strpos($input, '"') !== 0)
+    {
+        $test = explode('"', $input);
+        $count = count($test);
+
+        for($i = 0; $i < strlen($count); $i = $i + 2)
+        {
+            $output .= $test[$i];
+        }
     }
     else
     {
-        return "true";
+        return $output;
     }
+}
+
+function JSONAutoValidate($input)
+{
+    //Declare this to make the rest easier
+    $variableName = "";
+
+    if(strpos(removeStrings($input), ":") !== 0)
+    {
+        //Found a colon - let's remove the variable name.
+        $exploded = explode(":", removeStrings($input));
+        $variableName = $exploded[0];
+        $input = $exploded[1];
+    }
+
+    if(is_numeric($input))
+    {
+        //Numeric input. Validate as a number.
+        return JSONNumber($variableName, $input);
+    }
+    else
+    if(strtolower($input) == "true" || strtolower($input) == "false")
+    {
+        //Boolean input. Validate as boolean.
+        return JSONBoolean($variableName, $input);
+    }
+    else
+    {
+        if(is_array($input))
+        {
+            //Array input. Validate as an array.
+            return JSONArray($variableName, $input, 0);
+        }
+        else
+        {
+            if(substr(trim($input), 0, 1) == "[" && substr(trim($input), -1, 1) == "]")
+            {
+                //Array input. Validate as an array.
+                return JSONArray($variableName, $input);
+            }
+            else
+            {
+                if(substr(trim($input), 0, 1) == '"' && substr(trim($input), -1, 1) == '"')
+                {
+                    //Input is already a valid string. Return.
+                    return $input;
+                }
+                else
+                {
+                    //Nothing left, so input must be a string. Validate it.
+                    return JSONString($variableName, $input);
+                }
+            }
+        }
+    }
+}
+
+function JSONObject($variableName, $input, $mode)
+{
+    //This function accepts an array, with all the JSON contents pre-validated.
+
+    //Validate the variable name first
+    $variableName = JSONVariable($variableName);
+
+/*
+    if(is_array($input))
+    {
+        $input = JSONValidateArray(4, $input);
+    }
+*/
+
+    //The return is a string formatted as a JSON Object.
+
+    if(is_array($input))
+    {
+        return $variableName . "{" . implode(",", $input) . "}";
+    }
+    else
+    {
+        return $variableName . '{' . $input . '}';
+    }
+}
+
+function JSONArray($variableName, $input, $mode)
+{
+    //This function accepts an array, and returns a JSON string
+
+    //Validate the variable name first
+    $variableName = JSONVariable($variableName);
+
+    if(is_array($input))
+    {
+        $input = JSONValidateArray($mode, $input);
+    }
+
+    //Return a string of the variable name, and the array delimited with commas
+    if(is_array($input))
+    {
+        return $variableName . '[' . implode(',', $input) . ']';
+    }
+    else
+    {
+        return $variableName . '[' . $input . ']';
+    }
+}
+
+function JSONString($variableName, $input)
+{
+    //Validate the variable name first
+    $variableName = JSONVariable($variableName);
+
+    if(is_array($input))
+    {
+        $input = JSONValidateArray(3, $input);
+    }
+
+    //Replace quotes on the input string, and return.
+    return $variableName . '"' . replaceQuotes($input) . '"';
+}
+
+function JSONNumber($variableName, $input)
+{
+    //Validate the variable name first
+    $variableName = JSONVariable($variableName);
+
+    $input = strtolower(trim($input));
+
+    if(is_array($input))
+    {
+        $input = JSONValidateArray(2, $input);
+    }
+
+    if(is_numeric($input))
+    {
+        return $variableName . $input;
+    }
+    else
+    {
+        return $variableName . "0";
+    }
+}
+
+function JSONBoolean($variableName, $input)
+{
+    //Validate the variable name first
+    $variableName = JSONVariable($variableName);
+
+    $input = strtolower(trim($input));
+
+    if(is_array($input))
+    {
+        $input = JSONValidateArray(1, $input);
+    }
+
+    if($input == "1" || $input == "true" || $input == "yes")
+    {
+        return $variableName . "true";
+    }
+    else
+    {
+        return $variableName . "false";
+    }
+}
+
+function JSONValidateArray($mode, $input)
+{
+    //Validate $mode. 0 means do not validate.
+    if(isset($mode))
+    {
+        $mode = numericValidator($mode, 0, 4, 0);
+    }
+    else
+    {
+        $mode = 0;
+    }
+
+    $count = count($input);
+
+    //Mode 1 validates as a boolean
+    if($mode == "1")
+    {
+        for($i = 0; $i < $count; $i++)
+        {
+                $input[$i] = JSONBoolean("", $input[$i]);
+        }
+    }
+    //Mode 2 validates as a number
+    elseif($mode == "2")
+    {
+        for($i = 0; $i < $count; $i++)
+        {
+                $input[$i] = JSONNumber("", $input[$i]);
+        }
+    }
+    //Mode 3 validates as a string
+    elseif($mode == "3")
+    {
+        for($i = 0; $i < $count; $i++)
+        {
+                $input[$i] = JSONString("", $input[$i]);
+        }
+    }
+    //Mode 4 validates as an object
+    elseif($mode == "4")
+    {
+        for($i = 0; $i < $count; $i++)
+        {
+                $input[$i] = JSONObject("", $input[$i], 0);
+        }
+    }
+    return $input;
+}
+
+function replaceQuotes($input)
+{
+    //This function replaces incoming double quotes and back slashes with escape characters for JSON validation
+    $input = str_replace('\\', "\\\\", $input);
+    $input = str_replace('"', '\\"', $input);
+
+    return $input;
 }
 
 function RConRemoveExploits($input)
 {
     $input = str_replace("<?", ' EXPLOIT REMOVED (LessThan, QuestionMark) ', $input);
-    $input = str_replace("?>", ' EXPLOIT REMOVED (QuestionMark, GreaterThan) ', $input);
-    $input = str_replace("*/", ' EXPLOIT REMOVED (Asterisk, ForwardSlash) ', $input);
-    return $input;
-}
-
-function RConLogHeader()
-{
-    $output = "<?php \n echo '<h3 class=" . '"errorMessage"' . ">RConLog.php can only be viewed with direct file system access.<br />Download it and open it in a text editor.</h3>';\n exit(); \n/*  LOG ENTRIES:\n";
-    return $output;
-}
-
-function RConLogFooter()
-{
-    return "\n*/ ?> ";
-}
-
-function writeNewConfigFile()
-{
-$configBuffer = '<?php
-///////////////////////////////
-// ParaTracker Configuration //
-///////////////////////////////
-
-// This is the configuration file for ParaTracker.
-// If you want to edit fonts and colors, you should edit them
-// in the css files found in the /skins folder.
-// The visual settings found here are overrides only and should be used with caution!
-
-// ONLY modify the variables defined below, between the double quotes!
-// Changing anything else can break the tracker!
-
-// If this file ever breaks and you have no idea what is wrong, just delete it.
-// When ParaTracker is run, it will write a new one for you.
-
-// If you find any exploits in the code, please bring them to my attention immediately!
-// Thank you and enjoy!
-
-
-// NETWORK SETTINGS
-// NETWORK SETTINGS
-
-// This is the IP Address of the server. Do not include the port number!
-// By default, and for security, this value is empty. If ParaTracker is launched without a value here,
-// it will display a message telling the user to check config.php before running.
-$serverIPAddress = "";
-
-
-// Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
-// The default port number for Jedi Outcast is 28070.
-// If an invalid entry is given, this value will default to 29070.
-$serverPort = "";
-
-// This variable limits how many seconds are required between each snapshot of the server.
-// This prevents high traffic on the tracker from bogging down the game server it is tracking.
-// ParaTracker forces a minimum value of 5 seconds between snapshots. Maximum is 1200 seconds.
-// This value cannot be lower than the value of $connectionTimeout (below).
-// Default is 15 seconds.
-$floodProtectTimeout = "15";
-
-// This value is the number of seconds ParaTracker will wait for a response from the game server
-// before timing out. If the first attempt fails, a second attempt will be made.
-// ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
-// Not recommended to go above 5 seconds, as people will get impatient and leave.
-// This setting also affects RCon wait times.
-// Default is 2.5 seconds.
-$connectionTimeout = "2.5";
-
-// This value, given in seconds, determines how long ParaTracker will wait for a current refresh of
-// the server info to complete, before giving up and forcing another one. Raise this value if your
-// web server is busy or slow to reduce the load on the game server.
-// Minimum is 1 second, maximum is 15 seconds.
-// Default is 3 seconds.
-$refreshTimeout = "3";
-
-
-// VISUAL SETTINGS
-// VISUAL SETTINGS
-
-// These settings are OVERRIDES ONLY. Use with caution!
-
-// This line specifies which skin file to load. Skins are found in the skins/ folder, and they are all
-// simple CSS files. The name is case sensitive.
-// ParaTracker will automatically search in the skins/ folder for the file specified, and it will automatically
-// add the ".css" file extension. All you need to include here is the file name, minus the extension.
-// You can make your own custom CSS skins, but if you want to use JSON to make a custom skin, then
-// set this value to "JSON" and the tracker will send an unformatted JSON response.
-// Default value is "Metallic Console"
-$paraTrackerSkin = "Metallic Console";
-
-// This is a 6 character hexadecimal value that specifies the background color to be used.
-// The skin chosen will already have it\'s own color; this value will override it, if desired.
-// Default value is "".
-$backgroundColor = "";
-
-// This value is a percentage, from 0 to 100, of how opaque the background color will be.
-// Default value is "100".
-$backgroundOpacity = "100";
-
-// This is a 6 character hexadecimal value that specifies the color of the odd rows on the player list.
-// The skin chosen will already have it\'s own color; this value will override it, if desired.
-// Default value is "".
-$playerListColor1 = "";
-
-// This value is a percentage, from 0 to 100, of how opaque the color of the odd rows on the player list will be.
-// Default value is "100".
-$playerListColor1Opacity = "100";
-
-// This is a 6 character hexadecimal value that specifies the color of the even rows on the player list.
-// The skin chosen will already have it\'s own color; this value will override it, if desired.
-// Default value is "".
-$playerListColor2 = "";
-
-// This value is a percentage, from 0 to 100, of how opaque the color of the even rows on the player list will be.
-// Default value is "100".
-$playerListColor2Opacity = "100";
-
-// This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
-// It will not change the color of server names, mod names, map names, or player names.
-// The skin chosen will already have it\'s own color; this value will override it, if desired.
-// Default value is "".
-$textColor = "";
-
-// This value specifies a font to be used on the tracker page. Font families are also accepted.
-// Make sure you use a common font so everyone can see it!
-// Default value is "".
-$customFont = "";
-
-
-// LEVELSHOT SETTINGS
-// LEVELSHOT SETTINGS
-
-// Levelshots will be searched for on the web server in the images/levelshots folder.
-// If the map is mp/ffa5, ParaTracker will search for images in images/levelshots/mp/ffa5.
-
-// For levelshots to animate, they will have to be named with _1, _2, and _3 at the end of the file name.
-// For instance, to have three animated levelshots for mp/ffa5, the files would have to be in
-// the images/levelshots/mp folder, and they would need to be named ffa5_1.jpg, ffa5_2.jpg,
-// and ffa5_3.jpg
-
-// ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be used first, JPGs second,
-// and GIFs third. If no images are found, a placeholder image will be displayed instead.
-
-// The following value will enable or disable levelshot transitions. A value of 1 or "Yes" will allow them,
-// and any other value with disable them. If this is disabled, only the first levelshot will show.
-// Default value is 1.
-$levelshotTransitionsEnabled = "1";
-
-// This is the amount of time, in seconds, each levelshot will be displayed before moving on to the next.
-// Decimals are acceptable. Minimum is 1 second. Maximum is 15 seconds.
-// Default is 3 seconds.
-$levelshotDisplayTime = "3";
-
-// This is the amount of time, in second, each levelshot will take to fade into the next one.
-// Note that fades do not work in some browsers, like Internet Explorer 8.
-// Decimals are acceptable. Minimum is 0.1 seconds. Maximum is 5 seconds.
-// Default is 1 seconds.
-$levelshotTransitionTime = "1";
-
-// This is the animation that will be used for fading levelshots.
-// If you want to change the animations, they are found in "css/LevelshotAnimations.css"
-// Valid values are whole numbers between 0 to 999 (No decimals).
-// Setting this value to 0 will play a random animation.
-// Default value is 0
-// The default transitions are as follows:
-// Transition 1: Fade
-// Transition 2: Fade to black
-// Transition 3: Hue shift
-// Transition 4: Skew
-// Transition 5: Horizontal Stretch
-// Transition 6: Stretch and rebound
-// Transition 7: Slide to left
-// Transition 8: Slide to right
-// Transition 9: Slide to top
-// Transition 10: Slide to bottom
-// Transition 11: Spin and fly to top left
-// Transition 12: Spin and fly to top right
-// Transition 13: Fall away and spin
-// Transition 14: Zoom in
-// Transition 15: Blur
-$levelshotTransitionAnimation = "0";
-
-// The following value is the maximum number of levelshots that can be used. Keep in mind that
-// more levelshots is not always better. Minimum is 1, maximum is 99.
-// Default is 20 levelshots.
-$maximumLevelshots = "20";
-
-
-// TRACKER SETTINGS
-// TRACKER SETTINGS
-
-// This value is boolean. When this variable is set to Yes or 1, the game name will be displayed
-// in the tracker. Otherwise, it will be hidden.
-// Default is 1.
-$displayGameName = "1";
-
-// This value is boolean. When this variable is set to Yes or 1, offending symbols will be
-// filtered from the server name. Frequently, people will put unreadable symbols into their
-// server names to get a higher alphabetical listing. This feature will remove the nonsense symbols.
-// Default is 1.
-$filterOffendingServerNameSymbols = "1";
-
-// No Players Online Message
-// This message displays in place of the player list when nobody is online.
-// Default is "No players online."
-$noPlayersOnlineMessage = "No players online.";
-
-// ParaTracker can automatically refresh itself every so often.
-// This will not cause any disruption to the game, because the flood protection
-// limits how often ParaTracker will contact the server.
-// A value of Yes or 1 will enable it, and any other value will disable it.
-// Enabled by default.
-$enableAutoRefresh = "1";
-
-// This value determines how many seconds ParaTracker waits between refreshes.
-// This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
-// Decimals are invalid and will be rounded.
-// It also cannot be higher than 300 seconds.
-// Default is 30 seconds.
-$autoRefreshTimer = "30";
-
-// This variable will set the maximum number of characters ParaTracker will accept from the server.
-// This prevents pranksters from sending 50MB back, in the event that you connect to
-// the wrong server. Minimum is 2000 characters, maximum is 50000 characters.
-// If this limit is met, ParaTracker will terminate with an error.
-// Default is 16384 characters (One packet).
-$maximumServerInfoSize = "16384";
-
-// This next setting enables "Dynamic" ParaTracker. Clients can load "ParaTrackerDynamic.php" and give
-// an IP address, port number and visual theme ID in the URL, and ParaTracker will connect to that server.
-// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=ParaSkinA"
-// DO *NOT*, I REPEAT, DO *NOT* ENABLE THIS FEATURE UNLESS YOU WANT PEOPLE USING YOUR WEBSITE TO TRACK THEIR SERVERS.
-// Also, DO NOT run ParaTracker in this mode without isolating it in its own webroot first - the consequences
-// can be grave if there is a security hole that I have not yet found!
-// If you do not understand what this feature is, then DO NOT enable it.
-// A value of Yes or 1 will enable it, and any other value will disable it.
-// Disabled by default.
-$dynamicTrackerEnabled = "0";
-
-// The following setting is a personal message that will be displayed on ParaTrackerDynamic.php when a user is setting
-// up ParaTracker for their own use. By default, this is simply a link to our GitHub, where you can download the program
-// for free. The point is to encourage as many people as possible to run the software themselves, and not to rely on Dynamic
-// mode too much.
-// Default is: "ParaTracker is a free, open-source server tracker for Quake 3 based games! Download your own at http://github.com/ParabolicMinds/ParaTracker"
-$personalDynamicTrackerMessage = "ParaTracker is a free, open-source server tracker for Quake 3 based games! Download your own at http://github.com/ParabolicMinds/ParaTracker";
-
-
-// RCON SETTINGS
-// RCON SETTINGS
-
-// This value will enable or disable RCon.
-// A value of Yes or 1 will enable it, and any other value will disable it.
-// Disabled by default for security.
-$RConEnable = "0";
-
-// This value sets the maximum number of characters ParaTracker will send to the server.
-// If the command or password is any larger than this, the command will not be sent.
-// Minimum is 20 characters, maximum is 10000 characters.
-// Default is 100 characters.
-$RConMaximumMessageSize = "100";
-
-// RCon flood protection forces the user to wait a certain number of seconds before sending another command.
-// Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
-// send the command. Minimum is 10 seconds, maximum is 3600.
-// Cannot be lower than the value of $connectionTimeout.
-// Default is 20 seconds.
-$RConFloodProtect = "20";
-
-// RCon events are logged in RConLog.php for security. This variable will determine
-// the maximum number of lines that will be stored in the log file before the old
-// entries are truncated. Minimum is 100 lines. Maximum is 100000.
-// Default is 1000 lines.
-$RConLogSize = "1000";
-
-
-// POPUP WINDOW SETTINGS
-// POPUP WINDOW SETTINGS
-
-// This value is boolean. When the RCon and PARAM buttons are clicked, the popup
-// window will snap to the top left corner of the screen by default. When this
-// variable is set to any value other than Yes or 1, the behavior is disabled.
-// Does not appear to work correctly in Google Chrome.
-// Default is 0.
-$newWindowSnapToCorner = "0";
-
-
-// GEOIP SETTINGS
-// GEOIP SETTINGS
-
-// This value is boolean. When this variable is set to Yes or 1, GeoIP will be enabled, which
-// allows a country flag icon to be displayed on the tracker.
-// GEOIP MUST BE INSTALLED ON THE SERVER FOR THIS TO WORK.
-// If ParaTracker does not find GeoIP, it will ignore this setting and give a debug message.
-// Default is 0.
-$enableGeoIP = "0";
-
-// For GeoIP to work, ParaTracker needs to know where to find the country database. This path
-// needs to point to the GeoIP database file. Include the file name and extension.
-// default value is ""
-$geoIPPath = "";
-
-
-
-// End of config file
-
-/*
-
-ParaTracker is released under the MIT license, which reads thus:
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-*/
-
-?>';
+    $input = str_replace("?>
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title></title>
+</head>
+
+<body>
+  ", ' EXPLOIT REMOVED (QuestionMark, GreaterThan) ', $input); $input = str_replace("*/", ' EXPLOIT REMOVED (Asterisk,
+  ForwardSlash) ', $input); return $input; } function RConLogHeader() { $output =
+  "<?php \n echo '<h3 class=" . '"errorMessage"' . ">RConLog.php can only be viewed with direct file system access.<br />Download it and open it in a text editor.</h3>';\n exit(); \n/*  LOG ENTRIES:\n";
+      return $output;
+  }
+
+  function RConLogFooter()
+  {
+      return "\n*/ ?> "; } function writeNewConfigFile() { $configBuffer = '<?php
+  ///////////////////////////////
+  // ParaTracker Configuration //
+  ///////////////////////////////
+
+  // This is the configuration file for ParaTracker.
+  // If you want to edit fonts and colors, you should edit them
+  // in the css files found in the /skins folder.
+  // The visual settings found here are overrides only and should be used with caution!
+
+  // ONLY modify the variables defined below, between the double quotes!
+  // Changing anything else can break the tracker!
+
+  // If this file ever breaks and you have no idea what is wrong, just delete it.
+  // When ParaTracker is run, it will write a new one for you.
+
+  // If you find any exploits in the code, please bring them to my attention immediately!
+  // Thank you and enjoy!
+
+
+  // NETWORK SETTINGS
+  // NETWORK SETTINGS
+
+  // This is the IP Address of the server. Do not include the port number!
+  // By default, and for security, this value is empty. If ParaTracker is launched without a value here,
+  // it will display a message telling the user to check config.php before running.
+  $serverIPAddress = "";
+
+
+  // Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
+  // The default port number for Jedi Outcast is 28070.
+  // If an invalid entry is given, this value will default to 29070.
+  $serverPort = "";
+
+  // This variable limits how many seconds are required between each snapshot of the server.
+  // This prevents high traffic on the tracker from bogging down the game server it is tracking.
+  // ParaTracker forces a minimum value of 5 seconds between snapshots. Maximum is 1200 seconds.
+  // This value cannot be lower than the value of $connectionTimeout (below).
+  // Default is 15 seconds.
+  $floodProtectTimeout = "15";
+
+  // This value is the number of seconds ParaTracker will wait for a response from the game server
+  // before timing out. If the first attempt fails, a second attempt will be made.
+  // ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
+  // Not recommended to go above 5 seconds, as people will get impatient and leave.
+  // This setting also affects RCon wait times.
+  // Default is 2.5 seconds.
+  $connectionTimeout = "2.5";
+
+  // This value, given in seconds, determines how long ParaTracker will wait for a current refresh of
+  // the server info to complete, before giving up and forcing another one. Raise this value if your
+  // web server is busy or slow to reduce the load on the game server.
+  // Minimum is 1 second, maximum is 15 seconds.
+  // Default is 3 seconds.
+  $refreshTimeout = "3";
+
+
+  // VISUAL SETTINGS
+  // VISUAL SETTINGS
+
+  // These settings are OVERRIDES ONLY. Use with caution!
+
+  // This line specifies which skin file to load. Skins are found in the skins/ folder, and they are all
+  // simple CSS files. The name is case sensitive.
+  // ParaTracker will automatically search in the skins/ folder for the file specified, and it will automatically
+  // add the ".css" file extension. All you need to include here is the file name, minus the extension.
+  // You can make your own custom CSS skins, but if you want to use JSON to make a custom skin, then
+  // set this value to "JSON" and the tracker will send an unformatted JSON response.
+  // Default value is "Metallic Console"
+  $paraTrackerSkin = "Metallic Console";
+
+  // This is a 6 character hexadecimal value that specifies the background color to be used.
+  // The skin chosen will already have it\'s own color; this value will override it, if desired.
+  // Default value is "".
+  $backgroundColor = "";
+
+  // This value is a percentage, from 0 to 100, of how opaque the background color will be.
+  // Default value is "100".
+  $backgroundOpacity = "100";
+
+  // This is a 6 character hexadecimal value that specifies the color of the odd rows on the player list.
+  // The skin chosen will already have it\'s own color; this value will override it, if desired.
+  // Default value is "".
+  $playerListColor1 = "";
+
+  // This value is a percentage, from 0 to 100, of how opaque the color of the odd rows on the player list will be.
+  // Default value is "100".
+  $playerListColor1Opacity = "100";
+
+  // This is a 6 character hexadecimal value that specifies the color of the even rows on the player list.
+  // The skin chosen will already have it\'s own color; this value will override it, if desired.
+  // Default value is "".
+  $playerListColor2 = "";
+
+  // This value is a percentage, from 0 to 100, of how opaque the color of the even rows on the player list will be.
+  // Default value is "100".
+  $playerListColor2Opacity = "100";
+
+  // This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
+  // It will not change the color of server names, mod names, map names, or player names.
+  // The skin chosen will already have it\'s own color; this value will override it, if desired.
+  // Default value is "".
+  $textColor = "";
+
+  // This value specifies a font to be used on the tracker page. Font families are also accepted.
+  // Make sure you use a common font so everyone can see it!
+  // Default value is "".
+  $customFont = "";
+
+
+  // LEVELSHOT SETTINGS
+  // LEVELSHOT SETTINGS
+
+  // Levelshots will be searched for on the web server in the images/levelshots folder.
+  // If the map is mp/ffa5, ParaTracker will search for images in images/levelshots/mp/ffa5.
+
+  // For levelshots to animate, they will have to be named with _1, _2, and _3 at the end of the file name.
+  // For instance, to have three animated levelshots for mp/ffa5, the files would have to be in
+  // the images/levelshots/mp folder, and they would need to be named ffa5_1.jpg, ffa5_2.jpg,
+  // and ffa5_3.jpg
+
+  // ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be used first, JPGs second,
+  // and GIFs third. If no images are found, a placeholder image will be displayed instead.
+
+  // The following value will enable or disable levelshot transitions. A value of 1 or "Yes" will allow them,
+  // and any other value with disable them. If this is disabled, only the first levelshot will show.
+  // Default value is 1.
+  $levelshotTransitionsEnabled = "1";
+
+  // This is the amount of time, in seconds, each levelshot will be displayed before moving on to the next.
+  // Decimals are acceptable. Minimum is 1 second. Maximum is 15 seconds.
+  // Default is 3 seconds.
+  $levelshotDisplayTime = "3";
+
+  // This is the amount of time, in second, each levelshot will take to fade into the next one.
+  // Note that fades do not work in some browsers, like Internet Explorer 8.
+  // Decimals are acceptable. Minimum is 0.1 seconds. Maximum is 5 seconds.
+  // Default is 1 seconds.
+  $levelshotTransitionTime = "1";
+
+  // This is the animation that will be used for fading levelshots.
+  // If you want to change the animations, they are found in "css/LevelshotAnimations.css"
+  // Valid values are whole numbers between 0 to 999 (No decimals).
+  // Setting this value to 0 will play a random animation.
+  // Default value is 0
+  // The default transitions are as follows:
+  // Transition 1: Fade
+  // Transition 2: Fade to black
+  // Transition 3: Hue shift
+  // Transition 4: Skew
+  // Transition 5: Horizontal Stretch
+  // Transition 6: Stretch and rebound
+  // Transition 7: Slide to left
+  // Transition 8: Slide to right
+  // Transition 9: Slide to top
+  // Transition 10: Slide to bottom
+  // Transition 11: Spin and fly to top left
+  // Transition 12: Spin and fly to top right
+  // Transition 13: Fall away and spin
+  // Transition 14: Zoom in
+  // Transition 15: Blur
+  $levelshotTransitionAnimation = "0";
+
+  // The following value is the maximum number of levelshots that can be used. Keep in mind that
+  // more levelshots is not always better. Minimum is 1, maximum is 99.
+  // Default is 20 levelshots.
+  $maximumLevelshots = "20";
+
+
+  // TRACKER SETTINGS
+  // TRACKER SETTINGS
+
+  // This value is boolean. When this variable is set to Yes or 1, the game name will be displayed
+  // in the tracker. Otherwise, it will be hidden.
+  // Default is 1.
+  $displayGameName = "1";
+
+  // This value is boolean. When this variable is set to Yes or 1, offending symbols will be
+  // filtered from the server name. Frequently, people will put unreadable symbols into their
+  // server names to get a higher alphabetical listing. This feature will remove the nonsense symbols.
+  // Default is 1.
+  $filterOffendingServerNameSymbols = "1";
+
+  // No Players Online Message
+  // This message displays in place of the player list when nobody is online.
+  // Default is "No players online."
+  $noPlayersOnlineMessage = "No players online.";
+
+  // ParaTracker can automatically refresh itself every so often.
+  // This will not cause any disruption to the game, because the flood protection
+  // limits how often ParaTracker will contact the server.
+  // A value of Yes or 1 will enable it, and any other value will disable it.
+  // Enabled by default.
+  $enableAutoRefresh = "1";
+
+  // This value determines how many seconds ParaTracker waits between refreshes.
+  // This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
+  // Decimals are invalid and will be rounded.
+  // It also cannot be higher than 300 seconds.
+  // Default is 30 seconds.
+  $autoRefreshTimer = "30";
+
+  // This variable will set the maximum number of characters ParaTracker will accept from the server.
+  // This prevents pranksters from sending 50MB back, in the event that you connect to
+  // the wrong server. Minimum is 2000 characters, maximum is 50000 characters.
+  // If this limit is met, ParaTracker will terminate with an error.
+  // Default is 16384 characters (One packet).
+  $maximumServerInfoSize = "16384";
+
+  // This next setting enables "Dynamic" ParaTracker. Clients can load "ParaTrackerDynamic.php" and give
+  // an IP address, port number and visual theme ID in the URL, and ParaTracker will connect to that server.
+  // For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=ParaSkinA"
+  // DO *NOT*, I REPEAT, DO *NOT* ENABLE THIS FEATURE UNLESS YOU WANT PEOPLE USING YOUR WEBSITE TO TRACK THEIR SERVERS.
+  // Also, DO NOT run ParaTracker in this mode without isolating it in its own webroot first - the consequences
+  // can be grave if there is a security hole that I have not yet found!
+  // If you do not understand what this feature is, then DO NOT enable it.
+  // A value of Yes or 1 will enable it, and any other value will disable it.
+  // Disabled by default.
+  $dynamicTrackerEnabled = "0";
+
+  // The following setting is a personal message that will be displayed on ParaTrackerDynamic.php when a user is setting
+  // up ParaTracker for their own use. By default, this is simply a link to our GitHub, where you can download the program
+  // for free. The point is to encourage as many people as possible to run the software themselves, and not to rely on Dynamic
+  // mode too much.
+  // Default is: "ParaTracker is a free, open-source server tracker for Quake 3 based games! Download your own at http://github.com/ParabolicMinds/ParaTracker"
+  $personalDynamicTrackerMessage = "ParaTracker is a free, open-source server tracker for Quake 3 based games! Download your own at http://github.com/ParabolicMinds/ParaTracker";
+
+
+  // RCON SETTINGS
+  // RCON SETTINGS
+
+  // This value will enable or disable RCon.
+  // A value of Yes or 1 will enable it, and any other value will disable it.
+  // Disabled by default for security.
+  $RConEnable = "0";
+
+  // This value sets the maximum number of characters ParaTracker will send to the server.
+  // If the command or password is any larger than this, the command will not be sent.
+  // Minimum is 20 characters, maximum is 10000 characters.
+  // Default is 100 characters.
+  $RConMaximumMessageSize = "100";
+
+  // RCon flood protection forces the user to wait a certain number of seconds before sending another command.
+  // Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
+  // send the command. Minimum is 10 seconds, maximum is 3600.
+  // Cannot be lower than the value of $connectionTimeout.
+  // Default is 20 seconds.
+  $RConFloodProtect = "20";
+
+  // RCon events are logged in RConLog.php for security. This variable will determine
+  // the maximum number of lines that will be stored in the log file before the old
+  // entries are truncated. Minimum is 100 lines. Maximum is 100000.
+  // Default is 1000 lines.
+  $RConLogSize = "1000";
+
+
+  // POPUP WINDOW SETTINGS
+  // POPUP WINDOW SETTINGS
+
+  // This value is boolean. When the RCon and PARAM buttons are clicked, the popup
+  // window will snap to the top left corner of the screen by default. When this
+  // variable is set to any value other than Yes or 1, the behavior is disabled.
+  // Does not appear to work correctly in Google Chrome.
+  // Default is 0.
+  $newWindowSnapToCorner = "0";
+
+
+  // GEOIP SETTINGS
+  // GEOIP SETTINGS
+
+  // This value is boolean. When this variable is set to Yes or 1, GeoIP will be enabled, which
+  // allows a country flag icon to be displayed on the tracker.
+  // GEOIP MUST BE INSTALLED ON THE SERVER FOR THIS TO WORK.
+  // If ParaTracker does not find GeoIP, it will ignore this setting and give a debug message.
+  // Default is 0.
+  $enableGeoIP = "0";
+
+  // For GeoIP to work, ParaTracker needs to know where to find the country database. This path
+  // needs to point to the GeoIP database file. Include the file name and extension.
+  // default value is ""
+  $geoIPPath = "";
+
+
+
+  // End of config file
+
+  /*
+
+  ParaTracker is released under the MIT license, which reads thus:
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  */
+
+  ?>';
 file_put_contents('ParaConfig.php', $configBuffer);
 }
 

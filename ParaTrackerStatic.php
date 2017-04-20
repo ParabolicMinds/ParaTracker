@@ -58,7 +58,7 @@ if (file_exists("info/" . dynamicIPAddressPath . "serverDump.txt") && file_get_c
     else
     {
         //Render a normal tracker page
-        $output = renderNormalHTMLPage(file_get_contents("info/" . dynamicIPAddressPath . "gamename.txt"));
+        $output = renderNormalHTMLPage();
 
         //Flush the output buffer to the client
         ob_end_flush();
