@@ -32,6 +32,8 @@ if (!isset($safeToExecuteParaFunc))
 }
 
 //This block is here to suppress error messages
+$serverIPAddress = "";
+$serverPort = "";
 $personalDynamicTrackerMessage = "";
 $lastRefreshTime = "";
 $floodProtectTimeout = "";
@@ -101,6 +103,10 @@ if(!isset($calledFromRCon))
 if(!isset($calledFromParam))
 {
     $calledFromParam = "0";
+}
+if(!isset($calledFromElsewhere))
+{
+    $calledFromElsewhere = "0";
 }
 
 /*
@@ -178,7 +184,7 @@ else
     }
 }
 
-if($executeDynamicInstructionsPage == "0")
+if($executeDynamicInstructionsPage == "0" && $calledFromElsewhere == "0")
 {
     //By default, static mode will already have given us an IP address before all of this took place.
     //So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
