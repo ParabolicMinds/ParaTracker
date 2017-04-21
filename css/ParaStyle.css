@@ -635,3 +635,76 @@ display: none;
 {
 display: none;
 }
+
+.reqforminfo {
+    display: inline-block;
+    margin-top: 40px;
+    font-weight: bold;
+    color: #F40;
+    margin-bottom: 10px;
+}
+
+#reqform {
+	display: inline-flex;
+	flex-direction: column;
+    width: 450px;
+    margin-bottom: 40px;
+    background-color: #222;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #F40;
+    box-shadow: 0px 0px 20px #F40, inset 0px 0px 10px #F40;
+}
+
+#reqform > * {
+	margin: 5px 0px;
+}
+
+.reqformrow {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.reqformlabel {
+    flex: 0 0 auto;
+    font-weight: bold;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.reqformtextentry {
+    flex: 1 1 auto;
+}
+
+.reqformsubmit {
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 5px;
+    outline: none;
+    color: #CCC;
+    font-weight: bold;
+}
+
+.reqformsubmit:hover {
+    color: #000;
+    background-color: #F40;
+}
+
+.notificationText {
+    font-weight: bold;
+    color: #000;
+}
+
+.notificationSuccess {
+    background-color: #0F0;
+}
+
+.notificationFail {
+    background-color: #F00;
+}
+
+.notificationInfo {
+    background-color: #08F;
+}

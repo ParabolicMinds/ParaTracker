@@ -437,6 +437,17 @@ if (enablePGSQL) {
     if (!empty(pgPass)) $connectString .= " password=" . pgPass;
     if (!empty(pgPort)) $connectString .= " port=" . pgPort;
     $pgCon = pg_connect($connectString);
+    if (!$pgCon) displayError("Could not establish database connection", $lastRefreshTime);
+
+    pg_query($pgCon, 'CREATE SCHEMA IF NOT EXISTS account')
+        or die ('could not create mapreq schema: ' . pg_last_error());
+    pg_query($pgCon, 'CREATE TABLE IF NOT EXISTS account.user (id BIGSERIAL PRIMARY KEY, username VARCHAR(64) UNIQUE NOT NULL, passhash VARCHAR(128) NOT NULL, salt VARCHAR(16) NOT NULL)')
+        or die ('could not create admin table: ' . pg_last_error());
+    pg_query($pgCon, 'CREATE TABLE IF NOT EXISTS account.session (id BIGSERIAL PRIMARY KEY REFERENCES account.user ON UPDATE CASCADE ON DELETE CASCADE, token VARCHAR(64) NOT NULL, expires TIMESTAMP NOT NULL)')
+        or die ('could not create cookie table: ' . pg_last_error());
+
+    pg_query($pgCon, 'CREATE TABLE IF NOT EXISTS mapreq (id BIGSERIAL PRIMARY KEY, game_name VARCHAR(128) NOT NULL, bsp_name VARCHAR(128) NOT NULL, dl_link TEXT, entry_date TIMESTAMP DEFAULT NOW(), UNIQUE(game_name, bsp_name))')
+        or die ('could not create map table: ' . pg_last_error());
 }
 
 if($executeDynamicInstructionsPage == "1")
@@ -1629,18 +1640,40 @@ function colorize($input)
     return $input;
 }
 
+function pageNotificationSuccess($msg) {
+    $output = '<div class="notificationSuccess"><span class="notificationText">';
+    $output .= $msg;
+    $output .= '</span></div>';
+    return $output;
+}
+
+function pageNotificationFailure($msg) {
+    $output = '<div class="notificationFail"><span class="notificationText">';
+    $output .= $msg;
+    $output .= '</span></div>';
+    return $output;
+}
+
+function pageNotificationInformation($msg) {
+    $output = '<div class="notificationInfo"><span class="notificationText">';
+    $output .= $msg;
+    $output .= '</span></div>';
+    return $output;
+}
+
 function dynamicInstructionsPage($personalDynamicTrackerMessage)
 {
+    global $pgCon;
+
     $gameListArray = detectGameName("");
     //The output returned will be an array. Position 0 is a full game list, position 1 is a filtered game list (Useful for hiding duplicate game entries)
     $gameList = $gameListArray[1];
     $gameOutput = "";
 
-
-  for($i = 0; $i < count($gameList); $i++)
-  {
+    for($i = 0; $i < count($gameList); $i++)
+    {
     $gameOutput .= $gameList[$i] . ', ';
-  }
+    }
 
     $urlWithoutParameters = explode('?', $_SERVER["REQUEST_URI"], 2);
     $currentURL = $_SERVER['HTTP_HOST'] . $urlWithoutParameters[0];
@@ -1658,7 +1691,30 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
 ';
 
     $output .= '<div class="paraTrackerTestFrameTexturePreload"></div>';
-    $output .= '<div class="dynamicPageContainer"><div class="dynamicPageWidth"><h1>' . versionNumber() . ' - Dynamic Mode</h1>
+    $output .= '<div class="dynamicPageContainer"><div class="dynamicPageWidth">';
+
+    // Process POST and print notifications
+    if (!empty($_POST['mapreq_bsp_game']) || !empty($_POST['mapreq_bsp_name'])) { // Map Request Submission
+        if (!enablePGSQL) {
+            $output .= pageNotificationFailure("Cannot submit map request, PGSQL is NOT enabled!");
+        } else if (!empty($_POST['mapreq_bsp_game']) && !empty($_POST['mapreq_bsp_name'])) {
+            $mapreq_bsp_game = $_POST['mapreq_bsp_game'];
+            $mapreq_bsp_name = $_POST['mapreq_bsp_name'];
+            $mapreq_bsp_link = "";
+            if (!empty($_POST['mapreq_bsp_link'])) $mapreq_bsp_link = $_POST['mapreq_bsp_link'];
+            pg_query_params($pgCon, '
+                INSERT INTO mapreq (game_name, bsp_name, dl_link)
+                VALUES ($1, $2, $3)
+                ON CONFLICT (game_name, bsp_name) DO UPDATE
+                SET dl_link = $3, entry_date = NOW()', array($mapreq_bsp_game, $mapreq_bsp_name, $mapreq_bsp_link))
+                or displayError ('could not insert data into map table', $lastRefreshTime);
+            $output .= pageNotificationSuccess("Submission received!");
+        } else { // Required field not filled out
+            $output .= pageNotificationFailure("Must fill out BOTH REQUIRED fields for map request!");
+        }
+    }
+
+    $output .= '<h1>' . versionNumber() . ' - Dynamic Mode</h1>
     <i>' . $personalDynamicTrackerMessage . '</i>
     <h6>ParaConfig.php settings still apply, so for instance, if you want to enable RCon, or change the auto refresh delay, it must be changed in ParaConfig.php,<br />by the server owner. For a full set of options, you can host your own ParaTracker.</h6>';
 
@@ -1837,13 +1893,45 @@ $output .= '</div>';
 //End of bit value calculator
 
 $output .= '<p class="collapsedFrame">Current page URL:<br /><input type="text" size="80" id="currentURL" value="' . $currentURL . '" readonly /></p>
-    <br />
-    <h3>Enter the data below to get a URL you can use for ParaTracker Dynamic:</h3>
+    <br />';
+
+if (enablePGSQL) {
+    $output .= '<span class="reqforminfo">&gt;&gt;&gt; Is ParaTracker missing levelshots? Fill out the below form to request levelshots for a specific map. &lt;&lt;&lt;</span><br>';
+    $output .= '<form method="POST" onsubmit="return confirm(\'Submitting will reload the page and reset anything on it. Continue?\');">
+        			<div id="reqform">
+        				<div class="reqformrow">
+        					<span class="reqformlabel">Game Name:</span>
+        					<input class="reqformtextentry" type="text" name="mapreq_bsp_game" placeholder="REQUIRED (e.g. Jedi Academy)">
+        				</div>
+        				<div class="reqformrow">
+        					<span class="reqformlabel">BSP Name:</span>
+        					<input class="reqformtextentry" type="text" name="mapreq_bsp_name" placeholder="REQUIRED (excluding .bsp)">
+        				</div>
+        				<div class="reqformrow">
+        					<span class="reqformlabel">BSP Download:</span>
+        					<input class="reqformtextentry" type="text" name="mapreq_bsp_link" placeholder="OPTIONAL (but greatly appreciated)">
+        				</div>
+        				<input class="reqformsubmit" type="submit" value="SUBMIT">
+        			</div>
+        		</form>';
+
+    $output .= '<div id="reqmapscont">
+                    <div id="reqmapsheader">';
+    if ($admin) $output .= '<span class="reqmapsfield reqmapsdeletefield remapsheaderfield"></span>';
+    $output .= '<span class="reqmapsfield reqmapsgamefield remapsheaderfield">Game</span>
+                <span class="reqmapsfield reqmapsbspfield remapsheaderfield">BSP</span>
+                <span class="reqmapsfield reqmapslinkfield remapsheaderfield">Download</span>
+                </div><div id="reqmapsbody">';
+
+    $output .= '</div></div>';
+}
+
+$output .= '<h3>Enter the data below to get a URL you can use for ParaTracker Dynamic:</h3>
 
     <form>
 
     <h3><span class="gameColor1">Server IP Address:</span> <input type="text" size="46" onchange="createURL()" id="IPAddress" value="" /></h3>
-    <h3><span class="gameColor1">:</span> <input type="text" size="15" onchange="createURL()" id="PortNumber" value="" /></h3>';
+    <h3><span class="gameColor1">Server port number:</span> <input type="text" size="15" onchange="createURL()" id="PortNumber" value="" /></h3>';
 
 
     //Let's dynamically find the CSS files, and parse the resolution of the tracker from them
