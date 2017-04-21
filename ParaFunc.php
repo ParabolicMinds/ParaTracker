@@ -57,6 +57,7 @@ $pgName = "";
 $pgHost = "";
 $pgPort = "";
 
+$admin = false;
 
 define("defaultSkin", $defaultSkin);
 
@@ -1646,27 +1647,6 @@ function colorize($input)
     return $input;
 }
 
-function pageNotificationSuccess($msg) {
-    $output = '<div class="notificationSuccess"><span class="notificationText">';
-    $output .= $msg;
-    $output .= '</span></div>';
-    return $output;
-}
-
-function pageNotificationFailure($msg) {
-    $output = '<div class="notificationFail"><span class="notificationText">';
-    $output .= $msg;
-    $output .= '</span></div>';
-    return $output;
-}
-
-function pageNotificationInformation($msg) {
-    $output = '<div class="notificationInfo"><span class="notificationText">';
-    $output .= $msg;
-    $output .= '</span></div>';
-    return $output;
-}
-
 function dynamicInstructionsPage($personalDynamicTrackerMessage)
 {
     global $pgCon;
@@ -1698,27 +1678,6 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
 
     $output .= '<div class="paraTrackerTestFrameTexturePreload"></div>';
     $output .= '<div class="dynamicPageContainer"><div class="dynamicPageWidth">';
-
-    // Process POST and print notifications
-    if (!empty($_POST['mapreq_bsp_game']) || !empty($_POST['mapreq_bsp_name'])) { // Map Request Submission
-        if (!enablePGSQL) {
-            $output .= pageNotificationFailure("Cannot submit map request, PGSQL is NOT enabled!");
-        } else if (!empty($_POST['mapreq_bsp_game']) && !empty($_POST['mapreq_bsp_name'])) {
-            $mapreq_bsp_game = $_POST['mapreq_bsp_game'];
-            $mapreq_bsp_name = $_POST['mapreq_bsp_name'];
-            $mapreq_bsp_link = "";
-            if (!empty($_POST['mapreq_bsp_link'])) $mapreq_bsp_link = $_POST['mapreq_bsp_link'];
-            pg_query_params($pgCon, '
-                INSERT INTO mapreq (game_name, bsp_name, dl_link)
-                VALUES ($1, $2, $3)
-                ON CONFLICT (game_name, bsp_name) DO UPDATE
-                SET dl_link = $3, entry_date = NOW()', array($mapreq_bsp_game, $mapreq_bsp_name, $mapreq_bsp_link))
-                or displayError ('could not insert data into map table', $lastRefreshTime);
-            $output .= pageNotificationSuccess("Submission received!");
-        } else { // Required field not filled out
-            $output .= pageNotificationFailure("Must fill out BOTH REQUIRED fields for map request!");
-        }
-    }
 
     $output .= '<h1>' . versionNumber() . ' - Dynamic Mode</h1>
     <i>' . $personalDynamicTrackerMessage . '</i>
@@ -1903,33 +1862,8 @@ $output .= '<p class="collapsedFrame">Current page URL:<br /><input type="text" 
 
 if (enablePGSQL) {
     $output .= '<span class="reqforminfo">&gt;&gt;&gt; Is ParaTracker missing levelshots? Fill out the below form to request levelshots for a specific map. &lt;&lt;&lt;</span><br>';
-    $output .= '<form method="POST" onsubmit="return confirm(\'Submitting will reload the page and reset anything on it. Continue?\');">
-        			<div id="reqform">
-        				<div class="reqformrow">
-        					<span class="reqformlabel">Game Name:</span>
-        					<input class="reqformtextentry" type="text" name="mapreq_bsp_game" placeholder="REQUIRED (e.g. Jedi Academy)">
-        				</div>
-        				<div class="reqformrow">
-        					<span class="reqformlabel">BSP Name:</span>
-        					<input class="reqformtextentry" type="text" name="mapreq_bsp_name" placeholder="REQUIRED (excluding .bsp)">
-        				</div>
-        				<div class="reqformrow">
-        					<span class="reqformlabel">BSP Download:</span>
-        					<input class="reqformtextentry" type="text" name="mapreq_bsp_link" placeholder="OPTIONAL (but greatly appreciated)">
-        				</div>
-        				<input class="reqformsubmit" type="submit" value="SUBMIT">
-        			</div>
-        		</form>';
-
-    $output .= '<div id="reqmapscont">
-                    <div id="reqmapsheader">';
-    if ($admin) $output .= '<span class="reqmapsfield reqmapsdeletefield remapsheaderfield"></span>';
-    $output .= '<span class="reqmapsfield reqmapsgamefield remapsheaderfield">Game</span>
-                <span class="reqmapsfield reqmapsbspfield remapsheaderfield">BSP</span>
-                <span class="reqmapsfield reqmapslinkfield remapsheaderfield">Download</span>
-                </div><div id="reqmapsbody">';
-
-    $output .= '</div></div>';
+    $output .= '<a href="ParaMapReqList.php" style="font-size: 12px; font-weight: bold; color: #F08;">You can see the current list by clicking here</a><br>';
+    $output .= '<iframe src="ParaMapReq.php" style="border:none;display:inline-block;" width=600 height=250></iframe>';
 }
 
 $output .= '<h3>Enter the data below to get a URL you can use for ParaTracker Dynamic:</h3>

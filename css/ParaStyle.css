@@ -45,6 +45,23 @@ font-family: monospace;
 color: #EEEEEE;
 }
 
+.mapReqListPageStyle {
+    background-color: #111111;
+    font-size: 12pt;
+    font-family: monospace;
+    color: #EEEEEE;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+}
+
 /* This class is for the buttons on ParaTrackerDynamic.php */
 .dynamicFormButtonsStyle
 {
@@ -640,7 +657,7 @@ display: none;
     display: inline-block;
     margin-top: 40px;
     font-weight: bold;
-    color: #F40;
+    color: #F08;
     margin-bottom: 10px;
 }
 
@@ -652,8 +669,8 @@ display: none;
     background-color: #222;
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid #F40;
-    box-shadow: 0px 0px 20px #F40, inset 0px 0px 10px #F40;
+    border: 1px solid #90B;
+    box-shadow: 0px 0px 20px #90B, inset 0px 0px 10px #90B;
 }
 
 #reqform > * {
@@ -689,12 +706,111 @@ display: none;
 
 .reqformsubmit:hover {
     color: #000;
-    background-color: #F40;
+    background-color: #90B;
+}
+
+#entrytop {
+    flex: 0 1 auto;
+	display: flex;
+	flex-direction: column;
+	width: 900px;
+	background-color: #444;
+	padding: 4px;
+	border: 4px solid #111;
+	margin: 20px 0px;
+	text-align: left;
+	overflow: hidden;
+    min-height: 0px;
+}
+
+#entryheader {
+	flex: 0 0 auto;
+	height: 40px;
+	background-color: #181818;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 0px 5px;
+}
+
+#entrybody {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	overflow: auto;
+}
+
+.entrycont {
+	flex: 1 1 auto;
+	min-height: fit-content;
+	min-height: 25px;
+	max-height: 30px;
+	padding: 0px 5px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.entrycont_dbg {
+	background-color: #222;
+}
+
+.entrycont_lbg {
+	background-color: #282828;
+}
+
+.entryheaderfield {
+	font-weight: bold;
+}
+
+.entryfield {
+	min-width: 0px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 0px 5px;
+}
+
+.entrydeletefield {
+	flex: 0 0 auto;
+	width: 20px;
+	text-align: center;
+}
+
+.entrydeletebutton {
+	display: inline-block;
+	width: 20px;
+	background-color: #C00;
+	margin: none;
+	padding: 2px;
+	border: 1px solid #400;
+	outline: none;
+	border-radius: 5px;
+}
+
+.entrydeletebutton:hover {
+	background-color: #F00;
+}
+
+.entrygamefield {
+	flex: 0 0 auto;
+	width: 250px;
+}
+
+.entrybspfield {
+	flex: 0 0 auto;
+	width: 450px;
+}
+
+.entrylinkfield {
+	flex: 1 1 auto;
 }
 
 .notificationText {
     font-weight: bold;
     color: #000;
+    font-size: 12px;
 }
 
 .notificationSuccess {
