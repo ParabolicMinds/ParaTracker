@@ -7,27 +7,6 @@ include 'ParaFunc.php';
 echo "-->";
 echo htmlDeclarations("", "");
 
-function pageNotificationSuccess($msg) {
-    $output = '<div class="notificationSuccess"><span class="notificationText">';
-    $output .= $msg;
-    $output .= '</span></div>';
-    return $output;
-}
-
-function pageNotificationFailure($msg) {
-    $output = '<div class="notificationFail"><span class="notificationText">';
-    $output .= $msg;
-    $output .= '</span></div>';
-    return $output;
-}
-
-function pageNotificationInformation($msg) {
-    $output = '<div class="notificationInfo"><span class="notificationText">';
-    $output .= $msg;
-    $output .= '</span></div>';
-    return $output;
-}
-
 ?>
 
 <body class="dynamicConfigPageStyle" style="text-align:center;padding-top:10px;">

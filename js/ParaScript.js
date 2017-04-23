@@ -111,7 +111,7 @@ function firstExecution()
             document.getElementById("topLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
             shot++;
             document.getElementById("bottomLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
- 
+
             //let's set up a pre-loader in case there are more than 2 levelshots
             shot++;
             //In case there are only two levelshots, then we will just go back to shot 1
@@ -122,7 +122,7 @@ function firstExecution()
             //In case there are only three levelshots, then we will just go back to shot 1
             if(shot > maxLevelshots) shot = 1;
             document.getElementById("levelshotPreload2").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
- 
+
             opac = 1;
             count = 0;
             mode = 1;
@@ -246,8 +246,8 @@ function toggleReload()
 
 function disableRConForm()
 {
-    document.getElementById("commandTextField").readOnly = true; 
-    document.getElementById("passwordTextField").readOnly = true; 
+    document.getElementById("commandTextField").readOnly = true;
+    document.getElementById("passwordTextField").readOnly = true;
     document.getElementById("submitButton").disabled = true;
     return true;
 }
