@@ -1697,7 +1697,7 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
     </head><body class="dynamicConfigPage dynamicConfigPageStyle">
 ';
 
-    $output .=  '<form method="POST">
+    if (enablePGSQL) $output .=  '<form method="POST">
             		<div id="adminlogin">
             			<input type="text" class="adminentry" name="username" placeholder="username">
             			<input type="password" class="adminentry" name="password" placeholder="password">
