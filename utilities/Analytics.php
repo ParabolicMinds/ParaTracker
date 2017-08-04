@@ -239,17 +239,6 @@ function get_analytics_data($modeflags, $server_id, $start, $end) {
 	$do_playercount = $modeflags & (1 << 6);
 
 	global $pgCon;
-	$frames_fetch = pg_fetch_all(pg_query_params($pgCon, "SELECT id FROM analytics.frame WHERE server_id = $1 AND entrydate BETWEEN $2 AND $3", array($server_id, date('Y-m-d H:i', $start), date('Y-m-d H:i', $end))));
-	$frame_ids = array();
-
-	if(empty($frames_fetch))
-	{
-	    //No valid info for the time range specified. Return nothing.
-	    return null;
-	}
-    foreach ($frames_fetch as $frame) {
-	    array_push($frame_ids, $frame['id']);
-    }
 
 	$query = "SELECT frame.entrydate AS entrydate";
 
@@ -269,9 +258,9 @@ function get_analytics_data($modeflags, $server_id, $start, $end) {
 	if ($do_modname) $query .= " LEFT OUTER JOIN analytics.modname ON record.modname_id = modname.id";
 	if ($do_gametype) $query .= " LEFT OUTER JOIN analytics.gametype ON record.gametype_id = gametype.id";
 
-	$query .= " WHERE server_id = $1 ORDER BY entrydate ASC";
+	$query .= " WHERE server_id = $1 AND entrydate BETWEEN $2 AND $3 ORDER BY entrydate ASC";
 
-	$record_fetch = pg_fetch_all(pg_query_params($pgCon, $query, array($server_id)));
+	$record_fetch = pg_fetch_all(pg_query_params($pgCon, $query, array($server_id, date('Y-m-d H:i', $start), date('Y-m-d H:i', $end))));
 	return $record_fetch;
 }
 
