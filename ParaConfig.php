@@ -1,4 +1,5 @@
 <?php
+
 ///////////////////////////////
 // ParaTracker Configuration //
 ///////////////////////////////
@@ -6,30 +7,31 @@
 // This is the configuration file for ParaTracker.
 // If you want to edit fonts and colors, you should edit them
 // in the css files found in the /skins folder.
-// The visual settings found here are overrides only and should be used with caution!
+// The visual settings found here are overrides only, and should be used with caution!
 
 // ONLY modify the variables defined below, between the double quotes!
 // Changing anything else can break the tracker!
 
 // If this file ever breaks and you have no idea what is wrong, just delete it.
-// When ParaTracker is run, it will write a new one for you.
+// The next time ParaTracker is run, it will create a new one for you.
 
-// If you find any exploits in the code, please bring them to my attention immediately!
+// If you find any exploits in the code, please bring them to our attention immediately!
 // Thank you and enjoy!
 
 
+/*==================================================================================================*/
 // NETWORK SETTINGS
 // NETWORK SETTINGS
 
 // This is the IP Address of the server. Do not include the port number!
 // By default, and for security, this value is empty. If ParaTracker is launched without a value here,
-// it will display a message telling the user to check config.php before running.
+// it will display a message telling the user to check ParaConfig.php before running.
 $serverIPAddress = "";
-
 
 // Port number of the server. The default port for Jedi Academy is 29070. Another common port is 21000.
 // The default port number for Jedi Outcast is 28070.
 // If an invalid entry is given, this value will default to 29070.
+//$serverPort = "";
 $serverPort = "";
 
 // This variable limits how many seconds are required between each snapshot of the server.
@@ -47,7 +49,7 @@ $floodProtectTimeout = "15";
 // Default is 2.5 seconds.
 $connectionTimeout = "2.5";
 
-// This value, given in seconds, determines how long ParaTracker will wait for a current refresh of
+// This value determines how many seconds ParaTracker will wait for a current refresh of
 // the server info to complete, before giving up and forcing another one. Raise this value if your
 // web server is busy or slow to reduce the load on the game server.
 // Minimum is 1 second, maximum is 15 seconds.
@@ -55,19 +57,21 @@ $connectionTimeout = "2.5";
 $refreshTimeout = "3";
 
 
+/*==================================================================================================*/
 // VISUAL SETTINGS
 // VISUAL SETTINGS
 
-// These settings are OVERRIDES ONLY. Use with caution!
-
-// This line specifies which skin file to load. Skins are found in the skins/ folder, and they are all
-// simple CSS files. The name is case sensitive.
-// ParaTracker will automatically search in the skins/ folder for the file specified, and it will automatically
+// This line specifies which skin file to load. Skins are found in the $skinsPath folder (Found near the bottom
+// of this file), and they are all simple CSS files. The file name is case sensitive.
+// ParaTracker will automatically search in the $skinsPath folder for the file specified, and it will automatically
 // add the ".css" file extension. All you need to include here is the file name, minus the extension.
-// You can make your own custom CSS skins, but if you want to use JSON to make a custom skin, then
+// You can make your own custom CSS skins. If you want to use JSON to make a fully custom skin, then
 // set this value to "JSON" and the tracker will send an unformatted JSON response.
 // Default value is "Metallic Console"
 $paraTrackerSkin = "Metallic Console";
+
+// The following visual settings are OVERRIDES ONLY. Use with caution!
+// The following visual settings are OVERRIDES ONLY. Use with caution!
 
 // This is a 6 character hexadecimal value that specifies the background color to be used.
 // The skin chosen will already have it's own color; this value will override it, if desired.
@@ -96,6 +100,16 @@ $playerListColor2 = "";
 // Default value is "100".
 $playerListColor2Opacity = "100";
 
+// This is a 6 character hexadecimal value that specifies the color of the scrollbar shaft.
+// The skin chosen will already have it's own color; this value will override it, if desired.
+// Default value is "".
+$scrollShaftColor = "";
+
+// This is a 6 character hexadecimal value that specifies the color of the scrollbar thumb.
+// The skin chosen will already have it's own color; this value will override it, if desired.
+// Default value is "".
+$scrollThumbColor = "";
+
 // This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
 // It will not change the color of server names, mod names, map names, or player names.
 // The skin chosen will already have it's own color; this value will override it, if desired.
@@ -108,40 +122,41 @@ $textColor = "";
 $customFont = "";
 
 
+/*==================================================================================================*/
 // LEVELSHOT SETTINGS
 // LEVELSHOT SETTINGS
 
-// Levelshots will be searched for on the web server in the images/levelshots folder.
-// If the map is mp/ffa5, ParaTracker will search for images in images/levelshots/mp/ffa5.
+// Levelshots will be searched for in the images/levelshots folder.
+// For instance, if the game is Jedi Academy and the map is mp/ffa5, ParaTracker will search for
+// images named "ffa5" in the "images/levelshots/jedi academy/mp/" folder.
 
 // For levelshots to animate, they will have to be named with _1, _2, and _3 at the end of the file name.
-// For instance, to have three animated levelshots for mp/ffa5, the files would have to be in
-// the images/levelshots/mp folder, and they would need to be named ffa5_1.jpg, ffa5_2.jpg,
-// and ffa5_3.jpg
+// For instance, to have three animated levelshots for mp/ffa5, the files would have to be
+// named ffa5_1.jpg, ffa5_2.jpg, and ffa5_3.jpg
 
-// ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be used first, JPGs second,
+// ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be searched for first, JPGs second,
 // and GIFs third. If no images are found, a placeholder image will be displayed instead.
 
 // The following value will enable or disable levelshot transitions. A value of 1 or "Yes" will allow them,
-// and any other value with disable them. If this is disabled, only the first levelshot will show.
+// and any other value will disable them. If this is disabled, only the first levelshot will show.
 // Default value is 1.
 $levelshotTransitionsEnabled = "1";
 
-// This is the amount of time, in seconds, each levelshot will be displayed before moving on to the next.
+// This is the number of seconds each levelshot will be displayed before moving on to the next.
 // Decimals are acceptable. Minimum is 1 second. Maximum is 15 seconds.
 // Default is 3 seconds.
 $levelshotDisplayTime = "3";
 
-// This is the amount of time, in second, each levelshot will take to fade into the next one.
-// Note that fades do not work in some browsers, like Internet Explorer 8.
+// This is the number of seconds, each levelshot will take to transition into the next one.
+// Note that transitions do not work in some browsers, like Internet Explorer 8.
 // Decimals are acceptable. Minimum is 0.1 seconds. Maximum is 5 seconds.
-// Default is 1 seconds.
+// Default is 1 second.
 $levelshotTransitionTime = "1";
 
 // This is the animation that will be used for fading levelshots.
 // If you want to change the animations, they are found in "css/LevelshotAnimations.css"
 // Valid values are whole numbers between 0 to 999 (No decimals).
-// Setting this value to 0 will play a random animation.
+// Setting this value to 0 will play a random animation from this list.
 // Default value is 0
 // The default transitions are as follows:
 // Transition 1: Fade
@@ -162,11 +177,13 @@ $levelshotTransitionTime = "1";
 $levelshotTransitionAnimation = "0";
 
 // The following value is the maximum number of levelshots that can be used. Keep in mind that
-// more levelshots is not always better. Minimum is 1, maximum is 99.
+// more levelshots is not always better.
+// Minimum is 1, maximum is 99.
 // Default is 20 levelshots.
 $maximumLevelshots = "20";
 
 
+/*==================================================================================================*/
 // TRACKER SETTINGS
 // TRACKER SETTINGS
 
@@ -181,22 +198,20 @@ $displayGameName = "1";
 // Default is 1.
 $filterOffendingServerNameSymbols = "1";
 
-// No Players Online Message
 // This message displays in place of the player list when nobody is online.
 // Default is "No players online."
 $noPlayersOnlineMessage = "No players online.";
 
-// ParaTracker can automatically refresh itself every so often.
-// This will not cause any disruption to the game, because the flood protection
-// limits how often ParaTracker will contact the server.
+// This value is boolean. When it is enabled, ParaTracker will automatically reload info from the
+// game server, keeping the tracker up to date.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Enabled by default.
 $enableAutoRefresh = "1";
 
 // This value determines how many seconds ParaTracker waits between refreshes.
-// This value cannot be lower than the value in $floodProtectTimeout, or 10 seconds, whichever is greater.
 // Decimals are invalid and will be rounded.
-// It also cannot be higher than 300 seconds.
+// Minimum is 10 seconds, maximum is 300 seconds.
+// Cannot be lower than the value of $floodProtectTimeout.
 // Default is 30 seconds.
 $autoRefreshTimer = "30";
 
@@ -207,12 +222,12 @@ $autoRefreshTimer = "30";
 // Default is 16384 characters (One packet).
 $maximumServerInfoSize = "16384";
 
-// This next setting enables "Dynamic" ParaTracker. Clients can load "ParaTrackerDynamic.php" and give
-// an IP address, port number and visual theme ID in the URL, and ParaTracker will connect to that server.
-// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=ParaSkinA"
+// This next setting enables "Dynamic" ParaTracker. Clients can load "ParaTrackerDynamic.php" and specify
+// an IP address, port number and skin in the URL, and ParaTracker will connect to that server.
+// For instance, "YourWebsiteNameHere.com/ParaTrackerDynamic.php?ip=192.168.1.100&port=29070&skin=Metallic%20Console"
 // DO *NOT*, I REPEAT, DO *NOT* ENABLE THIS FEATURE UNLESS YOU WANT PEOPLE USING YOUR WEBSITE TO TRACK THEIR SERVERS.
 // Also, DO NOT run ParaTracker in this mode without isolating it in its own webroot first - the consequences
-// can be grave if there is a security hole that I have not yet found!
+// can be grave if there is a security hole that has not been found!
 // If you do not understand what this feature is, then DO NOT enable it.
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default.
@@ -226,6 +241,7 @@ $dynamicTrackerEnabled = "0";
 $personalDynamicTrackerMessage = "ParaTracker is a free, open-source server tracker for Quake 3 based games! Download your own at http://github.com/ParabolicMinds/ParaTracker";
 
 
+/*==================================================================================================*/
 // RCON SETTINGS
 // RCON SETTINGS
 
@@ -237,41 +253,27 @@ $RConEnable = "0";
 // This value sets the maximum number of characters ParaTracker will send to the server.
 // If the command or password is any larger than this, the command will not be sent.
 // Minimum is 20 characters, maximum is 10000 characters.
-// Default is 100 characters.
-$RConMaximumMessageSize = "100";
+// Default is 200 characters.
+$RConMaximumMessageSize = "200";
 
 // RCon flood protection forces the user to wait a certain number of seconds before sending another command.
-// Note that this is not user-specific; if someone else is using your RCon, you may have to wait a bit to
-// send the command. Minimum is 10 seconds, maximum is 3600.
+// Note that this is not user-specific; if someone else is using RCon on your server, you will also have to wait
+// to send the command.
+// Minimum is 10 seconds, maximum is 3600.
 // Cannot be lower than the value of $connectionTimeout.
 // Default is 20 seconds.
 $RConFloodProtect = "20";
 
-// RCon events are logged in RConLog.php for security. This variable will determine
-// the maximum number of lines that will be stored in the log file before the old
-// entries are truncated. Minimum is 100 lines. Maximum is 100000.
-// Default is 1000 lines.
-$RConLogSize = "1000";
 
-
-// POPUP WINDOW SETTINGS
-// POPUP WINDOW SETTINGS
-
-// This value is boolean. When the RCon and PARAM buttons are clicked, the popup
-// window will snap to the top left corner of the screen by default. When this
-// variable is set to any value other than Yes or 1, the behavior is disabled.
-// Does not appear to work correctly in Google Chrome.
-// Default is 0.
-$newWindowSnapToCorner = "0";
-
-
+/*==================================================================================================*/
 // GEOIP SETTINGS
 // GEOIP SETTINGS
 
 // This value is boolean. When this variable is set to Yes or 1, GeoIP will be enabled, which
 // allows a country flag icon to be displayed on the tracker.
-// GEOIP MUST BE INSTALLED ON THE SERVER FOR THIS TO WORK.
-// If ParaTracker does not find GeoIP, it will ignore this setting and give a debug message.
+// GEOIP MUST BE INSTALLED ON THE WEB SERVER FOR THIS TO WORK.
+// If ParaTracker does not find GeoIP, it will ignore this setting, and give an error message in an
+// HTML comment at the top of the page.
 // Default is 0.
 $enableGeoIP = "0";
 
@@ -281,27 +283,214 @@ $enableGeoIP = "0";
 $geoIPPath = "";
 
 
+/*==================================================================================================*/
 // POSTGRESQL SETTINGS
 // POSTGRESQL SETTINGS
 
-// Default is 0
+// This value is boolean. When set to 1, ParaTracker will attempt to find a postgres SQL database. ParaTracker
+// will connect to this database and use it for things like analytics and levelshot requests for maps.
+// Do not enable this if you do not have postgres installed.
+// Default is 0.
 $enablePGSQL = "0";
 
+// This is the user name used for the postgres database.
 // Default is "postgres"
 $pgUser = "postgres";
 
+// This is the password used for the postgres database.
 // Default is ""
 $pgPass = "";
 
+// This is the name of the postgres database.
 // Default is "paratracker"
 $pgName = "paratracker";
 
+// This is the URL of the postgres database.
 // Default is "localhost"
 $pgHost = "localhost";
 
+// This is the port used to connect to the postgres database.
 // Default is "" (uses the default port of pg_connect)
-$pgPort = ""
+$pgPort = "";
 
+
+/*==================================================================================================*/
+// ANALYTICS SETTINGS
+// ANALYTICS SETTINGS
+
+// To run analytics, you must set up a cron job to run AnalyticsBackground.php (found in the $utilitiesPath folder)
+// at specific intervals. This process will connect to every server that has recently been tracked and
+// store info in the database.
+
+// This value is boolean. When this variable is set to Yes or 1, the analytics back end will be enabled.
+// Analytics will save server data to a database over time, and allow users to view this data.
+// Analytics REQUIRES pgsql to be enabled. If pgsql is disabled, analytics will also be disabled.
+// Default value is 0.
+$analyticsEnabled = "0";
+
+// This value is boolean. When this variable is set to Yes or 1, the analytics front end will be enabled.
+// This will allow users to view the saved analytics data from the database.
+// This feature is here to help prevent people from overloading the server with false analytics requests,
+// while at the same time allowing the back end to run.
+// If the analytics back end is disabled, the front end will be disabled as well.
+// Default value is 1.
+$analyticsFrontEndEnabled = "1";
+
+
+/*==================================================================================================*/
+// MAPREQ SETTINGS
+// MAPREQ SETTINGS
+
+// This value is boolean. When set to "Yes" or "1", mapreq will be used to allow users to request
+// levelshots of maps they like.
+// mapreq REQUIRES pgsql and dynamic mode to be enabled. If pgsql or dynamic mode is disabled, mapreq will disable itself.
+// Default is 0
+$mapreqEnabled = "0";
+
+
+/*==================================================================================================*/
+// EMAIL SETTINGS
+// EMAIL SETTINGS
+
+// These settings are for email functions.
+// Emails are sent by SendEmails.php, which is found in the $utilitiesPath folder.
+// SendEmails.php must be activated by a cron job, that runs at the frequency you want to receive administrative reports.
+
+// This setting enables or disables e-mail functionality. For this to work, an administrator e-mail address must exist,
+// and PHPMailer must be installed via composer.
+// Default is 0
+$emailEnabled = "0";
+
+// This setting enables or disables the sending of admin reports.
+// Default is 0
+$emailAdminReports = "0";
+
+// This setting is the path to PHPMailerAutoload.php.
+// Default is "vendor/phpmailer/phpmailer/"
+$emailPath = "vendor/phpmailer/phpmailer/";
+
+// This variable controls whether emails will be sent with SMTP or not.
+// Default is 0
+$useSMTP = "0";
+
+    // If using SMTP, this variable is the address of the SMTP server we will use
+    // Default is ""
+    $smtpAddress = "";
+
+    // If using SMTP, this variable is the port of the SMTP server we will use
+    // Default is ""
+    $smtpPort = "";
+
+    // If using SMTP, this variable is the username we will use for the SMTP server
+    // Default is ""
+    $smtpUsername = "";
+
+    // If using SMTP, this variable is the password we will use for the SMTP server
+    // Default is ""
+    $smtpPassword = "";
+
+// This is the address that will be used to send the email.
+// Default is ""
+$emailFromAddress = "";
+
+// This is an array of administrator e-mail addresses. You can add as many as you like. Add each e-mail address
+// on a new line, between the double quotes, and make sure there is a comma at the end of each line, with the
+// exception of the last line.
+// Example:
+// $emailAdministrators = array(
+// "adminNumberOne@nowhere.com",
+// "adminNumberTwo@nowhere.com",
+// "adminNumberThree@nowhere.com"
+// );
+$emailAdministrators = array(
+"",
+"",
+"",
+"",
+""
+);
+
+
+/*==================================================================================================*/
+// MAINTENANCE SETTINGS
+// MAINTENANCE SETTINGS
+
+// Every so often, ParaTracker will clean up the $infoPath folder and the levelshots request database
+// by checking for outdated data and deleting it.
+// This variable controls how many minutes ParaTracker will wait between cleanups.
+// Note that if analytics is enabled, cleanup will only be run by AnalyticsBackground.php.
+// Minimum is 10 minutes, maximum is 1440 minutes.
+// Default is 60 minutes.
+$cleanupInterval = "60";
+
+// This variable is how many days old the server info must be to be deleted.
+// If analytics are enabled, this value will instead determine how many days
+// a server must be offline before it is no longer tracked.
+// This variable cannot be lower than 2 times the amount of time specified in $cleanupInterval above.
+// Minimum is 1 day, maximum is 30 days.
+// Decimals are accepted.
+// Default is 7 days.
+$deleteInterval = "7";
+
+// This variable sets what percentage of server load will cause the cleanup to be skipped.
+// If ParaTracker is running on Windows, PHP cannot measure CPU load, so this setting will be ignored
+// and cleanup will run regardless of the load.
+// Minimum is 50, maximum is 100
+// Default is 90
+$loadLimit = "90";
+
+
+/*==================================================================================================*/
+// PATH SETTINGS
+// PATH SETTINGS
+
+// This setting controls the temporary folder where server info will be stored between refreshes.
+// Changing this while ParaTracker is live will result in all game servers being reloaded. Change with caution.
+// Default is "info"
+$infoPath = "info";
+
+// This setting controls the folder where logs will be stored.
+// Changing this while ParaTracker is live will result in all logs being reset. Change with caution.
+// Default is "logs"
+$logPath = "logs";
+
+// This setting controls the path to the skins folder.
+// Default is "skins"
+$skinsPath = "skins";
+
+// This setting controls the path to the utilities folder. Do not change this unless you are rearranging
+// the internals of ParaTracker to match.
+// Default is "utilities"
+$utilitiesPath = "utilities";
+
+
+/*==================================================================================================*/
+// LOG SETTINGS
+// LOG SETTINGS
+
+// Errors are logged in errorLog.php, which is found in the $logPath folder.
+// This setting will determine the maximum number of lines that will be stored in the log file
+// before the old entries are truncated.
+// Minimum is 100 lines. Maximum is 100000.
+// Default is 10000 lines.
+$errorLogSize = "10000";
+
+// Cleanup events are logged in cleanupLog.php, which is found in the $logPath folder.
+// This is the maximum of lines the cleanup log can have before the excess is truncated.
+// Minimum is 100 lines. Maximum is 100000.
+// Default is 10000 lines.
+$cleanupLogSize = "10000";
+
+// RCon events are logged in RConLog.php. Each server has it's own unique RCon log, which is found in the
+// $logPath folder, inside a folder named for the server's IP address and port.
+// This setting will determine the maximum number of lines that will be stored in the log file
+// before the old entries are truncated.
+// Minimum is 100 lines. Maximum is 100000.
+// Default is 1000 lines.
+$RConLogSize = "1000";
+
+
+/*==================================================================================================*/
 // End of config file
 
 /*

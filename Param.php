@@ -1,6 +1,6 @@
 <?php
 echo "<!-- ";
- 
+
 //This variable will allow ParaFunc to execute.
 //The point of this variable is to prevent ParaFunc from being executed directly,
 //as it would be a complete waste of CPU power.
@@ -18,7 +18,7 @@ if(isset($_GET["ip"]))
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
-    include 'ParaFunc.php';
+    include_once 'ParaFunc.php';
 }
 else
 {
@@ -26,17 +26,12 @@ else
     exit();
 }
 
-//ParaFunc already does the validation for everything, including the IP address. It should be fine to just check if a refresh is needed.
-//If it isn't, the response will end up being parsed from the old data anyhow.
-checkForAndDoUpdateIfNecessary();
+//Check to see if an update needs done, and do it
+checkForAndDoUpdateIfNecessary($dynamicIPAddressPath);
 
-if (file_exists("info/" . dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . dynamicIPAddressPath . "serverDump.txt") != "")
-{
-    echo "-->" . htmlDeclarations("", "") . file_get_contents("info/" . dynamicIPAddressPath . "param.txt");
-}
-else
-{
-    echo "-->" . htmlDeclarations("", "") . "</head><body><h3>Could not connect to game server!</h3><h4>" . $serverIPAddress . ":" . $serverPort . "</h4></body></html>";
-}
+//Render the param page
+$output = renderParamPage($serverIPAddress, $serverPort);
 
+//Echo $output and terminate
+echo "-->" . $output;
 ?>

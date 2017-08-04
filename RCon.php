@@ -11,7 +11,7 @@ $calledFromRCon = "1";
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
-    include 'ParaFunc.php';
+    include_once 'ParaFunc.php';
 }
 else
 {
@@ -20,18 +20,27 @@ else
 }
 
 //ParaFunc.php checks for the existence of the logs folder and for RConLog.php, otherwise we would check for it here.
-if (trim(file_get_contents("logs/" . dynamicIPAddressPath . "RConLog.php")) == "")
+if (trim(file_get_contents(logPath . $dynamicIPAddressPath . "RConLog.php")) == "")
 {
-    file_put_contents("logs/" . dynamicIPAddressPath . "RConLog.php", RConLogHeader() . "*/\n?>");
+    file_put_contents(logPath . $dynamicIPAddressPath . "RConLog.php", logHeader("RConLog.php") . logFooter());
 }
 
-$output = htmlDeclarations("Rcon - " . serverIPAddress . " - ParaTracker", "");
+$output = htmlDeclarations("Rcon - " . $serverIPAddress . " - ParaTracker", "");
 
-$output .= '</head><body class="RConPage">';
+if(scrollShaftColor != "")
+{
+    $output .= '<style>::-webkit-scrollbar-track{background-color: rgba(' . convertToRGBA(scrollShaftColor) . ', 100);}</style>';
+}
+if(scrollThumbColor != "")
+{
+    $output .= '<style>::-webkit-scrollbar-thumb{background-color: rgba(' . convertToRGBA(scrollThumbColor) . ', 100);}</style>';
+}
+
+$output .= '<script src="js/ParaScript.js">var runSetup = 0;</script></head><body class="RConPage">';
 
 if (RConEnable == "1")
 {
-if (serverIPAddress == "Invalid")
+if ($serverIPAddress == "Invalid")
 {
     $output = "Invalid IP address detected! Cannot continue.<br />Check the IP address in ParaConfig.php.";
     exit();
@@ -46,9 +55,9 @@ else
     {
         $RConCommand = "";
     }
-    if(isset($_POST["password"]))
+    if(isset($_POST["rconPassword"]))
     {
-        $RConPassword = $_POST["password"];
+        $RConPassword = $_POST["rconPassword"];
     }
     else
     {
@@ -56,9 +65,7 @@ else
     }
 
     $output .= '<form action="RCon.php';
-    $output .= '?ip=' . serverIPAddress;
-    $output .= '&port=' . serverPort;
-    $output .= '&skin=' . paraTrackerSkin;
+    $output .= '?' . $_SERVER['QUERY_STRING'];
 
     if(isset($_GET["customSkin"]))
     {
@@ -68,11 +75,12 @@ else
     $output .= '" method="post" onsubmit="disableRConForm()">
     <div class="RConPasswordCommand RConPasswordCommandSize">
     Command:<input id="commandTextField" class="RConInput" size="35" type="text" value="' . stringValidator($RConCommand, "", "") . '" name="command" />
-    &nbsp;Password:<input id="passwordTextField" class="RConInput" type="password" name="password" value="" />
+    &nbsp;Password:<input id="passwordTextField" class="RConInput" type="password" name="rconPassword" value="" />
     <input id="submitButton" type="submit" value=" Send " />
     </div>
     </form>
-    <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . serverIPAddress . ":" . serverPort . '<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse RConServerResponseScroll">';
+    <script>commandTextField.focus()</script>
+    <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . $serverIPAddress . ":" . $serverPort . '<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse RConServerResponseScroll">';
 
     if(strlen($RConCommand) > RConMaximumMessageSize)
     {
@@ -90,15 +98,15 @@ else
     if ($RConCommand != "" && $RConPassword != "")
     {
         $lastRefreshTime = "0";
-        if (file_exists("info/" . dynamicIPAddressPath . "RConTime.txt"))
+        if (file_exists(infoPath . $dynamicIPAddressPath . "RConTime.txt"))
         {
-            $lastRefreshTime = numericValidator(file_get_contents("info/" . dynamicIPAddressPath . "RConTime.txt"), "", "", 0);
+            $lastRefreshTime = numericValidator(file_get_contents(infoPath . $dynamicIPAddressPath . "RConTime.txt"), "", "", 0);
         }
 
         if ($lastRefreshTime + RConFloodProtect < time())
         {
-            file_put_contents("info/" . dynamicIPAddressPath . "RConTime.txt", time());
-            $output .= sendRecieveRConCommand($lastRefreshTime, $RConPassword, $RConCommand);
+            file_put_contents(infoPath . $dynamicIPAddressPath . "RConTime.txt", time());
+            $output .= sendReceiveRConCommand($serverIPAddress, $serverPort, $lastRefreshTime, $RConPassword, $RConCommand);
         }
         else
         {
@@ -140,7 +148,7 @@ else
 $output .= '<h2>RCon is disabled on this tracker!</h2><br />RCon must be enabled in ParaConfig.php.';
 }
 
-$output .= '<div class="RConblinkingCursor">&nbsp;</div></div></div>';
+$output .= '<span class="blinkingCursor" style="animation-duration: 1s; animation-fill-mode: forwards; animation-iteration-count: infinite; animation-name: blink;">_</span></div></div>';
 
 //Done with RCon Stuff! Remove the HTML comment and give the output.
 echo "-->";

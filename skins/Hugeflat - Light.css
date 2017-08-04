@@ -62,6 +62,34 @@ display: none;
 }
 
 
+/*
+SCROLL BAR STYLES
+SCROLL BAR STYLES
+*/
+
+::-webkit-scrollbar
+{
+    width: 12px;
+	border-radius: 6px;
+}
+ 
+::-webkit-scrollbar-track
+{
+	background-color: #444;
+	border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+    border: 1px inset #888;
+}
+
+::-webkit-scrollbar-thumb
+{
+    border: 1px outset #888;
+    border-radius: 6px;
+	background-color: #555;
+}
 
 
 /*
@@ -182,17 +210,14 @@ display: none;
 position: absolute;
     left: 240px;
     top: 6px;
-width: 353px;
+width: 321px;
 height: 24px;
 font-size: 14pt;
 font-family: "Trebuchet MS", sans-serif;
 font-weight: bold;
 overflow: hidden;
-text-align: center;
+text-align: left;
 padding-left: 7px;
-
-/* This class must use inline-flex to be compatible with GeoIP country flags */
-display: inline-flex;
 }
 
 /* This is the title of the game, shown just below the server name */
@@ -212,19 +237,16 @@ padding-left: 7px;
 }
 
 /* This class positions the column headers for name, score and ping.
-The width *must* be set correctly.
-The correct width value is the width of .playerTable minus 17 pixels (for the vertical scroll bar),
-and minus the left and right padding of the .playerRow classes (10 by default) */
+Javascript will automatically resize the width of this column to match the player table.  */
 .nameScorePing
 {
 position: absolute;
     left: 0px;
     top: 250px;
-width: 577px;
 height: 30px;
 padding-top: 4px;
 padding-bottom: 4px;
-padding-left: 5px;
+padding-left: 18px;
 padding-right: 5px;
 }
 
@@ -240,7 +262,8 @@ content: "";
 font-size: 14pt;
 font-family: sans-serif;
 color: #FFFFBB;
-padding-left: 13px;
+cursor: pointer;
+user-select: none;
 }
 
 /* This class adds the text to the "Score" column in the player list */
@@ -256,6 +279,8 @@ font-size: 14pt;
 font-family: sans-serif;
 color: #FFFFBB;
 text-align: center;
+cursor: pointer;
+user-select: none;
 }
 
 /* This class adds the text to the "Ping" column in the player list */
@@ -271,6 +296,8 @@ font-size: 14pt;
 font-family: sans-serif;
 color: #FFFFBB;
 text-align: center;
+cursor: pointer;
+user-select: none;
 }
 
 /* This class sets the size of the player list, and enables vertical scrolling only */
@@ -282,7 +309,7 @@ position: absolute;
 width: 600px;
 height: 700px;
 vertical-align: middle;
-overflow-y: scroll;
+overflow-y: auto;
 overflow-x: hidden;
 }
 
@@ -334,6 +361,66 @@ padding-top: 6px;
 padding-bottom: 6px;
 padding-left: 13px;
 padding-right: 5px;
+}
+
+/* This class sets the color of team 1 */
+.team1
+{
+color: #B00;
+}
+
+/* This class sets the background color of team 1's total score */
+.teamBackground1
+{
+background: linear-gradient(#400, #400, #400, #300, #300);
+cursor: pointer;
+}
+
+/* This class sets the color of team 2 */
+.team2
+{
+color: #44F;
+}
+
+/* This class sets the background color of team 2's total score */
+.teamBackground2
+{
+background: linear-gradient(#004, #004, #004, #003, #003);
+cursor: pointer;
+}
+
+/* This class sets the color of team 3 */
+.team3
+{
+color: #DD3;
+}
+
+/* This class sets the background color of team 3's total score */
+.teamBackground3
+{
+background: linear-gradient(#441, #441, #441, #331, #331);
+cursor: pointer;
+}
+
+/* This class sets the color of team 4 */
+.team4
+{
+color: #0F0;
+}
+
+/* This class sets the background color of team 4's total score */
+.teamBackground4
+{
+background: linear-gradient(#040, #040, #040, #030, #030);
+cursor: pointer;
+}
+
+/* This class is for the team colors */
+.playerTeam
+{
+font-weight: bold;
+cursor: pointer;
+user-select: none;
 }
 
 /* This class sets the size and font of player names */
@@ -390,12 +477,41 @@ color: #000000;
 font-size: 14pt;
 font-family: sans-serif;
 text-align: left;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+/* This class adds optional text to the analytics button */
+.analyticsButton::before
+{
+content: "";
+}
+
+/* This class affects the analytics button */
+.analyticsButton
+{
+position: absolute;
+    left: 247px;
+    top: 145px;
+background-image: url("../images/tracker/AnalyticsWhite.svg");
+background-size: 100% 100%;
+height: 30px;
+width: 30px;
+cursor: pointer;
+line-height: 30px;
+text-align: center;
+overflow: hidden;
+color: #EFEFEF;
+font-size: 14pt;
+font-family: monospace;
 }
 
 /* This class adds optional text to the RCon button */
 .rconButton::before
 {
-content: "";
+content: "RCON";
 }
 
 /* This class is the RCon button */
@@ -406,29 +522,25 @@ position: absolute;
     top: 202px;
 width: 85px;
 height: 45px;
-width: 85px;
-height: 45px;
+text-align: center;
+line-height: 45px;
+font-family: Tahoma, Sans-Serif;
+font-size: 14pt;
+color: #F00;
+letter-spacing: 2px;
 cursor: pointer;
-background-image: url("../images/tracker/rcon.png");
 }
 
 /* This class is the hover image for the RCon button */
 .rconButton:hover
 {
-background-image: url("../images/tracker/rcon_h.png");
-}
-
-/* This class is the preloader for the hover image for the RCon button. It needs to use the same background image as the class directly above it */
-.rconPreload
-{
-display: none;
-background-image: url("../images/tracker/rcon_h.png");
+text-shadow:0px 0px 30px #F00, 0px 0px 20px #F00;
 }
 
 /* This class adds optional text to the param button */
 .paramButton::before
 {
-content: "";
+content: "PARAM";
 }
 
 /* This class is the Param button */
@@ -439,21 +551,19 @@ position: absolute;
     top: 202px;
 width: 85px;
 height: 45px;
+text-align: center;
+line-height: 45px;
+font-family: Tahoma, Sans-Serif;
+font-size: 14pt;
+color: #0F0;
+letter-spacing: 1px;
 cursor: pointer;
-background-image: url("../images/tracker/param.png");
 }
 
 /* This class is the hover image for the Param button */
 .paramButton:hover
 {
-background-image: url("../images/tracker/param_h.png");
-}
-
-/* This class is the preloader for the hover image for the Param button. It needs to use the same background image as the class directly above it */
-.paramPreload
-{
-display: none;
-background-image: url("../images/tracker/param_h.png");
+text-shadow:0px 0px 30px #0F0, 0px 0px 20px #0F0;
 }
 
 /* This is a container for the levelshots, and it also disables selecting them */
@@ -476,25 +586,30 @@ width: 200px;
 height: 150px;
 }
 
+/* This class is used for the loading image between level changes */
+.loadingLevelshot
+{
+background: url('../images/loading.gif') 0% 0% / 100% 100% no-repeat;
+}
+
+/* This class is used to animate the loading image for levelshots. It is used when a level changes and the images are still loading. */
+@keyframes loadingLevelshotAnimationOn
+{
+0% {opacity: 0;}
+100% {opacity: 1;}
+}
+
+/* This class is used to animate the loading image for levelshots. It is used when a level changes and the images are still loading. */
+@keyframes loadingLevelshotAnimationOff
+{
+0% {opacity: 1;}
+100% {opacity: 0;}
+}
+
 /* This class adds the text to the "map name" value */
 .mapName::before
 {
 content: "";
-}
-
-/* This class is used for the "map name" value */
-.mapName
-{
-position: absolute;
-    left: 0px;
-    top: 176px;
-height: 24px;
-width: 240px;
-color: #EEEEEE;
-font-size: 10pt;
-font-family: monospace;
-overflow: hidden;
-text-align: center;
 }
 
 /* This class adds the text to the "mod name" value */
@@ -563,10 +678,6 @@ padding-left: 7px;
 /* This class is for the blinking cursor at the end of the IP address */
 .blinkingCursor
 {
-height: 20px;
-width: 10px;
-background: url("../images/tracker/blinker1.gif") no-repeat;
-background-position: 2px -2px;
 user-select: none;
 display: none;
 }
@@ -574,6 +685,9 @@ display: none;
 /* This adds the optional country flag to the page. This feature only works when GeoIP is installed. */
 .countryFlag
 {
+position: absolute;
+    left: 568px;
+    top: 6px;
 height: 24px;
 width: 32px;
 user-select: none;
@@ -610,31 +724,6 @@ NO CONNECTION PAGE STYLES
 NO CONNECTION PAGE STYLES
 */
 
-
-/* This class adds text to the reload timer */
-.reloadTimerNoConnection::before
-{
-content: "Retry in ";
-}
-
-/* This class affects the reload timer */
-.reloadTimerNoConnection
-{
-position: absolute;
-    left: 200px;
-    top: 204px;
-opacity: 1;
-cursor: pointer;
-width: 200px;
-height: 30px;
-line-height: 40px;
-text-align: center;
-overflow: hidden;
-color: #000000;
-font-size: 14pt;
-font-family: monospace;
-font-weight: bold;
-}
 
 /* This class adds the error message to the page when ParaTracker cannot connect to a server */
 .paraTrackerError::before
@@ -679,17 +768,6 @@ font-family: monospace;
 word-wrap: break-word;
 }
 
-/* This class is for the blinking cursor after the IP address */
-.noConnectionblinkingCursor
-{
-display: inline;
-width: 18px;
-background: url("../images/tracker/blinker2.gif") no-repeat;
-background-position: 2px 2px;
-user-select: none;
-display: none;
-}
-
 /* This class is for the version number, displayed when ParaTracker could not connect */
 .ParaTrackerTextNoConnection
 {
@@ -709,7 +787,7 @@ display: none;
 /* This class adds optional text to the reconnect button */
 .reconnectButton::before
 {
-content: "";
+content: "RECONNECT";
 }
 
 /* This class is the Reconnect button */
@@ -720,21 +798,19 @@ position: absolute;
     top: 202px;
 width: 170px;
 height: 45px;
+text-align: center;
+line-height: 45px;
+font-family: Tahoma, Sans-Serif;
+font-size: 14pt;
+color: #0FF;
+letter-spacing: 2px;
 cursor: pointer;
-background-image: url("../images/tracker/reconnect.png");
 }
 
 /* This class is the hover image for the Reconnect button */
 .reconnectButton:hover
 {
-background-image: url("../images/tracker/reconnect_h.png");
-}
-
-/* This class is the preloader for the hover image for the Reconnect button. It needs to use the same background image as the class directly above it */
-.reconnectPreload
-{
-display: none;
-background-image: url("../images/tracker/reconnect_h.png");
+text-shadow:0px 0px 30px #0FF, 0px 0px 20px #0FF;
 }
 
 
@@ -879,12 +955,20 @@ width: 540px;
 margin: 0 auto 0 auto;
 }
 
-
-/* This class is for the "Server Cvars" text at the top of the page */
+/* This class is for the server name at the top of the page */
 .CVarHeading
 {
 color:#EFEFEF;
 font-size:22pt;
+font-weight:bold;
+text-align:center;
+}
+
+/* This class is for the game name at the top of the page */
+.CVarGameHeading
+{
+color:#EFEFEF;
+font-size:14pt;
 font-weight:bold;
 text-align:center;
 }
@@ -1119,4 +1203,13 @@ It is highly advised that you leave it alone. */
 {
 margin: 0px;
 padding: 0px;
+}
+
+/* Used for the blinking cursor on the tracker and on the RCon page. */
+@keyframes blink
+{
+    0% {opacity: 1;}
+    49% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 0;}
 }

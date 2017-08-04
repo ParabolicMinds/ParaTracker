@@ -1,0 +1,13 @@
+/* This file exists to keep these classes separate from the rest of ParaTracker */
+
+::-webkit-scrollbar {
+    width: 12px;
+    background-color: #444;
+}
+ 
+::-webkit-scrollbar-track {
+}
+ 
+::-webkit-scrollbar-thumb {
+	background-color: #222;
+}

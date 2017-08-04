@@ -15,9 +15,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 if(!isset($dynamicTrackerCalledFromCorrectFile))
 {
     //We are running in static mode. Set the output buffer here, for JSON compatibility.
+    //ParaTrackerDynamic.php already does this for itself, so we have to check if it was already done before doing another.
     ob_start();
 }
-
 
 echo "<!--";
 
@@ -34,53 +34,38 @@ if(!isset($dynamicTrackerCalledFromCorrectFile))
     //ParaFunc.php MUST exist, or we must terminate!
     if (file_exists("ParaFunc.php"))
     {
-        include 'ParaFunc.php';
+        include_once 'ParaFunc.php';
     }
     else
     {
-        echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3> <!--';
+        echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3>';
         exit();
     }
 }
 
 //Check to see if an update needs done, and do it
-checkForAndDoUpdateIfNecessary();
+checkForAndDoUpdateIfNecessary($dynamicIPAddressPath);
 
+//Just as good practice, let's declare this
+$output = "";
 
-if (file_exists("info/" . dynamicIPAddressPath . "serverDump.txt") && file_get_contents("info/" . dynamicIPAddressPath . "serverDump.txt") != "")
+//We no longer need to check to see if the connection was successful. Just output a page.
+if(strtolower(paraTrackerSkin) == "json")
 {
-    //Server dump detected - connection assumed successful! Rendering a normal page.
-    if(strtolower(paraTrackerSkin) == "json")
-    {
-        //We are running in JSON mode! Output the JSON response here.
-        renderJSONPage();
-    }
-    else
-    {
-        //Render a normal tracker page
-        $output = renderNormalHTMLPage();
+    //Since we're giving a JSON response, we have to give the page a JSON header
+    header("Content-Type: application/json");
 
-        //Flush the output buffer to the client
-        ob_end_flush();
-    }
+    //We are running in JSON mode! Output the JSON response here.
+    $output = renderJSONOutput($dynamicIPAddressPath);
+
+    //Remove everything from the buffer so we can supply JSON info only
+    ob_clean();
 }
 else
 {
-    //Could not connect to the server! Display error page.
-    if(strtolower(paraTrackerSkin) == "json")
-    {
-        //We are running in JSON mode! Output the JSON response here.
-        renderJSONPage();
-    }
-    else
-    {
-        //Render a normal error page
-        $output = renderNoConnectionHTMLPage();
-
-    }
+    //Add an HTML end comment, then render a normal tracker page
+    $output = "-->" . renderNormalHTMLPage($dynamicIPAddressPath);
 }
-
-echo "-->";
 
 echo $output;
 

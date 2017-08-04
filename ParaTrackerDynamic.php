@@ -29,17 +29,17 @@ $safeToExecuteParaFunc = "1";
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
-    include 'ParaFunc.php';
+    include_once 'ParaFunc.php';
 }
 else
 {
-    echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3> <!--';
+    echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3>';
     exit();
 }
 
 if($dynamicTrackerEnabled != "1")
 {
-    displayError("Dynamic ParaTracker is disabled! If you wish to enable it,<br />first read the warnings in ParaConfig.php then PROCEED WITH CAUTION!", "", "", "");
+    displayError("Dynamic ParaTracker is disabled! If you wish to enable it,<br />first read the warnings in ParaConfig.php then PROCEED WITH CAUTION!", "", "");
 }
 
 if (file_exists("ParaTrackerStatic.php"))
@@ -48,7 +48,7 @@ include 'ParaTrackerStatic.php';
 }
 else
 {
-    displayError("ParaTrackerStatic.php not found - cannot continue!", "");
+    displayError("ParaTrackerStatic.php not found - cannot continue!", "", "");
     exit();
 }
 

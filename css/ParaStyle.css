@@ -15,11 +15,185 @@ PARATRACKER DYNAMIC SETUP PAGE CLASSES
 PARATRACKER DYNAMIC SETUP PAGE CLASSES
 */
 
+/* This class configures the iframe for analytics */
+.analyticsFrame
+{
+width: 95vw;
+min-width: 1050px;
+min-height: 200px;
+border-radius: 10px;
+border: 1px solid #999;
+box-shadow: 0px 0px 20px #999, inset 0px 0px 10px #999;
+display: flex;
+flex: 1 1 auto;
+flex-direction: column;
+}
+
+/* This class configures the iframe for the log viewer */
+.logViewerDiv
+{
+width: 95vw;
+display: flex;
+flex: 1 1 auto;
+flex-direction: column;
+}
+
+/* This class configures the iframe for account management */
+.accountManagementFrame
+{
+width: 95vw;
+min-width: 1000px;
+min-height: 200px;
+border-radius: 10px;
+border: 1px solid #999;
+box-shadow: 0px 0px 20px #999, inset 0px 0px 10px #999;
+display: flex;
+flex: 1 1 auto;
+flex-direction: column;
+}
+
+/* This class configures the iframe for the log viewer */
+.logViewerFrame
+{
+min-width: 1000px;
+min-height: 200px;
+border-radius: 10px;
+border: 1px solid #999;
+box-shadow: 0px 0px 20px #999, inset 0px 0px 10px #999;
+flex: 1 1 auto;
+flex-direction: column;
+}
+
+/* This class configures the log viewer */
+.logViewerPage
+{
+font-family: monospace;
+background-color: #222;
+color: #EEE;
+font-size: 10pt;
+}
+
+/* This class is for the log viewer's path table */
+.logPathTable
+{
+width: 800px;
+margin: 0 auto;
+}
+
+/* This class is for the first cell in the log viewer's path table */
+.logViewerPathTable
+{
+width: 75%;
+padding: 5px;
+color: #EEE;
+font-size: 12pt;
+}
+
+/* This class is for the log viewer's path table */
+.logViewerPathTable:hover
+{
+background-color: #872;
+}
+
+/* This class is for the log viewer's line numbers */
+.logViewerNumber
+{
+user-select: none;
+background-color: #228;
+padding: 5px;
+color: #EEE;
+font-size: 11pt;
+font-weight: bold;
+text-align: right;
+}
+
+/* This class is for the log viewer's text */
+.logViewerText
+{
+width: 100%;
+padding: 5px;
+color: #EEE;
+font-size: 10pt;
+}
+
+/* This class is for the hover effect on the log viewer's text */
+.logViewerText:hover
+{
+background-color: #872;
+}
+
+/* This class is used for the title at the top of the log viewer */
+.logTitle
+{
+text-align: center;
+}
+
+/* This class is used for the total number of lines in the log, just below the file name */
+.logSize
+{
+text-align: center;
+}
+
+/* The following classes are used for links in the log viewer */
+.logLink
+{
+color: #BBE;
+font-size: 12pt;
+}
+
+.logLink:hover
+{
+color: #E44;
+}
+
+/* The following classes are used for file sizes */
+.bytes {
+	color: #AFA;
+}
+
+.kilobytes {
+	color: #FD8;
+}
+
+.megabytes {
+	color: #FAA;
+}
+
+/* This class is for the account management page */
+.accountManagement
+{
+font-family: monospace;
+font-size: 12pt;
+}
+
+/* This class controls the hover text for the test message link */
+.testMessage:hover
+{
+color: #39D;
+}
+
+/* This class controls the text for the test message link */
+.testMessage
+{
+color: #28C;
+}
+
+/* This class is the text color when the test message successfully sent */
+.messageSuccess
+{
+color: #0C0;
+}
+
+/* This class is the text color when the test message failed to send */
+.messageFailed
+{
+color: #C00;
+}
 
 /* This class sets the width of the page */
 .dynamicPageWidth
 {
-width: 1050px;
+min-width: 1050px;
 display: inline-block;
 }
 
@@ -33,38 +207,105 @@ text-align: center;
 /* This class is used for the page formatting in ParaTrackerDynamic.php */
 .dynamicConfigPage
 {
+margin: 0;
 text-align: center;
+background-color: #111111;
+display: flex;
+flex-direction: column;
+left: 0px;
+right: 0px;
+top: 0px;
+width: 100%;
+height: 100vh;
+align-items: center;
+}
+
+/* This class is used for the top row of the utilities page */
+.utilitiesTopRow
+{
+
+}
+
+/* This class is used for the button row on the utilities page */
+.utilitiesButtonRow
+{
+
+}
+
+/* This class is used for the bottom row of the utilities page */
+.utilitiesBottomRow
+{
+display: flex;
+flex: 1 1 auto;
+flex-direction: column;
+}
+
+/* This class is used for the expanding iframes on the utilities page */
+.utilitiesIframe
+{
+display: flex;
+width: 95vw;
 }
 
 /* This class is used for the page formatting in ParaTrackerDynamic.php */
 .dynamicConfigPageStyle
 {
-background-color: #111111;
+text-align: center;
 font-size: 12pt;
 font-family: monospace;
 color: #EEEEEE;
 }
 
-.mapReqListPageStyle {
-    background-color: #111111;
-    font-size: 12pt;
-    font-family: monospace;
-    color: #EEEEEE;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    margin: 0px;
+/* This class is used for the utilities page formatting in ParaTrackerDynamic.php */
+.utilitiesPageStyle
+{
+font-size: 12pt;
+font-family: monospace;
+color: #FFE;
+background: linear-gradient(to right, #300, #211, #300, #211, #300, #211, #300, #211, #300, #211, #300, #211, #300);
+}
+
+.mapReqFrame
+{
+margin: 0 auto;
+width: 1050px;
+min-height: 200px;
+display: flex;
+flex: 1 1 auto;
+border: none;
+border-top: 2px solid #F40;
+border-bottom: 2px solid #F40;
+}
+
+/* This class is used for the levelshot request page */
+.mapReqPageStyle {
+min-width: 1000px;
+min-height: 200px;
+border-radius: 10px;
+
+display: flex;
+flex: 1 1 auto;
+flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   margin: 0px;
+   font-size: 12pt;
+   font-family: monospace;
+   color: #EEEEEE;
+}
+
+/* This class is used for the levelshot request page */
+.mapreqDiv
+{
+display: flex;
+flex: 1 1 auto;
+flex-direction: column;
 }
 
 /* This class is for the buttons on ParaTrackerDynamic.php */
 .dynamicFormButtonsStyle
 {
+margin: 10px;
 background-color: #292929;
 cursor: pointer;
 color: #EEEEEE;
@@ -72,6 +313,7 @@ font-family: inherit;
 font-size: 12pt;
 border: 1px solid #369;
 user-select: none;
+text-shadow: -1px 1px #000000;
 }
 
 /* This class is for the buttons on ParaTrackerDynamic.php */
@@ -83,13 +325,21 @@ text-shadow: -1px 1px #000000;
 border: 1px solid #900;
 }
 
+/* This class is for the buttons on ParaTrackerDynamic.php */
+.activeButton
+{
+background-color: #295656;
+font-weight: bold;
+text-shadow: -2px 2px #000000;
+}
+
 /* This class is used to center the list of supported games on ParaTrackerDynamic.php */
 .centerTable
 {
 margin-left: auto;
 margin-right: auto;
 text-align: center;
-width: 500px;
+width: 80%;
 }
 
 /* This class is for the buttons on ParaTrackerDynamic.php */
@@ -103,6 +353,12 @@ cursor: pointer;
 .smallText
 {
 font-size: 8pt;
+}
+
+/* This class makes the focus on a text field much more obvious */
+input:focus, select:focus, textarea.focus
+{
+box-shadow: 0px 0px 20px #44F, inset 0px 0px 10px #44F;
 }
 
 /* This class is used to put a border around the color selections */
@@ -120,11 +376,25 @@ border: 2px solid #44F;
 width: 600px;
 }
 
+/* This class is used for the border on the levelshot setup div  */
+.levelshotBorder
+{
+margin: 0 auto;
+margin-top: 30px;
+text-align: center;
+padding-left: 10px;
+padding-right: 10px;
+padding-top: 10px;
+padding-bottom: 10px;
+box-shadow: 0px 0px 20px #499, inset 0px 0px 10px #499;
+border: 2px solid #499;
+width: 500px;
+}
+
 /* This class is used to put a border around the Bit Value Calculator */
 .bitValueCalculator
 {
 margin: 0 auto;
-margin-top: 30px;
 text-align: center;
 box-shadow: 0px 0px 20px #FF4, inset 0px 0px 10px #FF4;
 border: 2px solid #FF4;
@@ -155,6 +425,18 @@ animation: paraTrackerTestFrameGradientAnimation 5s linear infinite;
     100% {background-position: -175px 0px;}
 }
 
+/* These two animations are used for switching between the utilities page and the setup page */
+@keyframes openPage
+{
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+}
+@keyframes closePage
+{
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+}
+
 /* This class is used for the background gradient on the dynamic setup page */
 .paraTrackerTestFrameTexture
 {
@@ -178,7 +460,6 @@ display: none;
 /* This class makes the test frame and color selections visible on ParaTrackerDynamic.php */
 .expandedFrame
 {
-display: block;
 }
 
 /* This class hides the test frame and color selections on ParaTrackerDynamic.php */
@@ -315,11 +596,12 @@ BITVALUE CALCULATOR CLASSES
 
 
 #bitflags_top {
-	width: 750px;
-	height: 600px;
+ 	width: 800px;
+	height: 640px;
 	display: flex;
 	flex-direction: column;
 	color: #CCC;
+	margin-bottom: 20px;
 }
 
 #bitflags_tabdisplay {
@@ -421,12 +703,10 @@ BITVALUE CALCULATOR CLASSES
 
 .bitflags_container_bottom {
 	flex: 0 0 auto;
-	display: flex;
-	flex-direction: row;
-	height: 36px;
-	background-color: #222;
+	height: 70px;
 	align-items: center;
 	justify-content: center;
+	background: linear-gradient(#262626, #161616, #060606, #000, #444);
 }
 
 .bitflags_container_flagcont {
@@ -470,27 +750,51 @@ BITVALUE CALCULATOR CLASSES
 
 .bitflags_container_bitvalue {
 	height: 24px;
+	width: 160px;
 	background-color: #111;
 	border: 2px solid #333;
 	outline: none;
 	color: inherit;
 	text-align: center;
-	width: 120px;
 	font-size: 12pt;
 	font-weight: bold;
+	margin-left: 30px;
+	margin-right: 30px;
+}
+
+.leftContainer
+{
+    width: 35%;
+    display: inline-block;
+}
+
+.rightContainer
+{
+    text-align: right;
+    display: inline-block;
+    width: 35%;
 }
 
 .bitflags_container_bitvalue_label {
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
 	color: #CCC;
-	margin-right: 10px;
 	font-weight: bold;
 	cursor: pointer;
+	font-size: 14pt;
+}
+
+.bottomContainer
+{
+    text-align: center;
+    width: 100%;
 }
 
 .bitflags_container_bitvalue_label:hover {
-	margin-right: 10px;
 	color: #FFF;
 	font-weight: bold;
+	font-size: 15pt;
 }
 
 .game_jediacademy
@@ -502,8 +806,22 @@ BITVALUE CALCULATOR CLASSES
 
 .game_jedioutcast
 {
-	background: linear-gradient(to right, #000666, #36C, #000666);
+	background: linear-gradient(to right, #000666, #38C, #000666);
 	border: 1px solid #038;
+	border-bottom-width: 0px;
+}
+
+.game_openarena
+{
+	background: linear-gradient(to right, #544, #F77, #544);
+	border: 1px solid #888;
+	border-bottom-width: 0px;
+}
+
+.game_quake
+{
+	background: linear-gradient(to right, #530, #D80, #530);
+	border: 1px solid #600;
 	border-bottom-width: 0px;
 }
 
@@ -514,11 +832,58 @@ BITVALUE CALCULATOR CLASSES
 	border-bottom-width: 0px;
 }
 
+.game_urbanterror
+{
+	background: linear-gradient(to right, #090999, #4CD, #090999);
+	border: 1px solid #038;
+	border-bottom-width: 0px;
+}
+
+.game_warsow
+{
+	background: linear-gradient(to right, #420, #FA0, #420);
+	border: 1px solid #A0A;
+	border-bottom-width: 0px;
+}
+
+.alphabetizeLabel
+{
+    display: inline-block;
+    font-family: monospace;
+    font-size: 8pt;
+}
+
+.alphabetizeCheckbox
+{
+    vertical-align: middle;
+    margin: 9px;
+}
+
+.invertSelectionButton
+{
+    border: 1px solid #000;
+    border-radius: 6px;
+    font-size: 8pt;
+    color: #FFF;
+	text-shadow: -1px 1px #000000;
+    background-color: #242;
+    border: none;
+    padding: 6px;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+.invertSelectionButton:hover
+{
+    color: #FFF;
+    background-color: #2A2;
+}
+
 .clearButton
 {
     border: 1px solid #000;
     border-radius: 6px;
-    font-size: 10pt;
+    font-size: 8pt;
     color: #FFF;
 	text-shadow: -1px 1px #000000;
     background-color: #422;
@@ -530,7 +895,7 @@ BITVALUE CALCULATOR CLASSES
 
 .clearButton:hover
 {
-    color: FFF;
+    color: #FFF;
     background-color: #A22;
 }
 
@@ -538,19 +903,19 @@ BITVALUE CALCULATOR CLASSES
 {
     border: 1px solid #000;
     border-radius: 6px;
-    font-size: 10pt;
+    font-size: 8pt;
     color: #FFF;
 	text-shadow: -1px 1px #000000;
     background-color: #224;
     border: none;
     padding: 6px;
-    margin-left: 12px;
+    margin-left: 6px;
     cursor: pointer;
 }
 
 .selectAllButton:hover
 {
-    color: FFF;
+    color: #FFF;
     background-color: #22A;
 }
 
@@ -561,9 +926,32 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 */
 
 
+.fiftyPercentWidth
+{
+    width: 50%;
+}
+
+.callofduty
+{
+	color: #DDC;
+	font-weight: bold;
+}
+
+.callofduty2
+{
+	color: #EEC;
+	font-weight: bold;
+}
+
 .callofduty4modernwarfare
 {
-	color: #999;
+	color: #9C9;
+	font-weight: bold;
+}
+
+.callofdutyworldatwar
+{
+	color: #CB8;
 	font-weight: bold;
 }
 
@@ -575,7 +963,25 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 
 .jedioutcast
 {
-	color: #36C;
+	color: #58D;
+	font-weight: bold;
+}
+
+.nexuizclassic
+{
+	color: #7AC;
+	font-weight: bold;
+}
+
+.openarena
+{
+	color: #FA9;
+	font-weight: bold;
+}
+
+.quake
+{
+	color: #D80;
 	font-weight: bold;
 }
 
@@ -585,9 +991,27 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 	font-weight: bold;
 }
 
+.soldieroffortuneiidoublehelix
+{
+	color: #ACA;
+	font-weight: bold;
+}
+
 .tremulous
 {
 	color: #0F0;
+	font-weight: bold;
+}
+
+.urbanterror
+{
+	color: #4ED;
+	font-weight: bold;
+}
+
+.warsow
+{
+	color: #FA0;
 	font-weight: bold;
 }
 
@@ -641,21 +1065,15 @@ font-family:monospace;
 line-height:90%;
 }
 
-/* This class is used to hide the refresh timer on page load. */
-.hiddenTimer
-{
-display: none;
-}
 
-/* This class is used to hide the reconnect button until another attempt is available. */
-.hide
-{
-display: none;
-}
+/*
+MAPREQ CLASSES
+MAPREQ CLASSES
+*/
+
 
 .reqforminfo {
     display: inline-block;
-    margin-top: 40px;
     font-weight: bold;
     color: #F08;
     margin-bottom: 10px;
@@ -670,12 +1088,14 @@ display: none;
 #reqform {
 	display: inline-flex;
 	flex-direction: column;
-    width: 450px;
+	width: 45%;
+    min-width: 450px;
     background-color: #222;
     padding: 10px;
     border-radius: 10px;
     border: 1px solid #90B;
     box-shadow: 0px 0px 20px #90B, inset 0px 0px 10px #90B;
+    margin-top: 20px;
 }
 
 #reqform > * {
@@ -714,21 +1134,23 @@ display: none;
     background-color: #90B;
 }
 
-#entrytop {
-    flex: 0 1 auto;
+.entrytop {
+    flex: 1 1 auto;
 	display: flex;
 	flex-direction: column;
-	width: 900px;
+	width: 90%;
+	min-width: 960px;
 	background-color: #444;
 	text-align: left;
 	overflow: hidden;
-    min-height: 0px;
     border-radius: 10px;
     border: 2px solid #FC0;
     box-shadow: 0px 0px 40px #F20;
+    min-height: 100px;
+    margin-bottom: 25px;
 }
 
-#entryheader {
+.entryheader {
 	flex: 0 0 auto;
 	height: 40px;
 	background-color: #181818;
@@ -738,7 +1160,7 @@ display: none;
 	padding: 0px 5px;
 }
 
-#entrybody {
+.entrybody {
 	flex: 1 1 auto;
 	display: flex;
 	flex-direction: column;
@@ -787,7 +1209,7 @@ display: none;
 	display: inline-block;
 	width: 20px;
 	background-color: #C00;
-	margin: none;
+	margin: 0;
 	padding: 2px;
 	border: 1px solid #400;
 	outline: none;
@@ -805,7 +1227,12 @@ display: none;
 
 .entrybspfield {
 	flex: 0 0 auto;
-	width: 450px;
+	min-width: 370px;
+}
+
+.entrydatefield {
+	flex: 0 0 auto;
+	width: 180px;
 }
 
 .entrylinkfield {
@@ -816,41 +1243,745 @@ display: none;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	height: 20px;
+	height: 43px;
 	background-color: #282828;
-	display: flex;
-	flex-direction: row;
 	padding: 3px;
 }
 
+/*
+This doesn't seem necessary. Commenting it out
 #adminlogin > *:not(:first-child) {
 	margin-left: 3px;
+}
+*/
+
+.loginRow
+{
+height: 20px;
 }
 
 .adminentry {
 	flex: 1 1 auto;
 	min-width: 0px;
-	min-height: 0px;
 	background-color: #222;
 	color: #CCC;
 	border: 2px solid #111;
 	outline: none;
+	cursor: pointer;
+}
+
+.loginText
+{
+    font-size: 12px;
+    height: 20px;
+    line-height: 20px;
+    color: #EEE;
 }
 
 .notificationText {
     font-weight: bold;
     color: #000;
     font-size: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .notificationSuccess {
+    height: 18px;
+    line-height: 18px;
+    border: 1px inset #090;
     background-color: #0F0;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .notificationFail {
+    height: 18px;
+    line-height: 18px;
+    border: 1px inset #900;
     background-color: #F00;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .notificationInfo {
+    height: 18px;
+    line-height: 18px;
+    border: 1px inset #059;
     background-color: #08F;
+    padding-left: 8px;
+    padding-right: 8px;
 }
+
+
+/*
+ANALYTICS CLASSES
+ANALYTICS CLASSES
+*/
+
+
+.centerPage
+{
+text-align: center;
+}
+
+.centerElement
+{
+text-align: center;
+margin-left: auto;
+margin-right: auto;
+}
+
+/* This class is used for the IP address and port inputs on the analytics page */
+.analyticsAddressForm
+{
+font-size: 14pt;
+padding: 6px;
+margin: 12px 12px auto;
+}
+
+.analyticsAddressPage
+{
+background-color: rgba(30, 30, 30, .65);
+}
+
+.fullHeightAndWidth
+{
+margin: 0px;
+padding: 0px;
+height: 100vh;
+width: 100%;
+}
+
+#analyticsContainingFrame
+{
+height: 100%;
+width: 100%;
+}
+
+#analyticsWrapper
+{
+height: 100%;
+width: 100%;
+min-width: 1000px;
+text-align: center;
+
+margin-left: auto;
+margin-right: auto;
+overflow: hidden;
+
+display: flex;
+flex-direction: column;
+}
+
+/* This class is used to display a loading screen while analytics is working */
+.loadingDiv
+{
+position: absolute;
+top: 50%;
+left: 50%;
+padding: 20px;
+background: linear-gradient(-20deg, #897, #788868, #897, #788868, #897, #788868);
+border: 1px outset #555;
+border-radius: 14px;
+opacity: .95;
+z-index: 10;
+color: #EEE;
+font-family: monospace;
+font-size: 18pt;
+text-shadow: -2px 2px #000000;
+transform: translate(-50%, -50%);
+}
+
+#analyticsDataFrame
+{
+width: 100%;
+min-width: 950px;
+min-height: 550px;
+text-align: center;
+position: relative;
+margin-left: auto;
+margin-right: auto;
+overflow: hidden;
+flex: 1 1 auto;
+}
+
+/* This class is used for the info div, which displays when the user clicks on an analytics element */
+#infoDiv
+{
+max-width: 300px;
+position: absolute;
+padding: 10px;
+background: linear-gradient(-20deg, #897, #788868, #897, #788868, #897, #788868);
+z-index: 3;
+opacity: .95;
+border: 1px outset #555;
+border-radius: 14px;
+
+/* These properties apply to all text inside the infoDiv */
+font-family: monospace;
+color: #EEE;
+font-size: 10pt;
+text-shadow: -1px 1px #000000;
+}
+
+/* This class is used for the header on the info div */
+.infoDivHeader
+{
+font-family: monospace;
+color: #FFF;
+font-size: 14pt;
+font-weight: bold;
+text-shadow: -1px 1px #000;
+}
+
+/* This class is used for the info inside the info div */
+.infoDivInfo
+{
+font-size: 12pt;
+font-weight: bold;
+}
+
+/* This class is used for the date inside the info div */
+.infoDivDate
+{
+font-size: 10pt;
+}
+
+/* This class is used for the infoDiv's close button */
+.infoDivCloseButton:hover
+{
+color: #FF0;
+}
+
+/* This class is used for the infoDiv's close button */
+.infoDivCloseButton
+{
+padding: 10px;
+cursor: pointer;
+font-family: monospace;
+font-size: 14pt;
+font-weight: bold;
+text-shadow: -1px 1px #555;
+text-align: right;
+color: #FFF;
+}
+
+/* This class is used for the the X on the infoDiv's close button */
+.infoDivCloseButtonX:hover
+{
+background: linear-gradient(-10deg, #900, #800);
+border: 1px inset #FFF;
+}
+
+/* This class is used for the the X on the infoDiv's close button */
+.infoDivCloseButtonX
+{
+padding-left: 7px;
+padding-right: 7px;
+padding-top: 3px;
+padding-bottom: 3px;
+margin: 10px;
+overflow: hidden;
+border: 1px outset #FFF;
+border-radius: 5px;
+background: linear-gradient(-10deg, #F33, #E22);
+cursor: pointer;
+font-family: monospace;
+font-size: 14pt;
+font-weight: bold;
+text-shadow: -1px 1px #000;
+text-align: right;
+}
+
+/* This class the colored container for the levelshots in the info div. */
+.infoDivLevelshotContainer
+{
+width: 180px;
+height: 135px;
+margin: 0 auto;
+padding: 20px;
+text-align: center;
+}
+
+/* This class is for the levelshots in the info div. */
+.infoDivLevelshot
+{
+width: 180px;
+height: 135px;
+background-size: 100% 100%;
+margin: 0 auto;
+padding: 0;
+opacity: 1;
+}
+
+/* This class is used to hide the info div on page load, and to hide the checkbox div. */
+.hiddenStuff
+{
+display: none;
+}
+
+/* This class is used for the button row, below the radio buttons */
+.buttonRow
+{
+display: inline-flex;
+}
+
+/* This class is for the show/hide button for the checkboxes */
+#showHideButton:hover
+{
+background-color: #BB0;
+border: 1px solid #F00;
+color: #F00;
+}
+
+/* This class is for the show/hide button for the checkboxes */
+#showHideButton
+{
+text-align: right;
+border: 1px solid #444;
+background-color: #000;
+cursor: pointer;
+padding: 10px;
+margin-left: 10px;
+margin-right: 10px;
+margin-bottom: 10px;
+margin-top: 0px;
+}
+
+/* This class is the container for the check boxes */
+#hiddenCheckboxes
+{
+padding: 10px;
+margin-left: 700px;
+position: absolute;
+transform: translate(-25%, -100%);
+border: 1px inset #555;
+background-color: #3D3D3D;
+z-index: 5;
+}
+
+/* This class is used to control the text labels on the control frame */
+#analyticsControlsFrame
+{
+padding-top: 5px;
+font-family: monospace;
+font-size: 10pt;
+color: #EEE;
+text-shadow: -1px 1px #000;
+background: linear-gradient(0deg, #222222, #212121, #222, #212121);
+background-size: 600px 8px;
+}
+
+/* This class controls the parent of the top row of flex boxes */
+.topRowFlex
+{
+display: flex;
+flex-direction: row;
+justify-content: space-around;
+align-items: center;
+}
+
+.topRowFlex > *
+{
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+/* These are the children in the top row of flex boxes */
+.topControlBarRow
+{
+display: flex;
+flex: 1 1 auto;
+flex-direction: column;
+text-align: left;
+}
+
+/* This class controls the parent of the bottom row of flex boxes */
+.bottomRowFlex
+{
+width: 100%;
+display: flex;
+flex-direction: row;
+justify-content: space-around;
+align-items: stretch;
+}
+
+/* These are the children in the bottom row of flex boxes */
+.bottomControlBarRow
+{
+width: 100%;
+margin-left: 4px;
+margin-right: 4px;
+}
+
+.timezoneDisclaimer
+{
+position: absolute;
+top: 100%;
+left: 2%;
+color: #FFF;
+font-family: monospace;
+font-size: 11pt;
+text-shadow: 1px 1px #000000;
+transform: translate(0%, 150%);
+}
+
+#gridBackground
+{
+position: absolute;
+height: 100%;
+width: 100%;
+background: linear-gradient(0deg, #233, #122, #011, #011, #000, #000, #011, #122);
+}
+
+.analyticsErrorMessage
+{
+font-family: monospace;
+font-size: 18pt;
+color: #DDD;
+text-shadow: 1px 1px #000000;
+}
+
+.gridLineHorizontal:hover
+{
+background: linear-gradient(-0.25deg, #39F 1px, #222 20px);
+opacity: 0.7;
+}
+
+.gridLineHorizontal
+{
+position: absolute;
+height: 0.05%;
+width: 100%;
+min-height: 2px;
+background: linear-gradient(-0.25deg, #0F0 1px, #222 20px);
+opacity: 0.4;
+cursor: pointer;
+}
+
+.gridLineVertical:hover
+{
+background: linear-gradient(89.5deg, #39F 1px, #222 20px);
+opacity: 0.7;
+}
+
+.gridLineVertical
+{
+position: absolute;
+height: 100%;
+width: 0.05%;
+min-width: 2px;
+background: linear-gradient(89.5deg, #0F0 1px, #222 20px);
+opacity: 0.4;
+cursor: pointer;
+}
+
+.gridNode:hover
+{
+border: 8px solid;
+border-color: #F55;
+border-style: ridge;
+opacity: 1;
+z-index: 2;
+}
+
+.gridNode
+{
+position: absolute;
+background-color: #FFF;
+border: 6px solid;
+border-radius: 10px;
+border-style: ridge;
+opacity: 0.75;
+cursor: pointer;
+
+/* This next line centers the nodes. */
+transform: translate(-50%, -50%);
+}
+
+.gridBlockPoint:hover
+{
+opacity: .45;
+}
+
+.gridBlockPoint
+{
+border: none;
+position: absolute;
+opacity: 0.3;
+cursor: pointer;
+}
+
+/* This class is for the labels for the horizontal grid lines. */
+.gridLabelHorizontal
+{
+position: absolute;
+color: #FFF;
+font-size: 10pt;
+font-family: monospace;
+transform: translate(0, -50%);
+cursor: pointer;
+text-shadow: 1px 1px #000000, 2px 2px #000000;
+z-index: 1;
+}
+
+/* This class is for the labels for the vertical grid lines. */
+.gridLabelVertical
+{
+position: absolute;
+color: #FFF;
+font-size: 8pt;
+font-family: monospace;
+cursor: pointer;
+text-shadow: 1px 1px #000000, 2px 2px #000000;
+opacity: 0.8;
+white-space: nowrap;
+overflow: hidden;
+z-index: 1;
+}
+
+/* This class is for the labels for the vertical grid lines. */
+.gridLabelVerticalOffset1
+{
+transform: translate(-50%, -250%);
+}
+
+/* This class is for the labels for the vertical grid lines. */
+.gridLabelVerticalOffset2
+{
+transform: translate(-50%, -125%);
+}
+
+/* This class is for the labels for the horizontal grid lines. */
+.gridLabelZero
+{
+transform: translate(0, -100%);
+}
+
+/* This class is for the labels for the horizontal grid lines. */
+.gridLabelTop
+{
+transform: translate(0, 0);
+}
+
+/* This color is used for the server online status */
+.analyticsColor1
+{
+border-color: #A33;
+background-color: #A33;
+}
+
+/* This class is used to make the status blocks more obvious */
+.offlineBlinker:hover
+{
+opacity: .8;
+}
+
+/* This class is used to blink the blocks that identify if the server is offline */
+.offlineBlinker
+{
+opacity: .6;
+animation: redBlinker 1.75s linear infinite;
+}
+
+/* This class is used for the server address input fields */
+.serverAddressFields
+{
+padding: 4px;
+border: 1px inset #444;
+background-color: #000;
+font-family: monospace;
+font-size: 11pt;
+color: #FFF;
+}
+
+/* This class is used for the time fields */
+.timeField
+{
+padding: 4px;
+border: 1px inset #444;
+background-color: #000;
+font-family: monospace;
+font-size: 11pt;
+color: #FFF;
+}
+
+/* This class resizes the reset button */
+.resetTimeFieldSize
+{
+flex: 0 0 auto;
+}
+
+/* This class is for the show/hide button for the checkboxes */
+.resetTimeFields:hover
+{
+background-color: #BB0;
+border: 1px solid #F00;
+color: #F00;
+}
+
+/* This class is used for the reset button for the time fields */
+.resetTimeFields
+{
+text-align: right;
+border: 1px solid #444;
+background-color: #000;
+cursor: pointer;
+padding: 10px;
+color: #FFF;
+font-family: monospace;
+font-size: 11pt;
+flex: 0 0 auto;
+}
+
+/* This class is used for the ParaTracker Analytics text at the bottom of the page */
+.radioButton
+{
+border: 1px inset #444;
+background-color: #000;
+font-family: monospace;
+font-size: 11pt;
+color: #FFF;
+}
+
+/* This class is used for the ParaTracker Analytics text at the bottom of the page */
+.analyticsLogo
+{
+font-family: monospace;
+font-size: 22pt;
+font-weight: bold;
+padding-right: 350px;
+}
+
+@keyframes redBlinker
+{
+    0% {background-color: #D33;}
+    49% {background-color: #D33;}
+    50% {background-color: #933;}
+    100% {background-color: #933;}
+}
+
+/* This color is used for the game name */
+.analyticsColor2
+{
+border-color: #FFF;
+background-color: #FFF;
+}
+
+/* This color is used for the mod name */
+.analyticsColor3
+{
+border-color: #F93;
+background-color: #F93;
+}
+
+/* This color is used for the server name (sv_hostname) */
+.analyticsColor4
+{
+border-color: #39F;
+background-color: #39F;
+}
+
+/* This color is used for the map name. This color is only used when map-specific colors are turned off. */
+.analyticsColor5
+{
+border-color: #F3F;
+background-color: #F3F;
+}
+
+/* This color is used for the gametype */
+.analyticsColor6
+{
+border-color: #9F3;
+background-color: #9F3;
+}
+
+/* This color is used for the player count */
+.analyticsColor7
+{
+border-color: #33F;
+background-color: #33F;
+}
+
+
+/*
+COLORIZER CLASSES
+COLORIZER CLASSES
+
+The following values are used for colorizing map names and server names in analytics
+*/
+
+
+.infoDivColor0
+/* Black (Gray is used for readability)
+Default is #141414 */
+{
+color: #141414;
+text-shadow: -1px 1px #444;
+}
+
+.infoDivColor1
+/* Red
+Default is #FF0000 */
+{
+color: #FF0000;
+}
+
+.infoDivColor2
+/* Green
+Default is #00FF00 */
+{
+color: #00FF00;
+}
+
+.infoDivColor3
+/* Yellow
+Default is #FFFF00 */
+{
+color: #FFFF00;
+}
+
+.infoDivColor4
+/* Blue
+Default is #2222FF */
+{
+color: #2222FF;
+font-weight: bold;
+}
+
+.infoDivColor5
+/* Cyan
+Default is #00FFFF */
+{
+color: #00FFFF;
+}
+
+.infoDivColor6
+/* Pink/Purple
+Default is #FF00FF */
+{
+color: #FF00FF;
+}
+
+.infoDivColor7
+/* White
+Default is #FFFFFF */
+{
+color: #FFFFFF;
+}
+
+.infoDivColor8
+/* Orange
+Default is #FF6605 */
+{
+color: #FF6605;
+}
+
+.infoDivColor9
+/* Gray
+Default is #5E5E5E */
+{
+color: #5E5E5E;
+}
+

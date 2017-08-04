@@ -1,6 +1,7 @@
 var bitflags_tabdisplay
 var bitflags_bitselect
 var bitflags_tabregion
+var sortAlphabetically = false
 
 var bitflags_html = []
 
@@ -28,7 +29,7 @@ function setup() {
 			set_opt.className = 'bitselect_background'
 			set_opt.appendChild(document.createTextNode(bitset.setname))
 			
-			let bitset_html = {}
+			bitset_html = {}
 			bitset_html.flags = []
 			
 			// ================
@@ -37,32 +38,38 @@ function setup() {
 			// ================
 			let set_content_top = document.createElement('div')
 			set_content_top.className = 'bitflags_container_top'
+			set_content_top.id = 'bitflags_container_top'
 			let set_content_bottom = document.createElement('div')
 			set_content_bottom.className = 'bitflags_container_bottom'
 			set_content.appendChild(set_content_top)
 			set_content.appendChild(set_content_bottom)
 			// ================
+
+			i = 1
 			bitset.flags.forEach((flag)=>{
-				let flagobj = {}
-				flagobj.name = flag
-				let flagcont = document.createElement('div')
-				let span = document.createElement('span')
-				span.className = 'bitflags_container_flag'
-				span.appendChild(document.createTextNode(flagobj.name))
-				flagcont.appendChild(span)
-				let cb = document.createElement('input')
-				cb.onclick = ()=>{cb.checked = !cb.checked; bitflags_recalculate_from_cbs()}
-				cb.type = 'checkbox'
-				cb.className = 'bitflags_container_cb'
-				flagcont.appendChild(cb)
-				set_content_top.appendChild(flagcont)
+			    let flagobj = {}
+			    flagobj.name = flag
+		        flagobj.value = i
+			    let flagcont = document.createElement('div')
+			    let span = document.createElement('span')
+			    span.className = 'bitflags_container_flag'
+			    span.appendChild(document.createTextNode(flagobj.name))
+			    flagcont.appendChild(span)
+			    let cb = document.createElement('input')
+			    cb.onclick = ()=>{cb.checked = !cb.checked; bitflags_recalculate_from_cbs()}
+			    cb.type = 'checkbox'
+			    cb.className = 'bitflags_container_cb'
+			    flagcont.appendChild(cb)
+			    set_content_top.appendChild(flagcont)
 				
-				flagcont.onclick = cb.onclick
+			    flagcont.onclick = cb.onclick
 				
-				flagobj.cb = cb
-				flagobj.cont = flagcont
-				bitset_html.flags.push(flagobj)
+			    flagobj.cb = cb
+			    flagobj.cont = flagcont
+			    bitset_html.flags.push(flagobj)
+			    i = i * 2
 			})
+
 			// ================
 			let bitvalue_label = document.createElement('span')
 			bitvalue_label.appendChild(document.createTextNode(bitset.setname + ' '))
@@ -73,28 +80,59 @@ function setup() {
 			bitvalue.className = 'bitflags_container_bitvalue'
 			bitvalue.oninput = ()=>{bitflags_recalculate_from_input()}
 
-			let selectAll_button = document.createElement('div')
-			selectAll_button.appendChild(document.createTextNode(' Select All '))
-			selectAll_button.className = 'selectAllButton'
-			selectAll_button.onclick = ()=>{bitvalue.value = '9999999999999999999999';bitflags_recalculate_from_input()}
+			let alphabetize_label = document.createElement('div')
+			alphabetize_label.appendChild(document.createTextNode('Alphabetize List'))
+			alphabetize_label.className = 'alphabetizeLabel'
 
-			let clear_button = document.createElement('div')
-			clear_button.appendChild(document.createTextNode(' Clear All '))
+			let alphabetize_checkbox = document.createElement('input')
+			alphabetize_checkbox.type = "checkbox"
+			alphabetize_checkbox.className = 'alphabetizeCheckbox'
+			alphabetize_checkbox.onchange = ()=>{sortFlags()}
+
+			let leftSide = document.createElement('div')
+			leftSide.className = 'leftContainer'
+			leftSide.appendChild(alphabetize_label)
+			leftSide.appendChild(alphabetize_checkbox)
+
+			let invertSelection_button = document.createElement('span')
+			invertSelection_button.appendChild(document.createTextNode('Invert Selection'))
+			invertSelection_button.className = 'invertSelectionButton'
+			invertSelection_button.onclick = ()=>{invertSelection()}
+
+			let selectAll_button = document.createElement('span')
+			selectAll_button.appendChild(document.createTextNode('Select All'))
+			selectAll_button.className = 'selectAllButton'
+			selectAll_button.onclick = ()=>{setMaxValue()}
+
+			let clear_button = document.createElement('span')
+			clear_button.appendChild(document.createTextNode('Clear All'))
 			clear_button.className = 'clearButton'
 			clear_button.onclick = ()=>{bitvalue.value = '0';bitflags_recalculate_from_input()}
 
+			let rightSide = document.createElement('div')
+			rightSide.className = 'rightContainer'
+			rightSide.appendChild(invertSelection_button)
+			rightSide.appendChild(selectAll_button)
+			rightSide.appendChild(clear_button)
+
+			let bottom_container = document.createElement('div')
+			bottom_container.className = 'bottomContainer'
+
+			bottom_container.appendChild(leftSide)
+			bottom_container.appendChild(bitvalue)
+			bottom_container.appendChild(rightSide)
 			set_content_bottom.appendChild(bitvalue_label)
-			set_content_bottom.appendChild(bitvalue)
-			set_content_bottom.appendChild(selectAll_button)
-			set_content_bottom.appendChild(clear_button)
+			set_content_bottom.appendChild(bottom_container)
 			// ================
 			
 			
 			bitset_html.name = bitset.setname
 			bitset_html.opt = set_opt
+			bitset_html.flags_content = set_content_top
 			bitset_html.content = set_content
 			bitset_html.bitvalue = bitvalue
 			bitset_html.maxvalue = Math.pow(2, bitset.flags.length) - 1
+			bitset_html.alphacb = alphabetize_checkbox
 			game_html.sets.push(bitset_html)
 		})
 		bitflags_html.push(game_html)
@@ -112,6 +150,39 @@ document.addEventListener("DOMContentLoaded", function(event) {
 var cur_game
 var cur_bitset
 
+function sortEntriesByName(input)
+{
+    input.sort((a, b)=>{
+    let aname = a.name
+    let bname = b.name
+    aname = aname.toLowerCase()
+    bname = bname.toLowerCase()
+    if (aname == '(unused)') return 1
+    if (bname == '(unused)') return -1
+    if (aname < bname) return -1
+    if (aname > bname) return 1
+    return a.value - b.value
+    })
+}
+
+function sortEntriesByValue(input)
+{
+    input.sort((a, b)=>{
+    return a.value - b.value
+    })
+}
+
+function sortFlags() {
+	sortAlphabetically = cur_bitset.alphacb.checked
+    if(sortAlphabetically) sortEntriesByName(cur_bitset.flags)
+    else sortEntriesByValue(cur_bitset.flags)
+    
+    clear_element(cur_bitset.flags_content)
+    cur_bitset.flags.forEach(flag=>{
+		cur_bitset.flags_content.appendChild(flag.cont)
+	})
+}
+
 function bitflags_gamechange(index) {
 	bitflags_html.forEach(game=>{game.tab.className = 'game_tab ' + game.tab.gameClassName})
 	cur_game = bitflags_html[index]
@@ -127,6 +198,8 @@ function bitflags_setchange(index) {
 	clear_element(bitflags_tabregion)
 	cur_bitset = cur_game.sets[index]
 	bitflags_tabregion.appendChild(cur_bitset.content)
+	cur_bitset.alphacb.checked = sortAlphabetically
+	sortFlags()
 	bitflags_recalculate_from_cbs()
 }
 
@@ -140,11 +213,28 @@ function set_flag(flag, bool) {
 	}
 }
 
+function invertSelection()
+{
+    let testCount = cur_bitset.flags.length
+    for(f = 0; f < testCount; f++)
+    {
+        if(cur_bitset.flags[f].cb.checked == true)
+        {
+            cur_bitset.flags[f].cb.checked = false
+        }
+        else
+        {
+            cur_bitset.flags[f].cb.checked = true
+        }
+    }
+    bitflags_recalculate_from_cbs()
+}
+
 function bitflags_recalculate_from_cbs() {
 	let sum = 0
 	for (let i = 0; i < cur_bitset.flags.length; i++) {
 		if (cur_bitset.flags[i].cb.checked) {
-			sum += Math.pow(2, i)
+			sum += parseInt(cur_bitset.flags[i].value)
 			set_flag(cur_bitset.flags[i], true)
 		} else {
 			set_flag(cur_bitset.flags[i], false)
@@ -153,16 +243,22 @@ function bitflags_recalculate_from_cbs() {
 	cur_bitset.bitvalue.value = sum
 }
 
+function setMaxValue()
+{
+    cur_bitset.bitvalue.value = cur_bitset.maxvalue
+    bitflags_recalculate_from_input()
+}
+
 function bitflags_recalculate_from_input() {
 	let value = parseInt(cur_bitset.bitvalue.value)
 	if (isNaN(value) || value < 0) value = 0
 	if (!isFinite(value) || value > cur_bitset.maxvalue) value = cur_bitset.maxvalue
-	for (let i = 0; i < cur_bitset.flags.length; i++) {
-		let bit = 1 << i
-		set_flag(cur_bitset.flags[i], (value & bit))
-	}
-	cur_bitset.bitvalue.value = value
+
+	count = cur_bitset.flags.length
+    for (let i = 0; i < count; i++)
+    {
+        set_flag(cur_bitset.flags[i], (cur_bitset.flags[i].value & value) ? true : false)
+    }
+    
+    cur_bitset.bitvalue.value = value
 }
-
-
-
