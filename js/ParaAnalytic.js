@@ -490,16 +490,6 @@ function updateHash(variableName, value)
 
     if(hashValue.length > 0) hashArray = hashValue.split("&")
 
-    if(variableName == "URLStartTime")
-    {
-        outputArray[0] = "startTime=" + parseStartTime(value)
-    }
-
-    if(variableName == "URLEndTime")
-    {
-        outputArray[1] = "endTime=" + parseEndTime(value)
-    }
-
     //Add the new value to the array before processing
     hashArray.push(variableName + "=" + value)
 
@@ -509,6 +499,8 @@ function updateHash(variableName, value)
         if(!checkValidInput(hashVariable[0])) continue
         if(!checkValidInput(hashVariable[1])) continue
 
+        if(hashVariable[0] == "startTime") outputArray[0] = hashArray[i]
+        if(hashVariable[0] == "endTime") outputArray[1] = hashArray[i]
         if(hashVariable[0] == "twelveHourClockMode") outputArray[2] = hashArray[i]
         if(hashVariable[0] == "displayTimesInUTC") outputArray[3] = hashArray[i]
         if(hashVariable[0] == "colorizeBlocks") outputArray[4] = hashArray[i]
@@ -528,10 +520,14 @@ function updateHash(variableName, value)
         if(checkValidInput(outputArray[i])) output.push(outputArray[i])
     }
 
-    if(variableName == 'displayTimesInUTC')
+    if(variableName == "URLStartTime")
     {
-        outputArray[0] = "startTime=" + parseStartTime()
-        outputArray[1] = "endTime=" + parseEndTime()
+        outputArray[0] = "startTime=" + parseStartTime(value)
+    }
+
+    if(variableName == "URLEndTime")
+    {
+        outputArray[1] = "endTime=" + parseEndTime(value)
     }
 
 
