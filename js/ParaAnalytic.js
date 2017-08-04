@@ -1227,7 +1227,7 @@ function addBlocksToGrid(input, color, inputTitle, height)
         //Add the value as a title so that a mouse over will show the data.
         dateValue = new Date(currentTimeList[iGrid] * 1000)
 
-        if(iGrid > 0) leftPosition = 100 / timeDifference * (currentTimeList[iGrid] - startTime)
+        leftPosition = 100 / timeDifference * (currentTimeList[iGrid] - startTime)
 
         let displayHeight = height
         let topPosition = 100 - displayHeight - offset
@@ -1290,7 +1290,7 @@ function addOfflineStatusToGrid()
         //Add the value as a title so that a mouse over will show the data.
         dateValue = new Date(currentTimeList[iGrid] * 1000)
 
-        if(iGrid > 0) leftPosition = 100 / timeDifference * (currentTimeList[iGrid] - startTime)
+        leftPosition = 100 / timeDifference * (currentTimeList[iGrid] - startTime)
 
         let displayHeight = height
         let topPosition = 100 - displayHeight - offset
@@ -1363,7 +1363,7 @@ function addMapsToGrid(height)
             mapData = ": " + mapnameArray[currentTimeList[iGrid]] + " - " + gametypeArray[currentTimeList[iGrid]] + " - " + timePlayed + playersPerMapHour
         }
 
-        if(iGrid > 0) leftPosition = 100 / timeDifference * (currentTimeList[iGrid] - startTime)
+        leftPosition = 100 / timeDifference * (currentTimeList[iGrid] - startTime)
 
         if(!sortMapsBy)
         {

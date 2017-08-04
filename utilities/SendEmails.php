@@ -121,24 +121,27 @@ function getValuesFromArray($input, $key)
     $min = "No data";
     $average = "No data";
     $sum = 0;
-    $count = count($input);
-    if($count > 0)
+    if(is_array($input))
     {
-        $min = $input[0];
-        $max = 0;
-        for($i = 0; $i < $count; $i++)
+        $count = count($input);
+        if($count > 0)
         {
-            if(!empty($input[$i][$key]))
+            $min = $input[0];
+            $max = 0;
+            for($i = 0; $i < $count; $i++)
             {
-                $value = $input[$i][$key];
-                $sum = $sum + $value;
-                if($value > $max) $max = $value;
-                if($value < $min) $min = $value;
+                if(!empty($input[$i][$key]))
+                {
+                    $value = $input[$i][$key];
+                    $sum = $sum + $value;
+                    if($value > $max) $max = $value;
+                    if($value < $min) $min = $value;
+                }
             }
+            $max = round($max, 2);
+            $min = round($min, 2);
+            $average = round($sum / $count, 2);
         }
-        $max = round($max, 2);
-        $min = round($min, 2);
-        $average = round($sum / $count, 2);
     }
     return array($min, $max, $average);
 }
@@ -184,8 +187,10 @@ function prepareAndsendAdminReport($emailAdministrators)
 
         $unit = "time";
         if($displayErrorCount != 1) $unit .= 's';
-        $message .= '<p style="text-align: center;">DisplayError was called ' . colorizeDangerousValuesHigher($displayErrorCount, $unit, $problemThreshold, $problemThreshold * 1.5, '') . '
-        <br><span style="font-size: 9pt;">At a rate of ' . colorizeDangerousValuesHigher(((currentTime - lastRefreshTime) / 86400) * displayErrorCount, $unit, $problemThreshold, $problemThreshold * 1.5, '') . ' calls per day</span><br>
+        $message .= '<p style="text-align: center;">DisplayError was called ' . colorizeDangerousValuesHigher($displayErrorCount, $unit, $problemThreshold, $problemThreshold * 1.5, '');
+        $unit = "call";
+        if($displayErrorCount != 1) $unit .= 's';
+        $message .= '<br><span style="font-size: 9pt;">At a rate of ' . colorizeDangerousValuesHigher(((currentTime - lastRefreshTime) / 86400) * displayErrorCount, $unit, $problemThreshold, $problemThreshold * 1.5, '') . ' per day</span><br>
         <span style="font-size: 8pt;">If there are excessive displayError calls, check ' . logPath . 'errorLog.php for details.</span></p>';
 
         $executionTimeArray = getExecutionTimeArray();
