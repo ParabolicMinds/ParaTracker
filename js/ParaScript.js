@@ -988,7 +988,7 @@ function changeSetupPageFunction()
         activeButton("mapreqButton")
         expandDiv("mapreqDiv")
     }
-    else if(document.location.hash == "#logViewer" && typeof mapreqDiv !== 'undefined')
+    else if(document.location.hash == "#logViewer" && typeof logViewerDiv !== 'undefined')
     {
         openUtilitiesPage()
 
