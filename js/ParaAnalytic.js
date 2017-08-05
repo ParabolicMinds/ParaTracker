@@ -1302,7 +1302,8 @@ function addOfflineStatusToGrid()
     height = 100
     if(!showOfflineTimes) return
 
-    for(iGrid = 0; iGrid < currentTimeList.length; iGrid++)
+    //Setting iGrid to start at 1 fixes the offline status bug at the far left side.
+    for(iGrid = 1; iGrid < currentTimeList.length; iGrid++)
     {
         if(!trackerOnlineStatusArray[currentTimeList[iGrid]] || onlineStatusArray[currentTimeList[iGrid]]) continue
         if(!checkValidInput(currentTimeList[iGrid + 1])) break

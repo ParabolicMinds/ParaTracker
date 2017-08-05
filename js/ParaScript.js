@@ -1101,7 +1101,7 @@ function parsePlayerProperties()
             if(data.players[i].team > check)
             {
                 teamCount = data.players[i].team
-                team1count++
+//                team1count++
             }
             if(data.players[i].team == 1)
             {
