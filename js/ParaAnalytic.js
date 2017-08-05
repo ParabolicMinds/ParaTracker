@@ -57,7 +57,9 @@ timeDifference = 0
 
 currentTimeList = []
 
+trackerOnlineStatusArray = []
 onlineStatusArray = []
+newTimesArray = []
 refreshTimesArray = []
 gameNameArray = []
 sv_hostnameArray = []
@@ -376,7 +378,7 @@ function resetTimeFieldValues()
     URLstartTime = 0
     URLendTime = 0
 
-    updateHash('', '')
+    updateHash('resetTimes', '')
     loadAnalyticsData()
 }
 
@@ -499,8 +501,8 @@ function updateHash(variableName, value)
         if(!checkValidInput(hashVariable[0])) continue
         if(!checkValidInput(hashVariable[1])) continue
 
-        if(hashVariable[0] == "URLstartTime") outputArray[0] = hashArray[i]
-        if(hashVariable[0] == "URLendTime") outputArray[1] = hashArray[i]
+        if(hashVariable[0] == "startTime") outputArray[0] = hashArray[i]
+        if(hashVariable[0] == "endTime") outputArray[1] = hashArray[i]
         if(hashVariable[0] == "twelveHourClockMode") outputArray[2] = hashArray[i]
         if(hashVariable[0] == "displayTimesInUTC") outputArray[3] = hashArray[i]
         if(hashVariable[0] == "colorizeBlocks") outputArray[4] = hashArray[i]
@@ -515,21 +517,34 @@ function updateHash(variableName, value)
         if(hashVariable[0] == "showGridLabels") outputArray[13] = hashArray[i]
     }
 
+    if(variableName == "URLStartTime")
+    {
+        outputArray[0] = "startTime=" + parseStartTime(value)
+    }
+
+    if(variableName == "URLEndTime")
+    {
+        outputArray[1] = "endTime=" + parseEndTime(value)
+    }
+
+    if(variableName == "resetTimes")
+    {
+        outputArray[0] = "startTime=0"
+        outputArray[1] = "endTime=0"
+    }
+
     for(i = 0; i < outputArray.length; i++)
     {
         if(checkValidInput(outputArray[i])) output.push(outputArray[i])
     }
 
-    if(variableName == "URLStartTime" || URLStartTime != 0)
+/*
+    if(variableName == 'displayTimesInUTC')
     {
-        outputArray[0] = "startTime=" + parseStartTime(value)
+        outputArray[0] = "startTime=" + parseStartTime()
+        outputArray[1] = "endTime=" + parseEndTime()
     }
-
-    if(variableName == "URLEndTime" || URLEndTime != 0)
-    {
-        outputArray[1] = "endTime=" + parseEndTime(value)
-    }
-
+*/
 
     //Now, let's check to see if the server address/port is still the same
     newAddress = serverAddressField.value.trim()
@@ -583,12 +598,15 @@ function updateServerAddress()
 function updateStartTime(input1, input2)
 {
     clearTimeouts()
+    endTimeField.disabled = true
+
     if(!loadingPage) startTimeTimer = setTimeout("updateHashFromControls(\"" + input1 + "\",\"" + input2 + "\")", changeTimeTimeout);
 }
 
 function updateEndTime(input1, input2)
 {
     clearTimeouts()
+    startTimeField.disabled = true
     if(!loadingPage) endTimeTimer = setTimeout("updateHashFromControls(\"" + input1 + "\",\"" + input2 + "\")", changeTimeTimeout);
 }
 
@@ -691,6 +709,7 @@ function checkStartAndEndTimes(startInput, endInput)
 
 function clearDataArrays()
 {
+    trackerOnlineStatusArray = []
     onlineStatusArray = []
     refreshTimesArray = []
     gameNameArray = []
@@ -875,12 +894,10 @@ function clear_element(e) {
 
 function updateDataArray(inputArray, inputDeltas)
 {
-    for(i = 0; i < refreshTimesArray.length; i++)
+    for(i = 0; i < newTimesArray.length; i++)
     {
-        inputArray[refreshTimesArray[i]] = getDeltaState(inputDeltas, refreshTimesArray[i])
+        inputArray[newTimesArray[i]] = getDeltaState(inputDeltas, newTimesArray[i])
     }
-
-    return inputArray
 }
 
 function getDeltaState(inputDeltas, time)
@@ -910,7 +927,7 @@ function rasterizeTimeArrays()
 
     //We'll have to do the first one manually
     refreshTimesArray.push(runningTotal)
-    onlineStatusArray[refreshTimesArray[0]] = getDeltaState(analyticsData.online, refreshTimesArray[0])
+    trackerOnlineStatusArray[refreshTimesArray[0]] = getDeltaState(analyticsData.online, refreshTimesArray[0])
 
     for(i = 1; i < analyticsData.refreshTimes.length; i++)
     {
@@ -925,13 +942,16 @@ function rasterizeTimeArrays()
             if(averageTimeData * 2.5 < analyticsData.refreshTimes[i] && averageTimeData > 300)
             {
                 //Definitely missing info here. ParaTracker must have been broken or offline.
-                //Add an entry in onlineStatusArray for the offline time and continue.
+                //Add an entry in trackerOnlineStatusArray for the offline time and continue.
+                newTimesArray.push(runningTotal + averageTimeData)
                 refreshTimesArray.push(runningTotal + averageTimeData)
-                onlineStatusArray[runningTotal + averageTimeData] = false
+                trackerOnlineStatusArray[runningTotal + averageTimeData] = false
             }
         }
+        newTimesArray.push(runningTotal + analyticsData.refreshTimes[i])
         refreshTimesArray.push(runningTotal + analyticsData.refreshTimes[i])
-        onlineStatusArray[refreshTimesArray[i]] = getDeltaState(analyticsData.online, refreshTimesArray[i])
+
+        trackerOnlineStatusArray[refreshTimesArray[i]] = getDeltaState(analyticsData.online, newTimesArray[i])
         runningTotal += analyticsData.refreshTimes[i]
     }
     refreshTimesArray = sortAndRemoveDuplicates(refreshTimesArray)
@@ -957,21 +977,26 @@ function sortAndRemoveDuplicates(input)
 
 function rasterizeData()
 {
-    if(analyticsData == {} || analyticsData == null) return
+    //First check to see if any new data is coming in
+    if(analyticsData != {} && analyticsData != null)
+    {
+        newTimesArray = []
 
-    //This must be done BEFORE rasterization, or else it will need to use the times index.
-    makeMapsLowerCase()
+        //This must be done BEFORE rasterization, or else it will need to use the times index.
+        makeMapsLowerCase()
 
-    //Due to the new way refresh times are sent, the online status array must be processed alongside the refresh times array
-    rasterizeTimeArrays()
-
-    //Update the arrays with the incoming info. All incoming data will be joined with existing data.
-    gameNameArray = updateDataArray(gameNameArray, analyticsData.game)
-    sv_hostnameArray = updateDataArray(sv_hostnameArray, analyticsData.hostname)
-    mapnameArray = updateDataArray(mapnameArray, analyticsData.maps)
-    modNameArray = updateDataArray(modNameArray, analyticsData.mod)
-    gametypeArray = updateDataArray(gametypeArray, analyticsData.gametype)
-    playerCountArray = updateDataArray(playerCountArray, analyticsData.playercount)
+        //Due to the new way refresh times are sent, the tracker online status array must be processed alongside the refresh times array
+        rasterizeTimeArrays()
+        //Update the arrays with the incoming info. All incoming data will be joined with existing data.
+        updateDataArray(onlineStatusArray, analyticsData.online)
+        updateDataArray(gameNameArray, analyticsData.game)
+        updateDataArray(sv_hostnameArray, analyticsData.hostname)
+        updateDataArray(mapnameArray, analyticsData.maps)
+        updateDataArray(modNameArray, analyticsData.mod)
+        updateDataArray(gametypeArray, analyticsData.gametype)
+        updateDataArray(playerCountArray, analyticsData.playercount)
+        
+    }
 
     //We need to create a new time array that consists of all refresh times between the start time and end time
     createCurrentTimeList()
@@ -1054,7 +1079,7 @@ function generateAdditionalMapInfo()
 
         for(iSetup = 0; iSetup + 1 < currentTimeList.length; iSetup++)
         {
-            if(mapnameKey([currentTimeList[iSetup]]) == mapList[j] && onlineStatusArray[currentTimeList[iSetup]])
+            if(mapnameKey([currentTimeList[iSetup]]) == mapList[j] && trackerOnlineStatusArray[currentTimeList[iSetup]] && onlineStatusArray[currentTimeList[iSetup]])
             {
                 mapTime[j] += currentTimeList[iSetup + 1] - currentTimeList[iSetup]
                 playerCountByTime[j] += parseInt(playerCountArray[currentTimeList[iSetup]]) * (currentTimeList[iSetup + 1] - currentTimeList[iSetup])
@@ -1162,6 +1187,7 @@ function inputAnalyticsData()
     }
     
     populateAnalyticsField()
+    analyticsData = null
     unFreezeControls()
 }
 
@@ -1184,7 +1210,7 @@ function addPlayersToGrid()
     for(iGrid = 0; iGrid < currentTimeList.length; iGrid++)
     {
         //If the server was offline, we need to skip the frame since there will be no data
-        if(!onlineStatusArray[currentTimeList[iGrid]]) continue
+        if(!trackerOnlineStatusArray[currentTimeList[iGrid]] || !onlineStatusArray[currentTimeList[iGrid]]) continue
 
         dataElement = document.createElement('div')
         dataElement.className = "gridNode analyticsColor7"
@@ -1216,7 +1242,7 @@ function addBlocksToGrid(input, color, inputTitle, height)
     for(iGrid = 0; iGrid < currentTimeList.length; iGrid++)
     {
         //If the server was offline, we need to skip the frame since there will be no data.
-        if(!onlineStatusArray[currentTimeList[iGrid]]) continue
+        if(!trackerOnlineStatusArray[currentTimeList[iGrid]] || !onlineStatusArray[currentTimeList[iGrid]]) continue
 
         dataElement = document.createElement('div')
         dataElement.className = "gridBlockPoint " + color
@@ -1231,7 +1257,7 @@ function addBlocksToGrid(input, color, inputTitle, height)
 
         let blockStart = currentTimeList[iGrid]
 
-        while(iGrid + 1 < currentTimeList.length && input[currentTimeList[iGrid]] == input[currentTimeList[iGrid + 1]] && onlineStatusArray[currentTimeList[iGrid]] == onlineStatusArray[currentTimeList[iGrid + 1]])
+        while(iGrid + 1 < currentTimeList.length && input[currentTimeList[iGrid]] == input[currentTimeList[iGrid + 1]] && trackerOnlineStatusArray[currentTimeList[iGrid]] == trackerOnlineStatusArray[currentTimeList[iGrid + 1]] && onlineStatusArray[currentTimeList[iGrid]] == onlineStatusArray[currentTimeList[iGrid + 1]])
         {
             iGrid++
             width++
@@ -1278,7 +1304,7 @@ function addOfflineStatusToGrid()
 
     for(iGrid = 0; iGrid < currentTimeList.length; iGrid++)
     {
-        if(onlineStatusArray[currentTimeList[iGrid]]) continue
+        if(!trackerOnlineStatusArray[currentTimeList[iGrid]] || onlineStatusArray[currentTimeList[iGrid]]) continue
         if(!checkValidInput(currentTimeList[iGrid + 1])) break
         dataElement = document.createElement('div')
         dataElement.className = "gridBlockPoint analyticsColor1"
@@ -1294,7 +1320,7 @@ function addOfflineStatusToGrid()
         let blockStart = currentTimeList[iGrid]
 
         let width = 0
-        while(iGrid + 1 < currentTimeList.length && onlineStatusArray[currentTimeList[iGrid]] == onlineStatusArray[currentTimeList[iGrid + 1]])
+        while(iGrid + 1 < currentTimeList.length && trackerOnlineStatusArray[currentTimeList[iGrid]] == trackerOnlineStatusArray[currentTimeList[iGrid + 1]] && onlineStatusArray[currentTimeList[iGrid]] == onlineStatusArray[currentTimeList[iGrid + 1]])
         {
             iGrid++
             width++
@@ -1340,7 +1366,7 @@ function addMapsToGrid(height)
         let leftPosition = 0
 
         //If the server was offline, we need to skip the frame since there will be no data
-        if(!onlineStatusArray[currentTimeList[iGrid]]) continue
+        if(!trackerOnlineStatusArray[currentTimeList[iGrid]] || !onlineStatusArray[currentTimeList[iGrid]]) continue
 
         dataElement = document.createElement('div')
         dataElement.className = "gridBlockPoint " + color
@@ -1382,7 +1408,7 @@ function addMapsToGrid(height)
 
         let blockStart = currentTimeList[iGrid]
 
-        while(iGrid + 1 < currentTimeList.length && mapnameKey(currentTimeList[iGrid]) == mapnameKey(currentTimeList[iGrid + 1]) && onlineStatusArray[currentTimeList[iGrid]] == onlineStatusArray[currentTimeList[iGrid + 1]])
+        while(iGrid + 1 < currentTimeList.length && mapnameKey(currentTimeList[iGrid]) == mapnameKey(currentTimeList[iGrid + 1]) && trackerOnlineStatusArray[currentTimeList[iGrid]] == trackerOnlineStatusArray[currentTimeList[iGrid + 1]] && onlineStatusArray[currentTimeList[iGrid]] == onlineStatusArray[currentTimeList[iGrid + 1]])
         {
             iGrid++
             width++
