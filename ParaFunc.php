@@ -298,6 +298,28 @@ $pgCon = null;
 $admin = false;
 $adminUser = "";
 
+if($serverIPAddress != "" || $serverPort != "")
+{
+    //By default, static mode will already have given us an IP address before all of this took place.
+    //So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
+    //The port must be validated first, because it is used in IP address validation.
+    $serverPort = numericValidator($serverPort, 1, 65535, 29070);
+    $serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
+
+    $paraTrackerSkin = skinValidator($paraTrackerSkin, $customSkin);
+
+    //Check for path exploits
+    if(strpos($serverIPAddress, "..") !== false || strpos($serverPort, "..") !== false)
+    {
+        displayError("Server address exploit detected! This event has been logged.", "", "");
+    }
+}
+else
+{
+    //This line prevents a skin file from being mistakenly applied to the dynamic instructions page or the analytics page.
+    $paraTrackerSkin = "";
+}
+
 if (enablePGSQL)
 {
     global $pgCon;
@@ -415,23 +437,6 @@ if (enablePGSQL)
 		
     $admin = adminCheck();
 }
-
-if($executeDynamicInstructionsPage == "0" && $calledFromAnalytics == "0" && $calledFromElsewhere == "0")
-{
-    //By default, static mode will already have given us an IP address before all of this took place.
-    //So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
-    //The port must be validated first, because it is used in IP address validation.
-    $serverPort = numericValidator($serverPort, 1, 65535, 29070);
-    $serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
-
-    $paraTrackerSkin = skinValidator($paraTrackerSkin, $customSkin);
-}
-else
-{
-    //This line prevents a skin file from being mistakenly applied to the dynamic instructions page or the analytics page.
-    $paraTrackerSkin = "";
-}
-
 
 if($dynamicTrackerCalledFromCorrectFile == "1" || $calledFromParam == "1" || $calledFromRCon == "1")
 {
@@ -1801,6 +1806,11 @@ function stringValidator($input, $maxLength, $defaultValue)
 return $input;
 }
 
+function protectPathValidator($input)
+{
+    $input = str_replace("..", "&#46;", $input);
+}
+
 function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 {
     //Remove whitespace
@@ -1848,6 +1858,8 @@ function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
 
     //Check for an ipv6 address, and add brackets if it is one
     if(strpos($input, ':') !== false) return '[' . $input . ']';
+
+    //Otherwise, return the address/domain as-is
     return $input;
 }
 
@@ -1968,8 +1980,8 @@ function displayError($errorMessage, $lastRefreshTime, $dynamicIPAddressPath)
     if($dynamicIPAddressPath != "")
     {
         $brokenAddress = breakDynamicAddressPath($dynamicIPAddressPath);
-        $serverIPAddress = $brokenAddress[0];
-        $serverPort = $brokenAddress[1];
+        $serverIPAddress = protectPathValidator($brokenAddress[0]);
+        $serverPort = protectPathValidator($brokenAddress[1]);
     }
 
     if(trim($errorMessage) == "")
@@ -1977,10 +1989,10 @@ function displayError($errorMessage, $lastRefreshTime, $dynamicIPAddressPath)
         $errorMessage = "An unknown error has occurred! ParaTracker must terminate.";
     }
 
-    if(!empty($dynamicIPAddressPath)) $serverAddressStuff = "Server being tracked: " . $serverIPAddress . ":" . $serverPort;
+    if(!empty($dynamicIPAddressPath)) $serverAddressStuff = "Server being tracked: '" . $serverIPAddress . ":" . $serverPort . "'";
 
     //Let's log this event...
-    $errorLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  " . $serverAddressStuff . "  Error message: " . $errorMessage;
+    $errorLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  " . stringValidator($serverAddressStuff, "", "") . "  Error message: " . $errorMessage;
     writeToLogFile("errorLog.php", $errorLog, errorLogSize);
 
     //If postgres is enabled, we need to log this event to the database
