@@ -2775,7 +2775,7 @@ $output .= '<div id="nameScorePing" class="nameScorePing textColor"><div id="nam
 if(analyticsFrontEndEnabled == "1")
 {
     //If analytics are enabled, this adds the analytics button to the page.
-    $output .= '<div id="analyticsButton" onclick="analytics_window();"><div id="analyticsButtonText" class="analyticsButton textColor"></div></div>';
+    $output .= '<div id="analyticsButton" onclick="analytics_window();"><div id="analyticsButtonText" class="analyticsButton textColor" title="Click to launch ParaTracker Analytics"></div></div>';
 }
 
 //This adds the RCon button to the page.
