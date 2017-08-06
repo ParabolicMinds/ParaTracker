@@ -40,7 +40,7 @@ Function detectGameName($input)
             "JAmp" => "Jedi Academy",
             "JK2MP" => "Jedi Outcast",
             "Nexuiz" => "Nexuiz Classic",
-            "q3urt" => "Urban Terror",
+            "urt" => "Urban Terror",
             "ioq3" => "Open Arena",
             "quake" => "Quake",
             "Q3" => "Quake III Arena",

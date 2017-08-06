@@ -298,21 +298,13 @@ $pgCon = null;
 $admin = false;
 $adminUser = "";
 
-if($serverIPAddress != "" || $serverPort != "")
+$temp = ipAndPortValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
+$serverIPAddress = $temp[0];
+$serverPort = $temp[1];
+
+if($executeDynamicInstructionsPage == "0" && $calledFromAnalytics == "0" && $calledFromElsewhere == "0")
 {
-    //By default, static mode will already have given us an IP address before all of this took place.
-    //So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
-    //The port must be validated first, because it is used in IP address validation.
-    $serverPort = numericValidator($serverPort, 1, 65535, 29070);
-    $serverIPAddress = ipAddressValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
-
     $paraTrackerSkin = skinValidator($paraTrackerSkin, $customSkin);
-
-    //Check for path exploits
-    if(strpos($serverIPAddress, "..") !== false || strpos($serverPort, "..") !== false)
-    {
-        displayError("Server address exploit detected! This event has been logged.", "", "");
-    }
 }
 else
 {
@@ -859,6 +851,11 @@ function checkForAndDoUpdateIfNecessary($dynamicIPAddressPath)
 {
     //Let's make sure we have a legitimate address first...
     if(empty($dynamicIPAddressPath) || $dynamicIPAddressPath == "-") return 0;
+
+    //Now let's validate the address for safety.
+    $temp = ipAndPortValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
+    $serverIPAddress = $temp[0];
+    $serverPort = $temp[1];
 
     //Let's make sure all the files we need are in place for this server
     //Between each check we should quit if it failed
@@ -1811,7 +1808,23 @@ function protectPathValidator($input)
     $input = str_replace("..", "&#46;", $input);
 }
 
-function ipAddressValidator($input, $serverPort, $dynamicTrackerEnabled)
+function ipAndPortValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled)
+{
+    //By default, static mode will already have given us an IP address before all of this took place.
+    //So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
+    if($serverPort != "") $serverPort = numericValidator($serverPort, 1, 65535, 29070);
+    if($serverIPAddress != "") $serverIPAddress = ipAddressValidator($serverIPAddress, $dynamicTrackerEnabled);
+
+    //Check for path exploits
+    if(strpos($serverPort, "..") !== false || strpos($serverIPAddress, "..") !== false)
+    {
+        displayError("Server address exploit detected! This event has been logged.", "", "");
+        return array("", "");
+    }
+    return array($serverIPAddress, $serverPort);
+}
+
+function ipAddressValidator($input, $dynamicTrackerEnabled)
 {
     //Remove whitespace
     $input = trim($input);
@@ -2312,7 +2325,7 @@ if(admin)
     $JSONOutput = '<script type="text/javascript">var bitflags_raw = ' . JSONArray("", $JSONOutput, 4) . '</script>';
 
 //Add the HTML we need for the bit value calculator
-$output .= '<div id="bitValueCalculatorDiv" class="collapsedFrame"><h3 class="dynamicPageWidth" style="margin-top:0;">Bit value calculator:</h3>';
+$output .= '<div id="bitValueCalculatorDiv" class="collapsedFrame">';
 $output .= '<div id="bitflags_top" class="bitValueCalculator">
 <div id="bitflags_tabdisplay"></div>
 <select id="bitflags_bitselect" onchange="bitflags_setchange(this.selectedIndex)"></select>

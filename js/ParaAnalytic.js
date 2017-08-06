@@ -937,6 +937,7 @@ function rasterizeTimeArrays()
         //First let's check to see if there's a chance of missing info.
         if(i > 2 && analyticsData.refreshTimes[i] > analyticsData.refreshTimes[i - 1] * 2.5)
         {
+
             //Possible missing info detected! Need to check and be sure.
             averageTimeData = (analyticsData.refreshTimes[i] + analyticsData.refreshTimes[i - 1] + analyticsData.refreshTimes[i - 2]) / 3
             if(averageTimeData * 2.5 < analyticsData.refreshTimes[i] && averageTimeData > 300)
@@ -947,11 +948,12 @@ function rasterizeTimeArrays()
                 refreshTimesArray.push(runningTotal + averageTimeData)
                 trackerOnlineStatusArray[runningTotal + averageTimeData] = false
             }
+
         }
         newTimesArray.push(runningTotal + analyticsData.refreshTimes[i])
         refreshTimesArray.push(runningTotal + analyticsData.refreshTimes[i])
 
-        trackerOnlineStatusArray[refreshTimesArray[i]] = getDeltaState(analyticsData.online, newTimesArray[i])
+        trackerOnlineStatusArray[refreshTimesArray[i]] = true
         runningTotal += analyticsData.refreshTimes[i]
     }
     refreshTimesArray = sortAndRemoveDuplicates(refreshTimesArray)
