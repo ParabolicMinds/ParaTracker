@@ -852,10 +852,16 @@ function checkForAndDoUpdateIfNecessary($dynamicIPAddressPath)
     //Let's make sure we have a legitimate address first...
     if(empty($dynamicIPAddressPath) || $dynamicIPAddressPath == "-") return 0;
 
+    $brokenAddress = breakDynamicAddressPath($dynamicIPAddressPath);
+    $serverIPAddress = protectPathValidator($brokenAddress[0]);
+    $serverPort = protectPathValidator($brokenAddress[1]);
+
     //Now let's validate the address for safety.
-    $temp = ipAndPortValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled);
+    $temp = ipAndPortValidator($serverIPAddress, $serverPort, dynamicTrackerEnabled);
     $serverIPAddress = $temp[0];
     $serverPort = $temp[1];
+
+    if(empty($serverIPAddress) || empty($serverPort)) return 0;
 
     //Let's make sure all the files we need are in place for this server
     //Between each check we should quit if it failed
@@ -2012,7 +2018,11 @@ function displayError($errorMessage, $lastRefreshTime, $dynamicIPAddressPath)
     if(enablePGSQL)
     {
         global $pgCon;
-        pg_query($pgCon, 'INSERT INTO tracker.displayerror DEFAULT VALUES');
+        //This function may be called before pgCon is defined
+        if(!empty($pgCon))
+        {
+            pg_query($pgCon, 'INSERT INTO tracker.displayerror DEFAULT VALUES');
+        }
     }
 
     echo "<!--";
