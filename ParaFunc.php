@@ -853,8 +853,8 @@ function checkForAndDoUpdateIfNecessary($dynamicIPAddressPath)
     if(empty($dynamicIPAddressPath) || $dynamicIPAddressPath == "-") return 0;
 
     $brokenAddress = breakDynamicAddressPath($dynamicIPAddressPath);
-    $serverIPAddress = protectPathValidator($brokenAddress[0]);
-    $serverPort = protectPathValidator($brokenAddress[1]);
+    $serverIPAddress = $brokenAddress[0];
+    $serverPort = $brokenAddress[1];
 
     //Now let's validate the address for safety.
     $temp = ipAndPortValidator($serverIPAddress, $serverPort, dynamicTrackerEnabled);
@@ -862,6 +862,8 @@ function checkForAndDoUpdateIfNecessary($dynamicIPAddressPath)
     $serverPort = $temp[1];
 
     if(empty($serverIPAddress) || empty($serverPort)) return 0;
+
+    $dynamicIPAddressPath = makeDynamicAddressPath($serverIPAddress, $serverPort);
 
     //Let's make sure all the files we need are in place for this server
     //Between each check we should quit if it failed
@@ -1827,6 +1829,7 @@ function ipAndPortValidator($serverIPAddress, $serverPort, $dynamicTrackerEnable
         displayError("Server address exploit detected! This event has been logged.", "", "");
         return array("", "");
     }
+
     return array($serverIPAddress, $serverPort);
 }
 
