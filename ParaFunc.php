@@ -11,7 +11,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 */
 
-
 function versionNumber()
 {
     //Return a string of the version number
@@ -2700,6 +2699,9 @@ function renderNormalHTMLPage($dynamicIPAddressPath)
 
 $output = htmlDeclarations("ParaTracker - The Ultimate Quake III Server Tracker", "");
 
+$webServerName = '';
+if(isset($_SERVER['SERVER_NAME']) && !empty($_SERVER['SERVER_NAME'])) $webServerName = $_SERVER['SERVER_NAME'];
+
 //Let's add in the dynamic colors...
 //If dynamic mode is disabled these will already have been declared as null, so no worries
 //Also, these will not be sent with the JSON response, so they must be included here
@@ -2767,10 +2769,10 @@ $output .= '<div class="CustomDiv5 textColor"></div>';
 $output .= '<div class="CustomDiv6 textColor"></div>';
 
 //This adds the ParaTracker logo to the page.
-$output .= '<div class="ParaTrackerLogo textColor"></div>';
+$output .= '<div class="ParaTrackerLogo textColor" title="' . $webServerName . '"></div>';
 
 //This adds the ParaTracker text to the page.
-$output .= '<div id="paraTrackerVersion" class="ParaTrackerText textColor">' . versionNumber() . '</div>';
+$output .= '<div id="paraTrackerVersion" class="ParaTrackerText textColor" title="' . $webServerName . '">' . versionNumber() . '</div>';
 
 //This adds the server name to the page.
 $output .= '<div id="serverName" class="serverName color7 textColor"></div>';
