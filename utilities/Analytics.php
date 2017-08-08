@@ -355,7 +355,13 @@ $server_id_fetch = pg_fetch_row(pg_query_params($pgCon, "SELECT id FROM tracker.
 if (empty($server_id_fetch))
 {
     //No response was detected. Server must not have any info in the database.
-    echo "--><h3>No data found for server at '" . serverIPAddress . ":" . serverPort . "'!<br>Check back later.</h3>";
+    echo "--><h3>No data found for server";
+
+    if(!empty($serverIPAddress) && !empty($serverPort))
+    {
+        echo " at '" . $serverIPAddress . ":" . $serverPort . "'";
+    }
+    echo "!<br>Check back later.</h3>";
     checkForAndDoUpdateIfNecessary($dynamicIPAddressPath);
     exit();
 }

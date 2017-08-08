@@ -2769,10 +2769,10 @@ $output .= '<div class="CustomDiv5 textColor"></div>';
 $output .= '<div class="CustomDiv6 textColor"></div>';
 
 //This adds the ParaTracker logo to the page.
-$output .= '<div class="ParaTrackerLogo textColor" title="' . $webServerName . '"></div>';
+$output .= '<div class="ParaTrackerLogo textColor" title="Click to launch ' . $webServerName . '" onclick="setup_window()"></div>';
 
 //This adds the ParaTracker text to the page.
-$output .= '<div id="paraTrackerVersion" class="ParaTrackerText textColor" title="' . $webServerName . '">' . versionNumber() . '</div>';
+$output .= '<div id="paraTrackerVersion" class="ParaTrackerText textColor" title="Click to launch ' . $webServerName . '" onclick="setup_window()">' . versionNumber() . '</div>';
 
 //This adds the server name to the page.
 $output .= '<div id="serverName" class="serverName color7 textColor"></div>';

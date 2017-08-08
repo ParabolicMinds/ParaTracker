@@ -223,6 +223,12 @@ text-shadow: -1px 1px #000000;
 }
 
 /* This class is the ParaTracker logo */
+.ParaTrackerLogo:hover
+{
+opacity: 1;
+}
+
+/* This class is the ParaTracker logo */
 .ParaTrackerLogo
 {
 position: absolute;
@@ -232,7 +238,9 @@ width: 20px;
 height: 102px;
 user-select: none;
 background-image: url("../images/tracker/ParaTrackerLogoSideways.png");
+cursor: pointer;
 display: none;
+opacity: .85;
 }
 
 
@@ -253,6 +261,7 @@ font-family: monospace;
 font-weight: bold;
 transform: rotate(90deg);
 text-shadow: -1px 1px #000;
+cursor: pointer;
 }
 
 /* This is the server name, shown at the top of the tracker */
@@ -523,6 +532,12 @@ content: "";
 }
 
 /* This class affects the analytics button */
+.analyticsButton:hover
+{
+opacity: 1;
+}
+
+/* This class affects the analytics button */
 .analyticsButton
 {
 position: absolute;
@@ -539,6 +554,7 @@ overflow: hidden;
 color: #EFEFEF;
 font-size: 14pt;
 font-family: monospace;
+opacity: .8;
 }
 
 /* This class adds optional text to the RCon button */

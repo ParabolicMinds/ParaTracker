@@ -36,6 +36,12 @@ function analytics_window()
 		analyticsWindow = window.open(data.utilitiesPath + "Analytics.php?ip=" + data.serverIPAddress + "&port=" + data.serverPort, "analyticsWindow" ,"resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=1100,height=800");
 }
 
+//This function opens the Analytics window
+function setup_window()
+{
+		setupWindow = window.open("ParaTrackerDynamic.php", "ParaTrackerSetupWindow" ,"width=1100,height=800");
+}
+
 //This function handles the animated levelshots
 function animateLevelshot()
 {

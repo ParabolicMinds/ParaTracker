@@ -176,6 +176,12 @@ font-weight: bold;
 }
 
 /* This class is the ParaTracker logo */
+.ParaTrackerLogo:hover
+{
+opacity: 1;
+}
+
+/* This class is the ParaTracker logo */
 .ParaTrackerLogo
 {
 position: absolute;
@@ -186,6 +192,8 @@ height: 102px;
 user-select: none;
 background-image: url("../images/tracker/ParaTrackerLogoSideways.png");
 transform: rotate(270deg);
+cursor: pointer;
+opacity: .85;
 }
 
 /* This class is the ParaTracker text. It is meant to be used when a logo image is not used */
@@ -201,6 +209,7 @@ overflow: hidden;
 color: #000000;
 font-size: 14pt;
 font-family: monospace;
+cursor: pointer;
 display: none;
 }
 
@@ -490,6 +499,12 @@ content: "";
 }
 
 /* This class affects the analytics button */
+.analyticsButton:hover
+{
+opacity: 1;
+}
+
+/* This class affects the analytics button */
 .analyticsButton
 {
 position: absolute;
@@ -506,6 +521,7 @@ overflow: hidden;
 color: #EFEFEF;
 font-size: 14pt;
 font-family: monospace;
+opacity: .8;
 }
 
 /* This class adds optional text to the RCon button */
