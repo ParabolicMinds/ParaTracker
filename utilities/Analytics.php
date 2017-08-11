@@ -68,7 +68,7 @@ $endTime = numericValidator($endTime, $startTime, time(), time());
 
 // We must prevent the users from requesting 10 years of data at a time.
 // Not only will it be useless to view, but it will bog down the web server.
-// This MUST match the value in ParaAnalytic.js
+// This MUST match the value in ParaUtil.js
 // 4838400 seconds is 8 weeks.
 // 9676800 seconds is 16 weeks.
 // 19353600 seconds is 32 weeks.
@@ -91,7 +91,7 @@ function renderServerAddressPage()
 {
     $output = htmlDeclarations("ParaTracker - Analytics", "../");
     $output .= '<script>runOnStartup = 0</script>';
-    $output .= '<script src="../js/ParaAnalytic.js"></script>';
+    $output .= '<script src="../js/ParaUtil.js"></script>';
     $output .= '</head><body class="analyticsAddressPage">';
     $output .= '
     <br>
@@ -108,7 +108,7 @@ function renderServerAddressPage()
 function renderAnalyticsPage($serverIPAddress, $serverPort)
 {
     $output = htmlDeclarations("ParaTracker - Analytics", "../");
-    $output .= '<script src="../js/ParaAnalytic.js"></script>';
+    $output .= '<script src="../js/ParaUtil.js"></script>';
     $output .= '<script>analyticsData = ' . json_encode(getData($serverIPAddress, $serverPort)) . '</script>';
     $output .= '</head><body onhashchange="updateInfoFromHash()" class="centerPage fullHeightAndWidth">';
     $output .= '<div id="analyticsContainingFrame" class="">
