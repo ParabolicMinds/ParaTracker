@@ -117,7 +117,7 @@ $output .= '<body class="mapReqPageStyle">
                 <input class="reqformtextentry" type="text" name="mapreq_bsp_name" placeholder="REQUIRED (excluding .bsp)">
             </div>
             <div class="reqformrow">
-                <span class="reqformlabel">BSP Download:</span>
+                <span class="reqformlabel">BSP or Image(s) Download Link:</span>
                 <input class="reqformtextentry" type="text" name="mapreq_bsp_link" placeholder="OPTIONAL (but greatly appreciated)">
             </div>
             <input class="reqformsubmit" type="submit" value="SUBMIT">
@@ -128,10 +128,17 @@ $output .= '<body class="mapReqPageStyle">
 $output .= '';
 
 if (!empty($mapreqs_user)) {
-	$output .= addmapreqtable('User Added (High Priority)', $mapreqs_user, true);
+    if(admin)
+    {
+        $output .= addmapreqtable('User Added (High Priority)', $mapreqs_user, true);
+    }
+    else
+    {
+        $output .= addmapreqtable('Levelshot Requests', $mapreqs_user, true);
+    }
 }
 
-if (!empty($mapreqs_auto)) {
+if (admin && !empty($mapreqs_auto)) {
 	$output .= addmapreqtable('Automatically Added (Low Priority)', $mapreqs_auto, false);
 }
 

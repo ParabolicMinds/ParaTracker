@@ -1003,4 +1003,14 @@ function xonotic($cvars_hash, $cvars_hash_decolorized)
 }
 
 
+
+function unrecognizedgame($cvars_hash, $cvars_hash_decolorized)
+{
+    //Unknown game. Parse as if it is Q3.
+    $temp = quakeiiiarena($cvars_hash, $cvars_hash_decolorized);
+    $temp[1] = "quake 3 arena";
+    return $temp;
+}
+
+
 ?>

@@ -1174,7 +1174,7 @@ function parseGameName($cvars_hash, $cvars_hash_decolorized, $lastRefreshTime, $
     //Initialize this to null, so we can test against it later.
     $gameName = "";
 
-    //Most games use the 'version' variable to identify which game is running. Try that first.
+    //Most games use the 'gamename' variable to identify which game is running. Try that first.
     if(isset($cvars_hash_decolorized["gamename"]) && $cvars_hash_decolorized["gamename"] != "")
     {
         $gameName = detectGameName(removeColorization($cvars_hash_decolorized["gamename"]));
@@ -1229,8 +1229,8 @@ function parseGameName($cvars_hash, $cvars_hash_decolorized, $lastRefreshTime, $
             $error = "No data!";
         }
 
-        displayError("Unrecognized Game: " . $error . "<br />Please contact the ParaTracker team and request support!<br />" . $dynamicIPAddressPath, $lastRefreshTime, $dynamicIPAddressPath);
-        return "";
+        echo " Unrecognized Game: " . $error . "<br />\nPlease contact the ParaTracker team and request support!<br />" . $dynamicIPAddressPath . " \n";
+        return "Unrecognized Game";
     }
 
 return $gameName;

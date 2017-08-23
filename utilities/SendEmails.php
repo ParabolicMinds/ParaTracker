@@ -189,7 +189,7 @@ function prepareAndsendAdminReport($emailAdministrators)
         if($displayErrorCount != 1) $unit .= 's';
         $message .= '<p style="text-align: center;">DisplayError was called ' . colorizeDangerousValuesHigher($displayErrorCount, $unit, $problemThreshold, $problemThreshold * 1.5, '');
         $unit = "call";
-        if($displayErrorCount != 1) $unit .= 's';
+        if(intval($displayErrorCount) != 1) $unit .= 's';
         $message .= '<br><span style="font-size: 9pt;">At a rate of ' . colorizeDangerousValuesHigher(((currentTime - lastRefreshTime) / 86400) * displayErrorCount, $unit, $problemThreshold, $problemThreshold * 1.5, '') . ' per day</span><br>
         <span style="font-size: 8pt;">If there are excessive displayError calls, check ' . logPath . 'errorLog.php for details.</span></p>';
 
