@@ -25,7 +25,8 @@ else
 
 if(!admin)
 {
-    displayError("You must be logged in as an administrator to view log files!", "", "");
+    displayError("You must be logged in as an administrator!", "", "");
+    exit();
 }
 
 $output = htmlDeclarations("ParaTracker - Account Management", "../") . '</head><body class="accountManagement">';
@@ -68,7 +69,7 @@ if(emailEnabled)
 
     $output .= '<p>Administrator email addresses:</p>';
 
-    $output .= '<p><strong>' . implode($emailAdministrators, '<br>') . '</strong></p>';
+    $output .= '<h3>' . implode($emailAdministrators, '<br>') . '</h3>';
 
     $output .= '<a class="testMessage" href="AccountManagement.php?sendTestEmail=1">Send test message to administrators</a>';
 }

@@ -23,7 +23,7 @@ Function detectGameName($input)
             // This function is used to auto-detect the name of the game being tracked.
             // If you add a game, add it to this array. Each line detects a different game.
             // The first value of each line is the part of the game that identifies itself. ParaTracker will try to match from
-            // the variables "gamename", "version" and "com_gamename", in that order.
+            // the variables "gamename", "com_gamename", and "version", in that order.
             // The second value of each line is the name the tracker will display for that game.
             // When these names are given back to the parent function, it will remove everything except for alphanumeric
             // characters, and attempt to execute a function by that name. These game-specific functions are found below.
@@ -41,6 +41,7 @@ Function detectGameName($input)
             "JK2MP" => "Jedi Outcast",
             "Nexuiz" => "Nexuiz Classic",
             "urt" => "Urban Terror",
+            "q3ut" => "Urban Terror",
             "ioq3" => "Open Arena",
             "quake" => "Quake",
             "Q3" => "Quake III Arena",
@@ -48,6 +49,8 @@ Function detectGameName($input)
             "Tremulous" => "Tremulous",
             "warsow" => "Warsow",
             "Xonotic" => "Xonotic",
+            "wolfmp" => "Return To Castle Wolfenstein",
+            "ET" => "Wolfenstein: Enemy Territory"
 
             );
 
@@ -766,6 +769,67 @@ function openarena($cvars_hash, $cvars_hash_decolorized)
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $videoflags);
 }
 
+function returntocastlewolfenstein($cvars_hash, $cvars_hash_decolorized)
+{
+    //Declaring variables to be used here. DO NOT change this part.
+    $gametype = "";
+    $levelshotFolder = "";
+    $mapname = "";
+    $modName = "";
+    $sv_hostname = "";
+    $sv_maxclients = "?";
+    $BitFlagsIndex = array();
+
+
+    //If you are adding a custom game, the stuff below is what to change.
+
+    //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
+    $gametypeArray = array("", "", "", "", "", "Multiplayer", "Stopwatch", "Checkpoint");
+    if(isset($cvars_hash_decolorized["g_gametype"]))
+    {
+        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
+    }
+
+    //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
+    $levelshotFolder = "return to castle wolfenstein";
+
+    //The name of the map being played.
+    if(isset($cvars_hash["mapname"]))
+    {
+        $mapname = $cvars_hash["mapname"];
+    }
+
+    //The name of the mod being run.
+    if(isset($cvars_hash["gamename"]))
+    {
+        $modName = $cvars_hash["gamename"];
+    }
+
+    //The name of the server. Some games use a different variable.
+    if(isset($cvars_hash["sv_hostname"]))
+    {
+        $sv_hostname = $cvars_hash["sv_hostname"];
+    }
+
+    //The maximum number of players the server can take.
+    if(isset($cvars_hash["sv_maxclients"]))
+    {
+        $sv_maxclients = $cvars_hash["sv_maxclients"];
+    }
+
+    //All BitFlag arrays must be declared here
+    $dmflags = array("", "", "", "No fall damage", "Fixed cg_fov", "No footsteps");
+    $g_voteFlags = array("Restart Map", "Reset Match", "Start Match", "Next Map", "Swap Teams", "Game Type", "Kick Player", "Change Map");
+
+    //If there are any bitflags to return, they must be returned last.
+    //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
+    $BitFlagsIndex = array("dmflags", "g_voteFlags");
+
+    //Lastly, all data above MUST be returned in a specific order:
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $dmflags, $g_voteFlags);
+}
+
 function tremulous($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
@@ -942,6 +1006,71 @@ function warsow($cvars_hash, $cvars_hash_decolorized)
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex);
 }
 
+function wolfensteinenemyterritory($cvars_hash, $cvars_hash_decolorized)
+{
+    //Declaring variables to be used here. DO NOT change this part.
+    $gametype = "";
+    $levelshotFolder = "";
+    $mapname = "";
+    $modName = "";
+    $sv_hostname = "";
+    $sv_maxclients = "?";
+    $BitFlagsIndex = array();
+
+
+    //If you are adding a custom game, the stuff below is what to change.
+
+    //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
+    $gametypeArray = array("", "", "Objective", "Stopwatch", "Campaign", "LMS");
+    if(isset($cvars_hash_decolorized["g_gametype"]))
+    {
+        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
+    }
+
+    //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
+    $levelshotFolder = "wolfenstein enemy territory";
+
+    //The name of the map being played.
+    if(isset($cvars_hash["mapname"]))
+    {
+        $mapname = $cvars_hash["mapname"];
+    }
+
+    //The name of the mod being run.
+    if(isset($cvars_hash["gamename"]))
+    {
+        $modName = $cvars_hash["gamename"];
+    }
+
+    //The name of the server. Some games use a different variable.
+    if(isset($cvars_hash["sv_hostname"]))
+    {
+        $sv_hostname = $cvars_hash["sv_hostname"];
+    }
+
+    //The maximum number of players the server can take.
+    if(isset($cvars_hash["sv_maxclients"]))
+    {
+        $sv_maxclients = $cvars_hash["sv_maxclients"];
+    }
+
+    //All BitFlag arrays must be declared here
+
+    //Not sure if this is used. Commenting it out
+//    $g_voteFlags = array("Restart Map", "Reset Match", "Start Match", "Next Map", "Swap Teams", "Game Type", "Kick Player", "Change Map");
+    $g_mapVoteFlags = array("Change the tie breaker so that the map not played the longest wins", "Intermission does not end until g_intermissionReadyPercent people have voted", "Multi-voting (Allows everybody to vote for 3 maps instead of one)", "Do not randomize the maps", "A passed nextmap vote will start the intermission and lets players vote which map should be played next", "Disable the ready button during intermission");
+    $g_misc = array("Disable boosting when g_shove is enabled", "Medic syringe heal", "Combine Arty & Strike Timers", "Display owner of dynamite", "Display owner of landmine", "Players lose spawn shield when weapons are fired");
+    $omnibot_flags = array("Disable XPSave for bots", "Bots cannot mount tanks", "Bots cannot mount emplaced guns", "Do not count bots as players");
+
+    //If there are any bitflags to return, they must be returned last.
+    //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
+    $BitFlagsIndex = array("g_mapVoteFlags", "g_misc", "omnibot_flags");
+
+    //Lastly, all data above MUST be returned in a specific order:
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, $g_mapVoteFlags, $g_misc, $omnibot_flags);
+}
+
 function xonotic($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
@@ -1006,11 +1135,62 @@ function xonotic($cvars_hash, $cvars_hash_decolorized)
 
 function unrecognizedgame($cvars_hash, $cvars_hash_decolorized)
 {
-    //Unknown game. Parse as if it is Q3.
-    $temp = quakeiiiarena($cvars_hash, $cvars_hash_decolorized);
-    $temp[1] = "quake 3 arena";
-    return $temp;
-}
+    //Unknown game
+    //Declaring variables to be used here. DO NOT change this part.
+    $gametype = "";
+    $levelshotFolder = "";
+    $mapname = "";
+    $modName = "";
+    $sv_hostname = "";
+    $sv_maxclients = "?";
+    $BitFlagsIndex = array();
 
+
+    //If you are adding a custom game, the stuff below is what to change.
+
+    //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
+    if(isset($cvars_hash_decolorized["g_gametype"]))
+    {
+        $gametype = $cvars_hash_decolorized["g_gametype"];
+    }
+
+    //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
+    $levelshotFolder = "unknown";
+
+    //The name of the map being played.
+    if(isset($cvars_hash["mapname"]))
+    {
+        $mapname = $cvars_hash["mapname"];
+    }
+
+    //The name of the mod being run.
+    if(isset($cvars_hash["gamename"]))
+    {
+        $modName = $cvars_hash["gamename"];
+    }
+
+    //The name of the server. Some games use a different variable.
+    if(isset($cvars_hash["sv_hostname"]))
+    {
+        $sv_hostname = $cvars_hash["sv_hostname"];
+    }
+
+    //The maximum number of players the server can take.
+    if(isset($cvars_hash["sv_maxclients"]))
+    {
+        $sv_maxclients = $cvars_hash["sv_maxclients"];
+    }
+
+    //All BitFlag arrays must be declared here
+
+
+    //If there are any bitflags to return, they must be returned last.
+    //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
+    $BitFlagsIndex = array();
+
+    //Lastly, all data above MUST be returned in a specific order:
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex);
+}
 
 ?>

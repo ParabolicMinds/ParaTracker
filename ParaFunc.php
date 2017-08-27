@@ -1181,18 +1181,18 @@ function parseGameName($cvars_hash, $cvars_hash_decolorized, $lastRefreshTime, $
     }
     if($gameName == "")
     {
-        //Some games, like Jedi Academy and Jedi Outcast, use a 'version' variable to identify the game. Try that next.
-        //This can only be checked for AFTER the 'gamename' variable, because some games use both variables.
-        if(isset($cvars_hash_decolorized["version"]) && $cvars_hash_decolorized["version"] != "")
+        //Tremulous and RTCW use 'com_gamename' to identify the game. Try that next.
+        if(isset($cvars_hash_decolorized["com_gamename"]) && $cvars_hash_decolorized["com_gamename"] != "")
         {
-            $gameName = detectGameName(removeColorization($cvars_hash_decolorized["version"]));
+            $gameName = detectGameName(removeColorization($cvars_hash_decolorized["com_gamename"]));
         }
         if($gameName == "")
         {
-            //Tremulous uses 'com_gamename' to identify the game. Try that next.
-            if(isset($cvars_hash_decolorized["com_gamename"]) && $cvars_hash_decolorized["com_gamename"] != "")
+            //Some games, like Jedi Academy and Jedi Outcast, use a 'version' variable to identify the game. Try that next.
+            //This can only be checked for AFTER the 'gamename' variable, because some games use both variables.
+            if(isset($cvars_hash_decolorized["version"]) && $cvars_hash_decolorized["version"] != "")
             {
-                    $gameName = detectGameName(removeColorization($cvars_hash_decolorized["com_gamename"]));
+                $gameName = detectGameName(removeColorization($cvars_hash_decolorized["version"]));
             }
         }
         if($gameName == "")
@@ -1384,15 +1384,23 @@ function parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $fla
 
 function levelshotFinder($dynamicIPAddressPath, $mapName, $levelshotFolder, $gameName, $stopAfterOneShot)
 {
+            $levelshotBuffer = '';
+
+            $levelshotCount = 0;
+            $levelshotIndex = 1;
+            $foundLevelshot = 0;
+
+            if(strtolower($levelshotFolder) == 'unknown')
+            {
+                $levelshotBuffer .= "images/missing.gif";
+            }
+            else
+            {
+
                 //Let's make sure the levelshotfolder we were given is correct first.
-		        $levelshotFolder = checkLevelshotDirectories($levelshotFolder);
+                $levelshotFolder = checkLevelshotDirectories($levelshotFolder);
 
                 $levelshotCheckName = strtolower($mapName);
-                $levelshotBuffer = '';
-
-                $levelshotCount = 0;
-                $levelshotIndex = 1;
-            $foundLevelshot = 0;
                 do
                 {
 
@@ -1455,7 +1463,7 @@ function levelshotFinder($dynamicIPAddressPath, $mapName, $levelshotFolder, $gam
 
                                                     //Check to see if Postgres is active. If it is, let's automatically
                                                     //insert the map into the missing levelshots database.
-                                                    if(enablePGSQL == "1")
+                                                    if(enablePGSQL && strtolower($levelshotFolder) != "unknown")
                                                     {
                                                         global $pgCon;
                                                         pg_query_params($pgCon, '
@@ -1471,19 +1479,19 @@ function levelshotFinder($dynamicIPAddressPath, $mapName, $levelshotFolder, $gam
                             }
                         }
                     }
-
-                if ($foundLevelshot == 1)
-                {
-                    $levelshotBuffer .= "\n";
-                    $levelshotCount++;
-                    $levelshotIndex++;
-                }
-                else
-                {
-                    $levelshotBuffer = implode(":#:", explode("\n", trim($levelshotBuffer)));
-                }
+                    if ($foundLevelshot == 1)
+                    {
+                        $levelshotBuffer .= "\n";
+                        $levelshotCount++;
+                        $levelshotIndex++;
+                    }
+                    else
+                    {
+                        $levelshotBuffer = implode(":#:", explode("\n", trim($levelshotBuffer)));
+                    }
 
                 } While ($stopAfterOneShot == 0 && $foundLevelshot == 1 && $levelshotCount < maximumLevelshots);
+            }
 
 //This code prevents the Javascript that follows from seeing a value of 0 levelshots when none are found.
 //There will always be a minimum of one levelshot. A placeholder is used if none is found.

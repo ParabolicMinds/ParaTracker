@@ -652,8 +652,8 @@ BITVALUE CALCULATOR CLASSES
 	margin: 4px 4px 0px 4px;
 	padding-left: 4px;
 	padding-right: 4px;
-	padding-top: 10px;
-	padding-bottom: 10px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 	overflow: hidden;
 	line-height: 11pt;
 	vertical-align: middle;
@@ -832,6 +832,13 @@ BITVALUE CALCULATOR CLASSES
 	border-bottom-width: 0px;
 }
 
+.game_returntocastlewolfenstein
+{
+	background: linear-gradient(to right, #820, #A94, #820);
+	border: 1px solid #CA0;
+	border-bottom-width: 0px;
+}
+
 .game_urbanterror
 {
 	background: linear-gradient(to right, #090999, #4CD, #090999);
@@ -843,6 +850,13 @@ BITVALUE CALCULATOR CLASSES
 {
 	background: linear-gradient(to right, #420, #FA0, #420);
 	border: 1px solid #A0A;
+	border-bottom-width: 0px;
+}
+
+.game_wolfensteinenemyterritory
+{
+	background: linear-gradient(to right, #422, #F62, #422);
+	border: 1px solid #888;
 	border-bottom-width: 0px;
 }
 
@@ -991,6 +1005,11 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 	font-weight: bold;
 }
 
+.returntocastlewolfenstein
+{
+	color: #EA3;
+}
+
 .soldieroffortuneiidoublehelix
 {
 	color: #ACA;
@@ -1013,6 +1032,11 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 {
 	color: #FA0;
 	font-weight: bold;
+}
+
+.wolfensteinenemyterritory
+{
+	color: #F73;
 }
 
 .xonotic

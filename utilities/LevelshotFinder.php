@@ -44,6 +44,12 @@ function makeFunctionSafeName($input)
 
 function levelshotFinder($mapName, $levelshotFolder)
 {
+    if(strtolower($levelshotFolder) == "unknown")
+    {
+        //Invalid game. Terminate.
+        return "images/missing.gif";
+    }
+
                 $levelshotFolder = "images/levelshots/" . strtolower($levelshotFolder) . "/";
                 $levelshotCheckName = strtolower($mapName);
 
