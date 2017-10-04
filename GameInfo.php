@@ -58,6 +58,7 @@ Function detectGameName($input)
             //This feature is used by ParaTrackerDynamic's setup page to display a list of supported games to the users.
             if($input == "")
             {
+				//The output returned will be an array. Position 0 is a full game list, position 1 is a filtered game list (Useful for hiding duplicate game entries that still should be detected as separate games)
                 //This array is a blacklist for keeping unwanted games from the list. Use the full game name from the array above.
                 $removal = array(
 

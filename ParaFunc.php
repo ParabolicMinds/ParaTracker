@@ -15,7 +15,7 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    return("ParaTracker 1.4");
+    return("ParaTracker 1.4.1");
 }
 
 //Define the default skin, to be used throughout this file.
@@ -2164,7 +2164,7 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
     global $admin;
 
     $gameListArray = detectGameName("");
-    //The output returned will be an array. Position 0 is a full game list, position 1 is a filtered game list (Useful for hiding duplicate game entries)
+    //The output returned will be an array. Position 0 is a full game list, position 1 is a filtered game list (Useful for hiding duplicate game entries that still should be detected as separate games)
     $gameList = $gameListArray[1];
     $gameOutput = "";
 
@@ -2363,11 +2363,20 @@ $output .= '</div><p class="collapsedFrame">Current page URL:<br /><input type="
 
     $output .= '<div id="trackerSetup" class="expandedFrame">';
 
-    $output .= '<h3 style="margin-top: 0;">Supported Games:</h3><div class="centerTable"><table class="centerTable"><tr>';
+    $countGames = count($gameList);
+
+	$serversTracked = '';
+
+	if(enablePGSQL)
+	{
+		$trackedCount = pg_fetch_all(pg_query($pgCon, "SELECT COUNT(*) FROM tracker.server WHERE active = true"));
+		$serversTracked = 'Tracking <strong>' . $trackedCount[0]['count'] . '</strong> Servers<br /><br />';
+	}
+
+	$output .= '<h3 style="margin-top: 0;">' . $serversTracked . $countGames . ' Supported Games:</h3><div class="centerTable"><table class="centerTable"><tr>';
 
         $colorNumber = 0;
 
-        $countGames = count($gameList);
         //Loop through the array of stuff listed
         for($i = 0; $i < $countGames; $i++)
         {
@@ -3437,6 +3446,24 @@ function mapreq_delete_map($game_name, $bsp_name)
 {
   global $pgCon;
   pg_query_params($pgCon, 'DELETE FROM mapreq WHERE game_name = $1 AND bsp_name = $2', array($game_name, $bsp_name));
+}
+
+function countDatabaseReturn($input)
+{
+	if($input === false || $input == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return count($input);
+	}
+}
+
+function checkPlural($input, $count)
+{
+	if($count != 1) return $input . 's';
+	return $input;
 }
 
 function readLogFile($filename)
