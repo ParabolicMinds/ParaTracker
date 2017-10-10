@@ -2247,7 +2247,7 @@ if(analyticsFrontEndEnabled == "1")
 if(admin)
 {
     $output .= '<a id="logViewerButton" onclick="document.location.hash=\'logViewer\'" class="dynamicFormButtons dynamicFormButtonsStyle">Log Viewer</a>';
-    $output .= '<a id="accountManagementButton" onclick="document.location.hash=\'accountManagement\'" class="dynamicFormButtons dynamicFormButtonsStyle">Account Management</a>';
+    $output .= '<a id="adminInfoButton" onclick="document.location.hash=\'adminInfo\'" class="dynamicFormButtons dynamicFormButtonsStyle">Admin Info</a>';
 }
 
 $output .= '</p><br><br></div><div class="utilitiesDiv utilitiesBottomRow">';
@@ -2268,12 +2268,12 @@ if(analyticsFrontEndEnabled == "1")
     </div>';
 }
 
-//Add the log viewer and account management
+//Add the log viewer and admin info
 if(admin)
 {
     $output .= '<div id="logViewerDiv" class="logViewerDiv utilitiesIframe collapsedFrame"><iframe src="' . utilitiesPath . 'LogViewer.php" class="logViewerFrame"></iframe></div>';
 
-    $output .= '<div id="accountManagementDiv" class="accountManagementFrame utilitiesIframe collapsedFrame"><iframe src="' . utilitiesPath . 'AccountManagement.php" class="accountManagementFrame"></iframe></div>';
+    $output .= '<div id="adminInfoDiv" class="adminInfoFrame utilitiesIframe collapsedFrame"><iframe src="' . utilitiesPath . 'AdminInfo.php" class="adminInfoFrame"></iframe></div>';
 }
 
 
@@ -3446,6 +3446,63 @@ function mapreq_delete_map($game_name, $bsp_name)
 {
   global $pgCon;
   pg_query_params($pgCon, 'DELETE FROM mapreq WHERE game_name = $1 AND bsp_name = $2', array($game_name, $bsp_name));
+}
+
+function adminInfoGoBackLink()
+{
+	return '<a href="AdminInfo.php" class="logLink">Go Back</a>';
+}
+
+function getOptionLength($input)
+{
+	$temp = strrpos($input, ':');
+	return array($temp, strlen($input) - $temp);
+}
+
+function padOutputAndImplode($input, $glue)
+{
+	//This function adds spaces to lines at the beginning and end, to align them for the best readability
+
+	$pad = '&nbsp;';
+
+	$LPadMax = 0;
+	$RPadMax = 0;
+	$count = count($input);
+	for($i = 0; $i < $count; $i++)
+	{
+		$options = getOptionLength($input[$i]);
+		$check = $options[0];
+		$offset = $options[1];
+		if($check > $LPadMax) $LPadMax = $check;
+		if($offset > $RPadMax) $RPadMax = $offset;
+	}
+
+	for($i = 0; $i < $count; $i++)
+	{
+		$options = getOptionLength($input[$i]);
+		$Lpad = $options[0];
+		$Rpad = $options[1];
+		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . str_repeat($pad, $RPadMax - $Rpad);
+	}
+
+	return implode($glue, $input);
+}
+
+function getServerListFromDatabase()
+{
+	return pg_fetch_all(pg_query(
+	"WITH svrec AS (
+	SELECT server.id, server.location, server.port, MAX(analytics.frame.record_id) AS record_id 
+	FROM tracker.server 
+	INNER JOIN analytics.frame ON server_id = server.id
+	WHERE active = true 
+	GROUP BY server.id 
+	)
+	SELECT svrec.id, location, port, gamename.name 
+	FROM svrec 
+	INNER JOIN analytics.record ON record.id = record_id 
+	INNER JOIN analytics.gamename ON gamename.id = record.gamename_id
+	ORDER BY id"));
 }
 
 function countDatabaseReturn($input)

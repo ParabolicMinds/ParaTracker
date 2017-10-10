@@ -293,41 +293,6 @@ function prepareAndsendAdminReport($emailAdministrators)
     }
 }
 
-function padOutputAndImplode($input, $glue)
-{
-	//This function adds spaces to lines at the beginning and end, to align them for the best readability
-
-	$pad = '&nbsp;';
-
-	$LPadMax = 0;
-	$RPadMax = 0;
-	$count = count($input);
-	for($i = 0; $i < $count; $i++)
-	{
-		$options = getOptionLength($input[$i]);
-		$check = $options[0];
-		$offset = $options[1];
-		if($check > $LPadMax) $LPadMax = $check;
-		if($offset > $RPadMax) $RPadMax = $offset;
-	}
-
-	for($i = 0; $i < $count; $i++)
-	{
-		$options = getOptionLength($input[$i]);
-		$Lpad = $options[0];
-		$Rpad = $options[1];
-		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . str_repeat($pad, $RPadMax - $Rpad);
-	}
-
-	return implode($glue, $input);
-}
-
-function getOptionLength($input)
-{
-	$temp = strrpos($input, ':');
-	return array($temp, strlen($input) - $temp);
-}
-
 function sendEmail($recipients, $subject, $messageBody)
 {
 	//Create a new PHPMailer instance
@@ -415,20 +380,7 @@ function sentConfirmation()
 function getGameCountList()
 {
 	$output = array();
-	$databaseInfo = pg_fetch_all(pg_query(
-	"WITH svrec AS (
-	SELECT server.id, server.location, server.port, MAX(analytics.frame.record_id) AS record_id 
-	FROM tracker.server 
-	INNER JOIN analytics.frame ON server_id = server.id 
-	INNER JOIN analytics.record ON record_id = record.id 
-	WHERE active = true 
-	GROUP BY server.id 
-	)
-	SELECT svrec.id, location, port, gamename.name 
-	FROM svrec 
-	INNER JOIN analytics.record ON record.id = record_id 
-	INNER JOIN analytics.gamename ON gamename.id = record.gamename_id
-	ORDER BY id"));
+	$databaseInfo = getServerListFromDatabase();
 
 	$count = countDatabaseReturn($databaseInfo);
 	$unrecognizedGames = array();
@@ -450,7 +402,7 @@ function getGameCountList()
 		if(isset($gameCountList[$gameList[$i]]))
 		{
 			$unit = checkPlural("server", $gameCountList[$gameList[$i]]);
-			array_push($output, $gameList[$i] . ': ' . colorizeDangerousValuesLower($gameCountList[$gameList[$i]], $unit, 0, -1, ''));
+			array_push($output, $gameList[$i] . ': ' . colorizeDangerousValuesLower($gameCountList[$gameList[$i]], $unit, 5, 0, ''));
 		}
 		else
 		{

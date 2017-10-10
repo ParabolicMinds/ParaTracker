@@ -38,8 +38,8 @@ flex: 1 1 auto;
 flex-direction: column;
 }
 
-/* This class configures the iframe for account management */
-.accountManagementFrame
+/* This class configures the iframe for admin info */
+.adminInfoFrame
 {
 width: 95vw;
 min-width: 1000px;
@@ -159,8 +159,8 @@ color: #E44;
 	color: #FAA;
 }
 
-/* This class is for the account management page */
-.accountManagement
+/* This class is for the admin info page */
+.adminInfo
 {
 font-family: monospace;
 font-size: 12pt;
@@ -189,6 +189,17 @@ color: #0C0;
 {
 color: #C00;
 }
+
+/* This class is for the server list on the admin info page */
+.serverListHeading
+{
+margin-bottom:0px;
+padding-bottom:0px;
+color:#CCEEEE;
+font-size:16pt;
+font-weight: bold;
+}
+
 
 /* This class sets the width of the page */
 .dynamicPageWidth
@@ -1042,6 +1053,12 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 .xonotic
 {
 	color: #0CF;
+	font-weight: bold;
+}
+
+.unrecognizedgame
+{
+	color: #F40;
 	font-weight: bold;
 }
 

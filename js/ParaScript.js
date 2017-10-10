@@ -961,10 +961,10 @@ function changeSetupPageFunction()
         contractDiv("logViewerDiv")
         inactiveButton("logViewerButton")
     }
-    if(typeof accountManagementDiv !== 'undefined')
+    if(typeof adminInfoDiv !== 'undefined')
     {
-        contractDiv("accountManagementDiv")
-        inactiveButton("accountManagementButton")
+        contractDiv("adminInfoDiv")
+        inactiveButton("adminInfoButton")
     }
 
 
@@ -1001,12 +1001,12 @@ function changeSetupPageFunction()
         activeButton("logViewerButton")
         expandDiv("logViewerDiv")
     }
-    else if(document.location.hash == "#accountManagement" && typeof accountManagementDiv !== 'undefined')
+    else if(document.location.hash == "#adminInfo" && typeof adminInfoDiv !== 'undefined')
     {
         openUtilitiesPage()
 
-        activeButton("accountManagementButton")
-        expandDiv("accountManagementDiv")
+        activeButton("adminInfoButton")
+        expandDiv("adminInfoDiv")
     }
     else
     {
