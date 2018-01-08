@@ -94,7 +94,7 @@ echo "<!-- " . versionNumber() . " ";
 
 if (file_exists("ParaConfig.php"))
 {
-    include 'ParaConfig.php';
+    include_once 'ParaConfig.php';
 }
 else
 {
@@ -1872,7 +1872,7 @@ function ipAddressValidator($input, $dynamicTrackerEnabled)
         if($test == $input)
         {
             //DNS test failed. Just error out.
-            displayError('Invalid domain name! ' . stringValidator($input, "", "") . '<br />Check the address and try again.', "", "");
+            displayError('Invalid address! ' . stringValidator($input, "", "") . '<br />Check the address and try again.', "", "");
             return "";
         }
         else

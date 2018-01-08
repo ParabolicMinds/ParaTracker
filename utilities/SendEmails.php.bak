@@ -180,7 +180,7 @@ function prepareAndsendAdminReport($emailAdministrators)
 		//This next line prevents a boolean false from being counted as a 1
 		$count = countDatabaseReturn($mapreqs_auto);
         $unit = checkPlural("request", $count);
-		$message .= 'Automatic requests: ' . colorizeDangerousValuesHigher($count, $unit, 2000, 2500, '') . '</p>';
+		$message .= 'Automatic requests: ' . colorizeDangerousValuesHigher($count, $unit, 1500, 2000, '') . '</p>';
     }
 
 	if(enablePGSQL)
@@ -188,7 +188,7 @@ function prepareAndsendAdminReport($emailAdministrators)
 		$trackedCount = pg_fetch_all(pg_query($pgCon, "SELECT COUNT(*) FROM tracker.server WHERE active = true"));
 		$message .= '<h3 style="font-family: monospace; text-align: center;">Currently tracking <strong>' . $trackedCount[0]['count'] . '</strong> servers</h3>';
 
-		$message .= '<p class="font-family: monospace; text-align: center; font-size: 9pt;">' . padOutputAndImplode(getGameCountList(), '<br>') . '</p>';
+		$message .= '<p class="font-family: monospace; text-align: center;">' . padOutputAndImplode(getGameCountList(), '<br>') . '</p>';
 	}
 
 		$stuff = array();
@@ -404,7 +404,7 @@ function getGameCountList()
 		if(isset($gameCountList[$gameList[$i]]))
 		{
 			$unit = checkPlural("server", $gameCountList[$gameList[$i]]);
-			array_push($output, $gameList[$i] . ': ' . colorizeDangerousValuesLower($gameCountList[$gameList[$i]], $unit, 4, 0, ''));
+			array_push($output, $gameList[$i] . ': ' . colorizeDangerousValuesLower($gameCountList[$gameList[$i]], $unit, 5, 0, ''));
 		}
 		else
 		{

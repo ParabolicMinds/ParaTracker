@@ -44,15 +44,14 @@ $output .= '<body class="mapReqPageStyle">
         <div id="reqform">';
 
             // Process POST and print notifications
-            if (!empty($_POST['mapreq_bsp_game']) || !empty($_POST['mapreq_bsp_name'])) { // Map Request Submission
+            if (!empty($_POST['mapreq_bsp_game']) || !empty($_POST['mapreq_bsp_name']) || !empty($_POST['mapreq_bsp_link'])) { // Map Request Submission
                 if (!enablePGSQL) {
                     $output .= pageNotificationFailure("Cannot submit map request, PGSQL is NOT enabled!");
-                } else if (!empty($_POST['mapreq_bsp_game']) && !empty($_POST['mapreq_bsp_name'])) {
-                    $mapreq_bsp_game = $_POST['mapreq_bsp_game'];
-                    $mapreq_bsp_name = $_POST['mapreq_bsp_name'];
-                    $mapreq_bsp_link = "";
-                    if (!empty($_POST['mapreq_bsp_link'])) $mapreq_bsp_link = $_POST['mapreq_bsp_link'];
-                    else $mapreq_bsp_link = NULL;
+                 } else if (!empty($_POST['mapreq_bsp_game']) && !empty($_POST['mapreq_bsp_name']) && !empty($_POST['mapreq_bsp_link'])) {
+                    $mapreq_bsp_game = trim($_POST['mapreq_bsp_game']);
+                    $mapreq_bsp_name = strtolower($_POST['mapreq_bsp_name']);
+                    if(substr($mapreq_bsp_name, -4) == '.bsp') $mapreq_bsp_name = substr($mapreq_bsp_name, 0, strlen($mapreq_bsp_name) - 4);
+                    $mapreq_bsp_link = trim($_POST['mapreq_bsp_link']);
                     pg_query_params($pgCon, '
                         INSERT INTO mapreq (game_name, bsp_name, dl_link, useradded)
                         VALUES ($1, $2, $3, true)
@@ -70,11 +69,13 @@ $output .= '<body class="mapReqPageStyle">
                         $message .= '<p>BSP name: <strong>' . stringValidator($mapreq_bsp_name, "", "") . '</strong></p>';
                         if(!empty($mapreq_bsp_link))
                         {
-                            $message .= '<p style="">Link: <a href="' . stringValidator($mapreq_bsp_link, "", "") . '"><strong>' . stringValidator($mapreq_bsp_link, "", "") . '</strong></a></p>';
+							if(strtolower(trim($mapreq_bsp_link)) == "base game") $message .= '<p style=""><strong>Base Game</strong></a></p>';
+							else if(strtolower(trim($mapreq_bsp_link)) == "none") $message .= '<p>No link provided</p>';
+							else $message .= '<p>Link: <a href="' . stringValidator($mapreq_bsp_link, "", "") . '"><strong>' . stringValidator($mapreq_bsp_link, "", "") . '</strong></a></p>';
                         }
                         else
                         {
-                            $message .= '<p>No link provided.</p>';
+                            $message .= '<p>No link provided</p>';
                         }
                         $message .= '<p>Client IP Address: ' . $_SERVER['REMOTE_ADDR'] . '</p>';
                         $message .= '<p>Time: ' . date('Y-m-d H:i', time()) . '</p>';
@@ -83,7 +84,7 @@ $output .= '<body class="mapReqPageStyle">
                     }
 
                 } else { // Required field not filled out
-                    $output .= pageNotificationFailure("Must fill out BOTH REQUIRED fields for map request!");
+                    $output .= pageNotificationFailure("You must fill out ALL fields for levelshot requests!");
                 }
             }
 
@@ -92,7 +93,7 @@ $output .= '<body class="mapReqPageStyle">
 
                 $gameListArray = detectGameName("");
                 //The output returned will be an array. Position 0 is a full game list, position 1 is a filtered game list (Useful for hiding duplicate game entries)
-                $gameList = $gameListArray[1];
+                $gameList = $gameListArray[0];
 
                 $output .= '<select class="reqformtextentry" name="mapreq_bsp_game">';
 
@@ -114,11 +115,13 @@ $output .= '<body class="mapReqPageStyle">
             $output .= '</div>
             <div class="reqformrow">
                 <span class="reqformlabel">BSP Name:</span>
-                <input class="reqformtextentry" type="text" name="mapreq_bsp_name" placeholder="REQUIRED (excluding .bsp)">
+                <input class="reqformtextentry" type="text" name="mapreq_bsp_name" placeholder="">
             </div>
             <div class="reqformrow">
-                <span class="reqformlabel">BSP or Image(s) Download Link:</span>
-                <input class="reqformtextentry" type="text" name="mapreq_bsp_link" placeholder="OPTIONAL (but greatly appreciated)">
+                <span class="reqformlabel">Map or Image(s) Link:</span>
+			</div>
+			<div class="reqformrow">
+                <input class="reqformtextentry" type="text" name="mapreq_bsp_link" placeholder="Use \'\'Base Game\'\' for maps included with the game">
             </div>
             <input class="reqformsubmit" type="submit" value="SUBMIT">
         </div>
@@ -134,7 +137,7 @@ if (!empty($mapreqs_user)) {
     }
     else
     {
-        $output .= addmapreqtable('Levelshot Requests', $mapreqs_user, true);
+        $output .= addmapreqtable('Levelshot Requests', $mapreqs_user, false);
     }
 }
 
@@ -154,7 +157,7 @@ function addmapreqtable($title, $query, $with_dl) {
 				$output .= '<span class="entryfield entrygamefield entryheaderfield">Game</span>';
 				$output .= '<span class="entryfield entrybspfield entryheaderfield">BSP</span>';
 				$output .= '<span class="entryfield entrydatefield entryheaderfield">Date</span>';
-				if ($with_dl) $output .= '<span class="entryfield entrylinkfield entryheaderfield">Download</span>';
+				if ($with_dl && admin) $output .= '<span class="entryfield entrylinkfield entryheaderfield">Download</span>';
 				$output .= '</div><div class="entrybody">';
 
 				$curbg = false;
@@ -167,7 +170,12 @@ function addmapreqtable($title, $query, $with_dl) {
 					$output .= "<span class=\"entryfield entrygamefield\" title=\"$entry[game_name]\">" . htmlentities("$entry[game_name]") . "</span>";
 					$output .= "<span class=\"entryfield entrybspfield\" title=\"$entry[bsp_name]\">" . htmlentities("$entry[bsp_name]") . "</span>";
 					$output .= "<span class=\"entryfield entrydatefield\" title=\"$entry[bsp_name]\">" . date('Y-m-d', strtotime($entry['entry_date'])) . "</span>";
-					if ($with_dl && !empty($entry["dl_link"])) $output .= "<a class=\"entryfield entrylinkfield\" title=\"$entry[dl_link]\" href=\"$link\">Link</a>";
+					if ($with_dl && !empty($entry["dl_link"]))
+					{
+						if(strtolower(trim($entry["dl_link"])) == "base game") $output .= "<p class=\"entryfield entrylinkfield\">Base Game</p>";
+						else if(strtolower(trim($entry["dl_link"])) == "none") $output .= "<p class=\"entryfield entrylinkfield\">No link provided</p>";
+						else $output .= "<a class=\"entryfield entrylinkfield\" title=\"$entry[dl_link]\" href=\"$link\">Link</a>";
+					}
 					$curbg = !$curbg;
 					$output .= "</div>";
 				} else {

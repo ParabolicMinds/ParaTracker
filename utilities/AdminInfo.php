@@ -15,7 +15,7 @@ chdir("../");
 //ParaFunc.php MUST exist, or the page must terminate!
 if (file_exists("ParaFunc.php"))
 {
-    include 'ParaFunc.php';
+    include_once 'ParaFunc.php';
 }
 else
 {
@@ -31,6 +31,8 @@ if(!admin)
 
 $output = htmlDeclarations("ParaTracker - Admin Info", "../") . '</head><body class="adminInfo">';
 
+$output .= '</head><body style="background-color: #000; color: #FFF; font-family: monospace; text-align: center;">';
+
 if(isset($_GET['showServerList']) && booleanValidator($_GET['showServerList'], 0))
 {
 	if(analyticsEnabled) displayServerList($output);
@@ -38,12 +40,50 @@ if(isset($_GET['showServerList']) && booleanValidator($_GET['showServerList'], 0
 	exit();
 }
 
-$output .= '</head><body style="background-color: #000; color: #FFF; font-family: monospace; text-align: center;">';
+if(isset($_GET['forceAnalyticsBackground']))
+{
+	if(numericValidator($_GET['forceAnalyticsBackground'], 0, 2, 0) == 1)
+	{
+		$output .= '<h3>Forcing analyticsBackground to run could cause a high load on the server.<br>This should only be done if absolutely necessary.<br>Do you wish to continue?<br><br><strong><a class="testMessage" href="AdminInfo.php?forceAnalyticsBackground=2">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
+		echo '-->' . $output;
+		exit();
+	}
+	if (numericValidator($_GET['forceAnalyticsBackground'], 0, 2, 0) == 2)
+	{
+		$forceAnalyticsBackgroundRun = 1;
+		include_once utilitiesPath . 'AnalyticsBackground.php';
+		$output .= '<h4 class="messageSuccess">AnalyticsBackground complete!</h4>';
+		if(emailEnabled)
+		{
+			include_once utilitiesPath . 'SendEmails.php';
+			if(sendEmail($emailAdministrators, 'ParaTracker - AnalyticsBackground forced', '<h3>This message was sent to notify you that AnalyticsBackground was forced to run.</h4><br><br>' . 	date('Y-m-d H:i', time()))) $output .= '<h4 class="messageSuccess">Email alert sent!</h4>';
+			else $output .= '<h4 class="messageFailed">Email alert failed to send!</h4>';
+		}
+	}
+}
+
+
+if(emailEnabled && isset($_GET['forceAdminEmails']))
+{
+	if(numericValidator($_GET['forceAdminEmails'], 0, 2, 0) == 1)
+	{
+		$output .= '<h3>Forcing the admin status report to send will interfere with the weekly information sent.<br>Do you wish to continue?<br><br><strong><a class="testMessage" href="AdminInfo.php?forceAdminEmails=2">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
+		echo '-->' . $output;
+		exit();
+	}
+	if(numericValidator($_GET['forceAdminEmails'], 0, 2, 0) == 2)
+	{
+		include_once utilitiesPath . 'SendEmails.php';
+		if (prepareAndsendAdminReport($emailAdministrators)) $output .= '<h4 class="messageSuccess">Admin status email sent successfully!</h4>';
+		else $output .= '<h4 class="messageFailed">Admin status email failed to send!</h4>';
+	}
+}
+
 
 
 if(emailEnabled)
 {
-    include utilitiesPath . 'SendEmails.php';
+    include_once utilitiesPath . 'SendEmails.php';
 
     if(isset($_GET['sendTestEmail']) && booleanValidator($_GET['sendTestEmail'], 0))
     {
@@ -63,7 +103,7 @@ if(emailEnabled)
     {
         $output .= '<p>Admin reports are enabled.</p>';
     }
-	if(analyticsEnabled) $output .= '<p>Analytics is enabled.<br><strong><a class="testMessage" href="AdminInfo.php?showServerList=1">Display active server and address list</a></strong></p>';
+	if(analyticsEnabled) $output .= '<p>Analytics is enabled.<br><strong><a class="testMessage" href="AdminInfo.php?showServerList=1">Display active server and address list</a></strong><br><strong><a class="testMessage" href="AdminInfo.php?forceAnalyticsBackground=1">Force AnalyticsBackground to run now</a></strong></p>';
 	else $output .= 'Analytics is disabled.';
 
 	if(useSMTP)
@@ -82,6 +122,8 @@ if(emailEnabled)
     $output .= '<h3>' . implode($emailAdministrators, '<br>') . '</h3>';
 
     $output .= '<strong><a class="testMessage" href="AdminInfo.php?sendTestEmail=1">Send test message to administrators</a></strong>';
+
+	$output .= '<br><strong><a class="testMessage" href="AdminInfo.php?forceAdminEmails=1">Force Admin Status Report To Send Now</a></strong><br><br><strong>';
 
 }
 
@@ -141,11 +183,13 @@ function displayServerList($output)
 
 	$currentGame = '';
 	$outputArray = array();
+	$trackedGamesArray = array();
 	for($i = 0; $i < $count; $i++)
 	{
 		if($currentGame != $databaseInfo[$i]['name'])
 		{
 			//We've changed games
+			array_push($trackedGamesArray, $databaseInfo[$i]['name']);
 			if($currentGame != '')
 			{
 				//This is not our first execution
@@ -159,8 +203,43 @@ function displayServerList($output)
 		array_push($outputArray, $databaseInfo[$i]['location'] . ':' . $databaseInfo[$i]['port']);
 	}
 	$count2 = count($outputArray);
-	$output .= '<strong class="' . '' . '">' . $count2 . checkPlural('</strong> server', $count2) . '<br><div id="' . makeFunctionSafeName($databaseInfo[$i-1]['name']) . '">' . padOutputAndImplode($outputArray, '<br>') . '<br></div><br>';
 
+	$output .= '<strong>' . $count2 . checkPlural('</strong> server', $count2) . '<br><div id="' . makeFunctionSafeName($databaseInfo[$i-1]['name']) . '">' . padOutputAndImplode($outputArray, '<br>') . '<br></div><br>';
+
+	//Now we need to add the untracked games to the list
+	$gameList = detectGameName('')[1];
+	$count = count($trackedGamesArray);
+	$untrackedGamesArray = array();
+	while(count($gameList) > 0)
+	{
+		$foundMatch = 0;
+		$test = array_shift($gameList);
+		for($i = 0; $i < $count; $i++)
+		{
+			$foundMatch = 0;
+			if($test == $trackedGamesArray[$i])
+			{
+				$foundMatch = 1;
+				break;
+			}
+		}
+		if(!$foundMatch)
+		{
+			array_push($untrackedGamesArray, $test);
+		}
+	}
+
+	$output .= '<div class="cursorPointer" title="Click to expand/collapse" onclick="expandContractDiv(\'untrackedGames\')">
+				<div class="serverListHeading">Untracked Games</div>
+				</div>
+				<div id="untrackedGames">';
+				$count = count($untrackedGamesArray);
+				for($i = 0; $i < $count; $i++)
+				{
+					$untrackedGamesArray[$i] = '<strong class="' . makeFunctionSafeName($untrackedGamesArray[$i]) . '">' . $untrackedGamesArray[$i] . '</strong>';
+				}
+				if($count > 0) $output .= padOutputAndImplode($untrackedGamesArray, '<br>') . '</div>';
+				else $output .= 'None<br>';
 
 	$output .= '<br>' . adminInfoGoBackLink() . '<br></body></html>';
 

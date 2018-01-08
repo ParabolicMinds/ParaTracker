@@ -1,8 +1,8 @@
 <?php
 
-if (php_sapi_name() != "cli")
+if (php_sapi_name() != "cli" && !isset($forceAnalyticsBackgroundRun))
 {
-    echo "<h3>AnalyticsBackground.php cannot be run from the web!!</h3><p>Use a cron job to run this file.</p>";
+    echo "<!-- --><h3>AnalyticsBackground.php cannot be run from the web!!</h3><p>Use a cron job to run this file.</p>";
     exit();
 }
 
@@ -10,12 +10,15 @@ $analyticsBackground = 1;
 $calledFromElsewhere = 1;
 $safeToExecuteParaFunc = "1";
 
-//We are in the utilities folder, so we have to back out one
-chdir("../");
+if(!isset($utilitiesPath))
+{
+	//We are in the utilities folder, so we have to back out one
+	chdir("../");
+}
 
 if (file_exists("ParaFunc.php"))
 {
-    include 'ParaFunc.php';
+    include_once 'ParaFunc.php';
 }
 else
 {

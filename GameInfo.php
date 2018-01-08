@@ -45,12 +45,15 @@ Function detectGameName($input)
             "ioq3" => "Open Arena",
             "quake" => "Quake",
             "Q3" => "Quake III Arena",
-            "sof2mp" => "Soldier of Fortune II: Double Helix",
+            "sof2" => "Soldier of Fortune II: Double Helix",
             "Tremulous" => "Tremulous",
             "warsow" => "Warsow",
             "Xonotic" => "Xonotic",
             "wolfmp" => "Return To Castle Wolfenstein",
-            "ET" => "Wolfenstein: Enemy Territory"
+            "ET" => "Wolfenstein: Enemy Territory",
+            "jedi" => "Jedi Academy",
+            "jka" => "Jedi Academy",
+            "jko" => "Jedi Outcast"
 
             );
 
@@ -898,7 +901,7 @@ function urbanterror($cvars_hash, $cvars_hash_decolorized)
     //If you are adding a custom game, the stuff below is what to change.
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
-    $gametypeArray = array("FFA", "Last Man Standing", "Team FFA", "Team Survivor", "Follow The Leader", "Capture And Hold", "CTF", "Bomb Mode", "Jump", "Freeze Tag", "Gun Game");
+    $gametypeArray = array("FFA", "Last Man Standing", "", "Team Deathmatch", "Team Survivor", "Follow The Leader", "Capture and Hold", "CTF", "Bombmode", "Jump", "Freeze Tag", "Gun Game");
     if(isset($cvars_hash_decolorized["g_gametype"]))
     {
         $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
