@@ -15,7 +15,7 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    return("ParaTracker 1.4.1");
+    return("ParaTracker 1.4.2");
 }
 
 //Define the default skin, to be used throughout this file.
@@ -1913,9 +1913,9 @@ function skinValidator($paraTrackerSkin, $customSkin)
     {
         $customSkin = trim($customSkin);
         //If an external skin file was specified, we need to check for double quotes to prevent exploits.
-        if(substr(strtolower($customSkin), -4) == ".css")
+        if(strtolower(substr($customSkin, -4)) == ".css")
         {
-            $customSkin = substr($customSkin, 0, count($customSkin) - 5);
+            $customSkin = substr($customSkin, 0, -4);
         }
 
         if(strpos($customSkin, '"') !== 0)
@@ -2416,7 +2416,7 @@ $output .= '<h3 class="dynamicPageWidth">Enter the data below to get a URL you c
         //Ignore Template.css, json.css and custom.css (which cannot exist), and make sure the file extension on the detected file is ".css"
         if(strtolower($directoryList[$i]) != "template.css" && strtolower($directoryList[$i]) != "custom.css" && strtolower($directoryList[$i]) != "json.css" && substr(strtolower($directoryList[$i]), -4) == ".css")
         {
-            $skinList[$skinCount] = substr($directoryList[$i], 0, count($directoryList[$i]) - 5);
+			$skinList[$skinCount] = substr($directoryList[$i], 0, -4);
             $skinCount ++;
         }
     }
@@ -2540,14 +2540,18 @@ $output .= '<h3 class="dynamicPageWidth">Enter the data below to get a URL you c
     $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor1Opacity" maxlength="3" size="3" type="text" value="" placeholder="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
     $output .= '<p><span class="gameColor9">Player List Color 2:</span>&nbsp;&nbsp;# <input id="playerListColor2" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
     $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="playerListColor2Opacity" maxlength="3" size="3" type="text" value="" placeholder="100" onchange="createURL()" /> %<br /><span class="smallText">(Opacity only works when a background color is applied)</span></p>';
-    $output .= '<p><span class="gameColor5">Scroll Shaft Color</span>&nbsp;&nbsp;# <input id="scrollShaftColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
+
+	/*	Commented out because the scroll bars have been removed. The validation and other functionality for them remains in place.
+    $output .= '<p>';
+	$output .= '<span class="gameColor5">Scroll Shaft Color</span>&nbsp;&nbsp;# <input id="scrollShaftColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
 
 //    $output .= '<span class="gameColor4">&nbsp;&nbsp;&nbsp;<strong>Opacity:</strong>&nbsp;</span><input id="scrollShaftOpacity" maxlength="3" size="3" type="text" value="" placeholder="100" onchange="createURL()" /> %';
 
     $output .= '</p>';
     $output .= '<p><span class="gameColor5">Scroll Thumb Color</span>&nbsp;&nbsp;# <input id="scrollThumbColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
+*/
 
-        $output .= '<h2><span class="gameColor3">Text</span><br /><span class="smallText">These settings do not apply to JSON skins.</span></h2>';
+    $output .= '<h2><span class="gameColor3">Text</span><br /><span class="smallText">These settings do not apply to JSON skins.</span></h2>';
     $output .= '<p><span class="gameColor7">Text Color:</span>&nbsp;&nbsp;# <input id="textColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /><span class="gameColor7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Font:</span>&nbsp;&nbsp;<input id="font" maxlength="50" size="30" type="text" value="" onchange="createURL()" /><br /><span class="smallText">(Color changes do not affect colorized text)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Font families are also acceptable)</span></p>';
 
     $output .= '</div></div>';
@@ -3696,16 +3700,6 @@ $playerListColor2 = "";
 // This value is a percentage, from 0 to 100, of how opaque the color of the even rows on the player list will be.
 // Default value is "100".
 $playerListColor2Opacity = "100";
-
-// This is a 6 character hexadecimal value that specifies the color of the scrollbar shaft.
-// The skin chosen will already have it\'s own color; this value will override it, if desired.
-// Default value is "".
-$scrollShaftColor = "";
-
-// This is a 6 character hexadecimal value that specifies the color of the scrollbar thumb.
-// The skin chosen will already have it\'s own color; this value will override it, if desired.
-// Default value is "".
-$scrollThumbColor = "";
 
 // This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
 // It will not change the color of server names, mod names, map names, or player names.

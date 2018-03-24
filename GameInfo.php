@@ -53,7 +53,8 @@ Function detectGameName($input)
             "ET" => "Wolfenstein: Enemy Territory",
             "jedi" => "Jedi Academy",
             "jka" => "Jedi Academy",
-            "jko" => "Jedi Outcast"
+            "jko" => "Jedi Outcast",
+            "jk" => "Jedi Academy"
 
             );
 

@@ -111,14 +111,16 @@ function swapLevelshots()
 
 function detectLevelshotClasses()
 {
-//Let's detect all levelshot transition animation classes currently in memory.
-//If levelshot transitions are set to random, we'll pick one at random from this list.
+    //Let's detect all levelshot transition animation classes currently in memory.
+    //If levelshot transitions are set to random, we'll pick one at random from this list.
 
+    //Browsers are now blocking Javascript access to the style sheets, so this method is invalid.
+    /*
     var sheet = "";
 
     for (sheeti = 0; sheeti < document.styleSheets.length; sheeti++)
     {
-      sheet = document.styleSheets[sheeti]
+    sheet = document.styleSheets[sheeti]
 
       if(sheet.cssRules)
       {
@@ -132,6 +134,14 @@ function detectLevelshotClasses()
             }
         }
     }
+    */
+
+	//We will now have to assume the original 15 levelshots, as given in the original animation stylesheet.
+    animationList = []
+    for(iLev = 1; iLev <= 15; iLev++)
+	{
+        animationList.push("levelshotTransition".concat(iLev))
+	}
 }
 
 //This function sets up the tracker to run for it's first time
@@ -367,8 +377,11 @@ function inputData()
 
 function adjustPlayerTableWidth()
 {
+    //Browsers are now blocking Javascript access to the style sheets, so this function is invalid.
+    /*
     //We have to get the padding values for namescoreping to set the value correctly
     rules = document.styleSheets[2].cssRules;
+    if (!rules) return;
     paddingWidth = 0
     for (let i = 0; i < rules.length; i++)
     {
@@ -380,6 +393,7 @@ function adjustPlayerTableWidth()
     }
     newWidth = playerListObject.scrollWidth - paddingWidth
     nameScorePingObject.style.width = newWidth + "px"
+    */
 }
 
 function levelshotClick()
@@ -627,7 +641,7 @@ function createURL()
         }
         else
         {
-    var outputURL = "http://";
+    var outputURL = "https://";
     var width = "";
     var height = "";
 //    var skinWidth = "";
@@ -785,6 +799,8 @@ function createURL()
         }
     }
 
+/*
+	Scrollshaft and scrollthumb are disabled since modern browsers do not allow javascript access to CSS
     if(document.getElementById("scrollShaftColor").value != "")
     {
         outputURL += "&scrollShaftColor=" + document.getElementById("scrollShaftColor").value;
@@ -794,6 +810,8 @@ function createURL()
     {
         outputURL += "&scrollThumbColor=" + document.getElementById("scrollThumbColor").value;
     }
+*/
+
 
 /*
     if(document.getElementById("scrollShaftOpacity").value != "")

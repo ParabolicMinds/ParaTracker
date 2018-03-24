@@ -10,6 +10,14 @@ If there is a feature that you don't want to be visible in your skin, then apply
 */
 
 
+/*
+This part is here to forcefully remove the scroll bar from the player list. Javascript is unable to
+read CSS files in modern browsers, so the column headers can no longer be resized to match the list.
+*/
+.playerTable::-webkit-scrollbar {
+display: none;
+}
+
 
 /*
 This class controls the size of the tracker. It is also the parent element for the entire tracker.
@@ -246,16 +254,17 @@ padding-left: 7px;
 }
 
 /* This class positions the column headers for name, score and ping.
-Javascript will automatically resize the width of this column to match the player table.  */
+The width, padding-left and padding-right attributes, when added together, MUST match the width of .playerTable  */
 .nameScorePing
 {
 position: absolute;
     left: 0px;
     top: 250px;
 height: 30px;
+width: 582px;
 padding-top: 4px;
 padding-bottom: 4px;
-padding-left: 18px;
+padding-left: 13px;
 padding-right: 5px;
 }
 
