@@ -10,21 +10,21 @@ is the old levelshot. The new levelshot is not animated.
 */
 
 
-/* Simple fade */
+/* Fade */
 @keyframes levelshotTransition1
 {
     0% {opacity: 1;}
     100% {opacity: 0;}
 }
 
-/* Fade to black */
+/* Smooth Fade */
 @keyframes levelshotTransition2
 {
     0% {animation-timing-function: ease-in-out; opacity: 1; filter: brightness(100%);}
     100% {animation-timing-function: ease-in-out; opacity: 0; filter: brightness(0%);}
 }
 
-/* Hue shift */
+/* Hue Shift */
 @keyframes levelshotTransition3
 {
     0% {opacity: 1; filter: hue-rotate(0deg) }
@@ -45,63 +45,63 @@ is the old levelshot. The new levelshot is not animated.
     100% {width: 200%; height: 0%; top: 50%; left: -50%; opacity: .3;}
 }
 
-/* Stretch and rebound */
+/* Stretch and Rebound */
 @keyframes levelshotTransition6
 {
     0% {opacity: 1; transform: matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);}
     100% {opacity: 0; transform: matrix3d(1,0,4,0,0,2,2,0,0,0,1,0,0,0,0,1);}
 }
 
-/* Slide to left */
+/* Slide Left */
 @keyframes levelshotTransition7
 {
     0% {left: 0%; opacity: 1;}
     100% {left: -100%; opacity: .3;}
 }
 
-/* Slide to right */
+/* Slide Right */
 @keyframes levelshotTransition8
 {
     0% {left: 0%; opacity: 1;}
     100% {left: 100%; opacity: .3;}
 }
 
-/* Slide to top */
+/* Slide Top */
 @keyframes levelshotTransition9
 {
     0% {top: 0%; opacity: 1;}
     100% {top: -100%; opacity: .3;}
 }
 
-/* Slide to bottom */
+/* Slide Bottom */
 @keyframes levelshotTransition10
 {
     0% {top: 0%; opacity: 1;}
     100% {top: 100%; opacity: .3;}
 }
 
-/* Spin and fly to top left */
+/* Spin, Fly Left */
 @keyframes levelshotTransition11
 {
     0% {animation-timing-function: ease-in; opacity: 1}
     100% {transform: rotate(-720deg); width: 0%; height: 0%; opacity: 0}
 }
 
-/* Spin and fly to top right */
+/* Spin, Fly Right */
 @keyframes levelshotTransition12
 {
     0% {animation-timing-function: ease-in; opacity: 1; left: 0%;}
     100% {animation-timing-function: ease-in; transform: rotate(720deg); width: 0%; height: 0%; opacity: 0; left: 100%;}
 }
 
-/* Fall away and spin */
+/* Fall Away */
 @keyframes levelshotTransition13
 {
     0% {animation-timing-function: linear; opacity: 1; transform: rotateY(0deg); height: 100%; width: 100%; left: 0%; top: 0%;}
     100% {animation-timing-function: linear; opacity: 0; transform: rotateY(540deg); height: 30%; width: 30%; left: 35%; top: 36%;}
 }
 
-/* Zoom in */
+/* Zoom */
 @keyframes levelshotTransition14
 {
     0% {opacity: 1; width: 100%; height: 100%; top: 0%; left: 0%}
@@ -111,6 +111,6 @@ is the old levelshot. The new levelshot is not animated.
 /* Blur */
 @keyframes levelshotTransition15
 {
-    0% {opacity: 1; filter: blur(0px); width: 100%; height: 100%; top: 0%; left: 0%;}
+    0% {opacity: 1; filter: blur(1px); width: 100%; height: 100%; top: 0%; left: 0%;}
     100% {opacity: 0; filter: blur(12px); width: 110%; height: 110%; top: -5%; left: -5%;}
 }

@@ -15,7 +15,7 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    return("ParaTracker 1.4.2");
+    return("ParaTracker 1.4.3");
 }
 
 //Define the default skin, to be used throughout this file.
@@ -474,7 +474,7 @@ $customFont = stringValidator($customFont, "50", "");
 $levelshotTransitionsEnabled = booleanValidator($levelshotTransitionsEnabled, 1);
 $levelshotDisplayTime = numericValidator($levelshotDisplayTime, 1, 15, 3);
 $levelshotTransitionTime = numericValidator($levelshotTransitionTime, 0.1, 5, 1);
-$levelshotTransitionAnimation = numericValidator(round($levelshotTransitionAnimation), 0, 999, 0);
+$levelshotTransitionAnimation = numericValidator($levelshotTransitionAnimation, 0, 32767, 3);
 $maximumLevelshots = numericValidator($maximumLevelshots, 1, 99, 20);
 
 $displayGameName = booleanValidator($displayGameName, 1);
@@ -537,6 +537,11 @@ if($dynamicTrackerCalledFromCorrectFile == "1" && $executeDynamicInstructionsPag
     if(isset($_GET["levelshotsEnabled"]) && $levelshotTransitionsEnabled == "1")
     {
         $levelshotTransitionsEnabled = booleanValidator($_GET["levelshotsEnabled"], 1);
+    }
+
+    if(isset($_GET["levelshotTransitionAnimation"]))
+    {
+        $levelshotTransitionAnimation = numericValidator($_GET["levelshotTransitionAnimation"], 0, 32767, 3);
     }
 
     if(isset($_GET["levelshotDisplayTime"]))
@@ -1532,7 +1537,7 @@ function levelshotJavascriptAndCSS()
     var runSetup = 1;   //This variable allows the setup script to execute
     var timer = 0;  //Used for setting re-execution timeout
     var originalStyleData = "";   //Used to contain the original CSS info while fading.
-    var levelshotTransitionAnimation = ' . levelshotTransitionAnimation . ';    //This value specifies the I.D. of the levelshot transition to use. The value is 0 if transitions are to be random
+    var levelshotTransitionAnimation = ' . levelshotTransitionAnimation . ';    //This value uses a bit field to determine which levelshot transitions to use.
     var animationList = []; //This initializes an array to be used for detecting the number of levelshot transitions
 </script>';
 
@@ -2531,7 +2536,77 @@ $output .= '<h3 class="dynamicPageWidth">Enter the data below to get a URL you c
     {
         $output .= '<div class="levelshotBorder"><p style="margin-top:0;"><input type="checkbox" id="levelshotsEnabled" onchange="createURL()" checked /><span class="gameColor7">Enable automatic levelshot transitions</span></p>';
         $output .= '<span class="gameColor2">Display Time:&nbsp;</span><input id="levelshotDisplayTime" maxlength="5" size="3" type="text" value="" placeholder="' . levelshotDisplayTime . '" onchange="createURL()" />';
-        $output .= '&nbsp;&nbsp;&nbsp;<span class="gameColor1">Transition Time:&nbsp;</span><input id="levelshotTransitionTime" maxlength="5" size="3" type="text" value="" placeholder="' . levelshotTransitionTime . '" onchange="createURL()" /><br /><span class="smallText">(Times are given in seconds. Decimals are accepted.)</span></div>';
+        $output .= '&nbsp;&nbsp;&nbsp;<span class="gameColor1">Transition Time:&nbsp;</span><input id="levelshotTransitionTime" maxlength="5" size="3" type="text" value="" placeholder="' . levelshotTransitionTime . '" onchange="createURL()" /><br /><span class="smallText">(Times are given in seconds. Decimals are accepted.)</span>';
+
+        $output .= '<br><p><a class="dynamicFormButtons dynamicFormButtonsStyle" onclick="expandContractDiv(\'transitionList\')">Choose Transitions</a></p>';
+
+        $output .= '<div id="transitionList" class="transitionListSelections collapsedFrame">
+
+        <div class="transitionButtonContainer"><a class="dynamicFormButtons dynamicFormButtonsStyle" onclick="selectAllTransitions()">Select All</a></div>
+        <div class="transitionButtonContainer"><a class="dynamicFormButtons dynamicFormButtonsStyle" onclick="selectNoTransitions()">Select None</a></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition1" checked="checked" onchange="createURL()"> Fade<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition1;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition2" checked="checked" onchange="createURL()"> Smooth Fade<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition2;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition3" onchange="createURL()"> Hue Shift<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition3;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition4" onchange="createURL()"> Skew<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition4;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition5" onchange="createURL()"> Horizontal Stretch<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition5;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition6" onchange="createURL()"> Stretch and Rebound<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition6;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition7" onchange="createURL()"> Slide Left<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition7;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition8" onchange="createURL()"> Slide Right<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition8;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition9" onchange="createURL()"> Slide Top<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition9;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition10" onchange="createURL()"> Slide Bottom<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition10;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition11" onchange="createURL()"> Spin, Fly Left<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition11;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition12" onchange="createURL()"> Spin, Fly Right<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition12;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition13" onchange="createURL()"> Fall Away<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition13;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition14" onchange="createURL()"> Zoom<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition14;" class="sampleOne"></div>
+        </div></div>
+
+        <div class="transitionSampleContainer"><input type="checkbox" id="transition15" onchange="createURL()"> Blur<br><div class="levelshotSample">
+        <div class="sampleTwo"></div><div style="animation-name:levelshotTransition15;" class="sampleOne"></div>
+        </div></div>
+
+        </div></div>';
+
     }
 
     $output .= '<h2 class="gameColor3">Colors</h2><h4>All colors are in hexadecimal (#123456).<br /><span class="smallText">These settings do not apply to JSON skins.</span></h4><p><span class="gameColor2">Background Color:</span>&nbsp;&nbsp;# <input id="backgroundColor" maxlength="6" size="7" type="text" value="" onchange="createURL()" /> ';
@@ -2896,7 +2971,7 @@ function renderJSONOutput($dynamicIPAddressPath)
     array_push($outputArray, JSONString("serverNumericAddress", gethostbyname($serverIPAddress)));
     array_push($outputArray, JSONString("paraTrackerSkin", paraTrackerSkin));
     array_push($outputArray, JSONBoolean("levelshotTransitionsEnabled", levelshotTransitionsEnabled));
-    array_push($outputArray, JSONString("levelshotTransitionAnimation", levelshotTransitionAnimation));
+    array_push($outputArray, JSONNumber("levelshotTransitionAnimation", levelshotTransitionAnimation));
     array_push($outputArray, JSONString("noPlayersOnlineMessage", noPlayersOnlineMessage));
     array_push($outputArray, JSONBoolean("enableAutoRefresh", enableAutoRefresh));
     array_push($outputArray, JSONNumber("autoRefreshTimer", autoRefreshTimer));
@@ -3746,26 +3821,29 @@ $levelshotTransitionTime = "1";
 
 // This is the animation that will be used for fading levelshots.
 // If you want to change the animations, they are found in "css/LevelshotAnimations.css"
-// Valid values are whole numbers between 0 to 999 (No decimals).
-// Setting this value to 0 will play a random animation from this list.
-// Default value is 0
+// Each transition is listed here. The user can pick which transitions are enabled
+// by adding the values of the desired transitions together, and putting them
+// into the variable below.
+// Dynamic mode will allow users to override this setting.
+// Minimum is 0 (No transitions). maximum is 32767.
+// Default value is 3.
 // The default transitions are as follows:
-// Transition 1: Fade
-// Transition 2: Fade to black
-// Transition 3: Hue shift
-// Transition 4: Skew
-// Transition 5: Horizontal Stretch
-// Transition 6: Stretch and rebound
-// Transition 7: Slide to left
-// Transition 8: Slide to right
-// Transition 9: Slide to top
-// Transition 10: Slide to bottom
-// Transition 11: Spin and fly to top left
-// Transition 12: Spin and fly to top right
-// Transition 13: Fall away and spin
-// Transition 14: Zoom in
-// Transition 15: Blur
-$levelshotTransitionAnimation = "0";
+// Transition 1: Fade                   ( Value: 1 )
+// Transition 2: Smooth Fade            ( Value: 2 )
+// Transition 3: Hue Shift              ( Value: 4 )
+// Transition 4: Skew                   ( Value: 8 )
+// Transition 5: Horizontal Stretch     ( Value: 16 )
+// Transition 6: Stretch and rebound    ( Value: 32 )
+// Transition 7: Slide Left             ( Value: 64 )
+// Transition 8: Slide Right            ( Value: 128 )
+// Transition 9: Slide Top              ( Value: 256 )
+// Transition 10: Slide Bottom          ( Value: 512 )
+// Transition 11: Spin, Fly Left        ( Value: 1024 )
+// Transition 12: Spin, Fly Right       ( Value: 2048 )
+// Transition 13: Fall Away             ( Value: 4096 )
+// Transition 14: Zoom                  ( Value: 8192 )
+// Transition 15: Blur                  ( Value: 16384 )
+$levelshotTransitionAnimation = "3";
 
 // The following value is the maximum number of levelshots that can be used. Keep in mind that
 // more levelshots is not always better.

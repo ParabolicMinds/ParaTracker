@@ -188,7 +188,7 @@ function prepareAndsendAdminReport($emailAdministrators)
 		$trackedCount = pg_fetch_all(pg_query($pgCon, "SELECT COUNT(*) FROM tracker.server WHERE active = true"));
 		$message .= '<h3 style="font-family: monospace; text-align: center;">Currently tracking <strong>' . $trackedCount[0]['count'] . '</strong> servers</h3>';
 
-		$message .= '<p class="font-family: monospace; text-align: center; font-size: 9pt;">' . padOutputAndImplode(getGameCountList(), '<br>') . '</p>';
+		$message .= '<p style="font-family: monospace; text-align: center; font-size: 7pt;">' . padOutputAndImplode(getGameCountList(), '<br>') . '</p>';
 	}
 
 		$stuff = array();

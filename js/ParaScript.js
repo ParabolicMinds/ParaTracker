@@ -52,25 +52,13 @@ function animateLevelshot()
         mode = 0;
         //Clear any timers that shouldn't be active, just in case
         clearTimeout(timer);
-
-        if(allowTransitions == 1)
-        {
-            if(data.levelshotTransitionAnimation == "0")
-            {
-                document.getElementById("topLayerFade").style.cssText = originalStyleData + " animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: " + animationList[Math.floor((Math.random() * animationList.length))] + ";";
-            }
-            else
-            {
-                document.getElementById("topLayerFade").style.cssText = originalStyleData + " animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: levelshotTransition" + data.levelshotTransitionAnimation + ";";
-            }
-            timer = setTimeout("swapLevelshots()", levelshotTransitionTime * 1000);
-        }
-        else
-        {
-            //Transitions are disabled, but we were clicked. We should still transition to the next levelshot, but with transition 1 only.
-            document.getElementById("topLayerFade").style.cssText = originalStyleData + " animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: levelshotTransition1;";
-            timer = setTimeout("swapLevelshots()", levelshotTransitionTime * 1000);
-        }
+        
+        if (!data.levelshotTransitionAnimation) {
+			swapLevelshots()
+		} else {
+			topLayerFade.style.cssText = originalStyleData + " animation-duration: " + levelshotTransitionTime + "s; animation-fill-mode: forwards; animation-name: " + animationList[activeLevelshotTransitions[Math.floor(Math.random() * activeLevelshotTransitions.length)]] + ";";
+			timer = setTimeout("swapLevelshots()", levelshotTransitionTime * 1000);
+		}
     }
 }
 
@@ -196,6 +184,12 @@ function firstExecution()
     {
         blinker = document.getElementById("blinker")
     }
+    
+    activeLevelshotTransitions = []
+    if (data.levelshotTransitionAnimation) {
+		for (let i = 0; i < 15; i++)
+			if ((1 << i) & data.levelshotTransitionAnimation) activeLevelshotTransitions.push(i)
+	}
 
     levelshots = data.levelshotsArray
     maxLevelshots = levelshots.length
@@ -664,6 +658,7 @@ function createURL()
     var enableAutoRefresh = "";
     var levelshotTransitionTime = "";
     var levelshotDisplayTime = "";
+    var levelshotTransitionAnimation = 0;
 
 
     outputURL += document.getElementById("currentURL").value;
@@ -771,6 +766,24 @@ function createURL()
     {
         outputURL += "&levelshotTransitionTime=" + document.getElementById("levelshotTransitionTime").value;
     }
+    
+    if (typeof(transition1) !== 'undefined' && transition1.checked) levelshotTransitionAnimation += 1 << 0;
+    if (typeof(transition2) !== 'undefined' && transition2.checked) levelshotTransitionAnimation += 1 << 1;
+    if (typeof(transition3) !== 'undefined' && transition3.checked) levelshotTransitionAnimation += 1 << 2;
+    if (typeof(transition4) !== 'undefined' && transition4.checked) levelshotTransitionAnimation += 1 << 3;
+    if (typeof(transition5) !== 'undefined' && transition5.checked) levelshotTransitionAnimation += 1 << 4;
+    if (typeof(transition6) !== 'undefined' && transition6.checked) levelshotTransitionAnimation += 1 << 5;
+    if (typeof(transition7) !== 'undefined' && transition7.checked) levelshotTransitionAnimation += 1 << 6;
+    if (typeof(transition8) !== 'undefined' && transition8.checked) levelshotTransitionAnimation += 1 << 7;
+    if (typeof(transition9) !== 'undefined' && transition9.checked) levelshotTransitionAnimation += 1 << 8;
+    if (typeof(transition10) !== 'undefined' && transition10.checked) levelshotTransitionAnimation += 1 << 9;
+    if (typeof(transition11) !== 'undefined' && transition11.checked) levelshotTransitionAnimation += 1 << 10;
+    if (typeof(transition12) !== 'undefined' && transition12.checked) levelshotTransitionAnimation += 1 << 11;
+    if (typeof(transition13) !== 'undefined' && transition13.checked) levelshotTransitionAnimation += 1 << 12;
+    if (typeof(transition14) !== 'undefined' && transition14.checked) levelshotTransitionAnimation += 1 << 13;
+    if (typeof(transition15) !== 'undefined' && transition15.checked) levelshotTransitionAnimation += 1 << 14;
+
+    outputURL += "&levelshotTransitionAnimation=" + levelshotTransitionAnimation
 
     if(document.getElementById("backgroundColor").value != "")
     {
@@ -844,6 +857,46 @@ function createURL()
     }
 }
 return false;
+}
+
+function selectAllTransitions()
+{
+    transition1.checked = true
+    transition2.checked = true
+    transition3.checked = true
+    transition4.checked = true
+    transition5.checked = true
+    transition6.checked = true
+    transition7.checked = true
+    transition8.checked = true
+    transition9.checked = true
+    transition10.checked = true
+    transition11.checked = true
+    transition12.checked = true
+    transition13.checked = true
+    transition14.checked = true
+    transition15.checked = true
+    createURL()
+}
+
+function selectNoTransitions()
+{
+    transition1.checked = false
+    transition2.checked = false
+    transition3.checked = false
+    transition4.checked = false
+    transition5.checked = false
+    transition6.checked = false
+    transition7.checked = false
+    transition8.checked = false
+    transition9.checked = false
+    transition10.checked = false
+    transition11.checked = false
+    transition12.checked = false
+    transition13.checked = false
+    transition14.checked = false
+    transition15.checked = false
+    createURL()
 }
 
 function checkForOtherValue()

@@ -503,6 +503,88 @@ border: 2px solid #4F4;
 width: 600px;
 }
 
+.transitionListSelections
+{
+margin: 0 auto;
+margin-top: 30px;
+margin-bottom: 10px;
+text-align: center;
+padding-left: 10px;
+padding-right: 10px;
+padding-top: 10px;
+padding-bottom: 10px;
+box-shadow: 0px 0px 20px #F92, inset 0px 0px 10px #F92;
+border: 2px solid #F92;
+width: 450px;
+}
+
+.levelshotSample
+{
+margin: 0 auto;
+font-size: 14pt;
+font-weight: bold;
+color: #000;
+font-family: monospace;
+text-align: center;
+border: 1px solid #000;
+position: relative;
+width: 100px;
+height: 76px;
+overflow: hidden;
+user-select: none;
+}
+
+.transitionButtonContainer
+{
+font-size: 10pt;
+margin-top: 20px;
+margin-bottom: 20px;
+width:200px;
+display:inline-block;
+}
+
+.transitionSampleContainer
+{
+font-size: 10pt;
+margin-top: 20px;
+margin-bottom: 20px;
+width:140px;
+display:inline-block;
+}
+
+.sampleOne
+{
+animation-duration: 2s;
+animation-fill-mode: forwards;
+animation-iteration-count: infinite;
+margin: 0 auto;
+background-color: #00F;
+padding-left: 0px;
+padding-right: 0px;
+padding-top: 0px;
+padding-bottom: 0px;
+position: absolute;
+width: 100px;
+height: 76px;
+background: linear-gradient(45deg, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333);}
+
+.sampleTwo
+{
+/* Looks better without this. */
+overflow: hidden;
+background-color: #F00;
+padding-left: 0px;
+padding-right: 0px;
+padding-top: 0px;
+padding-bottom: 0px;
+position: absolute;
+width: 100px;
+height: 76px;
+background-image: url("../images/tracker/backgroundTest.jpg");
+background-size: 75%;
+/* */
+}
+
 .skinDownloadSelections
 {
 margin: 0 auto;
@@ -515,6 +597,7 @@ padding-bottom: 10px;
 box-shadow: 0px 0px 20px #F22, inset 0px 0px 10px #F22;
 border: 2px solid #F22;
 width: 400px;
+background-size: 100%;
 }
 
 
