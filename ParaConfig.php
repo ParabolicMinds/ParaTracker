@@ -100,16 +100,6 @@ $playerListColor2 = "";
 // Default value is "100".
 $playerListColor2Opacity = "100";
 
-// This is a 6 character hexadecimal value that specifies the color of the scrollbar shaft.
-// The skin chosen will already have it's own color; this value will override it, if desired.
-// Default value is "".
-$scrollShaftColor = "";
-
-// This is a 6 character hexadecimal value that specifies the color of the scrollbar thumb.
-// The skin chosen will already have it's own color; this value will override it, if desired.
-// Default value is "".
-$scrollThumbColor = "";
-
 // This is a 6 character hexadecimal value that specifies the text color of all non-colorized text.
 // It will not change the color of server names, mod names, map names, or player names.
 // The skin chosen will already have it's own color; this value will override it, if desired.
@@ -155,26 +145,29 @@ $levelshotTransitionTime = "1";
 
 // This is the animation that will be used for fading levelshots.
 // If you want to change the animations, they are found in "css/LevelshotAnimations.css"
-// Valid values are whole numbers between 0 to 999 (No decimals).
-// Setting this value to 0 will play a random animation from this list.
-// Default value is 0
+// Each transition is listed here. The user can pick which transitions are enabled
+// by adding the values of the desired transitions together, and putting them
+// into the variable below.
+// Dynamic mode will allow users to override this setting.
+// Minimum is 0 (No transitions). maximum is 32767.
+// Default value is 3.
 // The default transitions are as follows:
-// Transition 1: Fade
-// Transition 2: Fade to black
-// Transition 3: Hue shift
-// Transition 4: Skew
-// Transition 5: Horizontal Stretch
-// Transition 6: Stretch and rebound
-// Transition 7: Slide to left
-// Transition 8: Slide to right
-// Transition 9: Slide to top
-// Transition 10: Slide to bottom
-// Transition 11: Spin and fly to top left
-// Transition 12: Spin and fly to top right
-// Transition 13: Fall away and spin
-// Transition 14: Zoom in
-// Transition 15: Blur
-$levelshotTransitionAnimation = "0";
+// Transition 1: Fade                   ( Value: 1 )
+// Transition 2: Smooth Fade            ( Value: 2 )
+// Transition 3: Hue Shift              ( Value: 4 )
+// Transition 4: Skew                   ( Value: 8 )
+// Transition 5: Horizontal Stretch     ( Value: 16 )
+// Transition 6: Stretch and rebound    ( Value: 32 )
+// Transition 7: Slide Left             ( Value: 64 )
+// Transition 8: Slide Right            ( Value: 128 )
+// Transition 9: Slide Top              ( Value: 256 )
+// Transition 10: Slide Bottom          ( Value: 512 )
+// Transition 11: Spin, Fly Left        ( Value: 1024 )
+// Transition 12: Spin, Fly Right       ( Value: 2048 )
+// Transition 13: Fall Away             ( Value: 4096 )
+// Transition 14: Zoom                  ( Value: 8192 )
+// Transition 15: Blur                  ( Value: 16384 )
+$levelshotTransitionAnimation = "3";
 
 // The following value is the maximum number of levelshots that can be used. Keep in mind that
 // more levelshots is not always better.
