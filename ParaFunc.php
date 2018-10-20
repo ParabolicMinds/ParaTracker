@@ -15,7 +15,7 @@ function versionNumber()
 {
     //Return a string of the version number
     //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    return("ParaTracker 1.4.3");
+    return("ParaTracker 1.4.4");
 }
 
 //Define the default skin, to be used throughout this file.
@@ -716,6 +716,16 @@ define("scrollThumbColor", $scrollThumbColor);
 define("customFont", $customFont);
 define("customSkin", $customSkin);
 
+//If we are running from within analytics, the client address will not exist. Let's give the log something useful
+if(analyticsBackground)
+{
+	define("clientAddress", "Analytics");
+}
+else
+{
+	define("clientAddress", $_SERVER['REMOTE_ADDR']);
+}
+
 //Make sure these directories exist before we do anything
 checkDirectoryExistence(infoPath);
 checkDirectoryExistence(logPath);
@@ -1007,6 +1017,11 @@ function doUpdate($lastRefreshTime, $dynamicIPAddressPath)
 	$sv_hostname = array_shift($gameFunctionParserReturn);
 	$sv_maxclients = array_shift($gameFunctionParserReturn);
 
+	$team1score = array_shift($gameFunctionParserReturn);
+	$team2score = array_shift($gameFunctionParserReturn);
+	$team3score = array_shift($gameFunctionParserReturn);
+	$team4score = array_shift($gameFunctionParserReturn);
+
 	//The rest is all BitFlag data.
 	$BitFlags = $gameFunctionParserReturn;
 
@@ -1029,7 +1044,7 @@ function doUpdate($lastRefreshTime, $dynamicIPAddressPath)
 	}
 
 	//This has to be last, because the timer will output on this page
-	parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $flag, $countryName, $cvar_array_single, $parseTimer, $serverPing, $BitFlags, $player_array, $playerParseCount, $sv_maxclients);
+	parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $flag, $countryName, $cvar_array_single, $parseTimer, $serverPing, $BitFlags, $player_array, $playerParseCount, $sv_maxclients, $team1score, $team2score, $team3score, $team4score);
 
 	return 1;
 }
@@ -1151,7 +1166,7 @@ function removeOffendingServerNameCharacters($input)
     $input = ltrim($input);
 
     //This is an array of garbage characters to be removed
-    $filterArray = array("¬â‚", "€", "â", "¬", "");
+    $filterArray = array("¬â‚", " ", "€", "â", "¬", "");
 
     $count = count($filterArray);
 
@@ -1275,7 +1290,7 @@ function ParseGameData($gameName, $cvars_hash, $cvars_hash_decolorized, $lastRef
         return $GameInfoData;
 }
 
-function parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $flag, $countryName, $cvar_array_single, $parseTimer, $serverPing, $BitFlags, $player_array, $playerParseCount, $sv_maxclients)
+function parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $flag, $countryName, $cvar_array_single, $parseTimer, $serverPing, $BitFlags, $player_array, $playerParseCount, $sv_maxclients, $team1score, $team2score, $team3score, $team4score)
 {
         $returnArray = array();
         $BitFlagsIndex = array();
@@ -1317,6 +1332,11 @@ function parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $fla
                 array_push($serverInfoArray, JSONString("geoIPcountryCode", $flag));
                 array_push($serverInfoArray, JSONString("geoIPcountryName", $countryName));
 
+                array_push($serverInfoArray, JSONString("team1score", $team1score));
+                array_push($serverInfoArray, JSONString("team2score", $team2score));
+                array_push($serverInfoArray, JSONString("team3score", $team3score));
+                array_push($serverInfoArray, JSONString("team4score", $team4score));
+
                 //Let's get parsing.
                 foreach($cvar_array_single as $cvar)
                 {
@@ -1354,7 +1374,7 @@ function parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $fla
                                 if ($cvar['value'] >= pow(2, count(${$BitFlagsIndex[$i]})))
                                 {
                                     //Miscount detected! Array does not have enough values
-                                    array_push($bitFlagArray, array(JSONString("name", $cvar['name']), JSONArray("flags", "\"Miscount detected!\"", 0)));
+                                    array_push($bitFlagArray, array(JSONString("name", $cvar['name']), JSONArray("flags", "\"Error: miscount detected!\"", 0)));
                                 }
                                 else
                                 {
@@ -1876,8 +1896,8 @@ function ipAddressValidator($input, $dynamicTrackerEnabled)
         //gethostbyname returns the input string on failure. So, to test if this is a failure, we test it against itself
         if($test == $input)
         {
-            //DNS test failed. Just error out.
-            displayError('Invalid address! ' . stringValidator($input, "", "") . '<br />Check the address and try again.', "", "");
+            //DNS test failed.
+			displayError('Invalid address! ' . stringValidator($input, "", "") . '<br />Check the address and try again.', "", "", false);
             return "";
         }
         else
@@ -2005,7 +2025,7 @@ function getHumanReadableFilesize($file)
     else return '<span class="megabytes">' . round($val / 1048576, 2) . ' MiB</span>';
 }
 
-function displayError($errorMessage, $lastRefreshTime, $dynamicIPAddressPath)
+function displayError($errorMessage, $lastRefreshTime, $dynamicIPAddressPath, $logError = true)
 {
     $serverIPAddress = "";
     $serverPort = "";
@@ -2025,21 +2045,23 @@ function displayError($errorMessage, $lastRefreshTime, $dynamicIPAddressPath)
 
     if(!empty($dynamicIPAddressPath)) $serverAddressStuff = "Server being tracked: '" . $serverIPAddress . ":" . $serverPort . "'";
 
-    //Let's log this event...
-    $errorLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  " . stringValidator($serverAddressStuff, "", "") . "  Error message: " . $errorMessage;
-    writeToLogFile("errorLog.php", $errorLog, errorLogSize);
-
-    //If postgres is enabled, we need to log this event to the database
-    if(enablePGSQL)
-    {
-        global $pgCon;
-        //This function may be called before pgCon is defined
-        if(!empty($pgCon))
-        {
-            pg_query($pgCon, 'INSERT INTO tracker.displayerror DEFAULT VALUES');
-        }
-    }
-
+	if($logError)
+	{
+		//Let's log this event...
+		$errorLog = date(DATE_RFC2822) . "  Client IP Address: " . clientAddress . "  " . stringValidator($serverAddressStuff, "", "") . "  Error message: " . $errorMessage;
+		writeToLogFile("errorLog.php", $errorLog, errorLogSize);
+	
+		//If postgres is enabled, we need to log this event to the database so the admin status email can see what's going on
+		if(enablePGSQL)
+		{
+			global $pgCon;
+			//This function may be called before pgCon is defined
+			if(!empty($pgCon))
+			{
+				pg_query($pgCon, 'INSERT INTO tracker.displayerror DEFAULT VALUES');
+			}
+		}
+	}
     echo "<!--";
 
     $errorMessage = '<!-- --><h3 class="errorMessage">' . $errorMessage . '</h3>';
@@ -2299,7 +2321,7 @@ if(admin)
 
         $bitFlagData = ParseGameData($testName, "", "", "", "");
         //Remove the stuff we don't need. All we want right now is bit values.
-        $bitFlagData = array_slice($bitFlagData, 6);
+        $bitFlagData = array_slice($bitFlagData, 10);
 
         if(count($bitFlagData) > 1)
         {
@@ -2784,19 +2806,25 @@ if ($RConPassword != "" && $RConCommand != "")
 
 
     //Log time!
-    $RConLog = date(DATE_RFC2822) . "  Client IP Address: " . $_SERVER['REMOTE_ADDR'] . "  Command: " . $RConCommand . "  Response: " . $newRConLogEntry . $RConLog2;
+    $RConLog = date(DATE_RFC2822) . "  Client IP Address: " . clientAddress . "  Command: " . $RConCommand . "  Response: " . $newRConLogEntry . $RConLog2;
     writeToLogFile(makeDynamicAddressPath($serverIPAddress, $serverPort) . "RConLog.php", $RConLog, RConLogSize);
 
     return $output;
 }
+
+function getWebServerName()
+{
+    if(isset($_SERVER['SERVER_NAME']) && !empty($_SERVER['SERVER_NAME'])) return $_SERVER['SERVER_NAME'];
+    return '';
+}
+
 
 function renderNormalHTMLPage($dynamicIPAddressPath)
 {
 
 $output = htmlDeclarations("ParaTracker - The Ultimate Quake III Server Tracker", "");
 
-$webServerName = '';
-if(isset($_SERVER['SERVER_NAME']) && !empty($_SERVER['SERVER_NAME'])) $webServerName = $_SERVER['SERVER_NAME'];
+$webServerName = getWebServerName();
 
 //Let's add in the dynamic colors...
 //If dynamic mode is disabled these will already have been declared as null, so no worries
@@ -3484,14 +3512,22 @@ function cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $clean
                 array_push($cleanupLog, "Done! Starting cleanup of levelshot requests...");
                 $mapsArray = mapreq_get_maps();
                 $count2 = count($mapsArray);
+
+                $previousGame_name = "";
                 for($i = 0; $i < $count2; $i++)
                 {
                     $game_name = $mapsArray[$i]['game_name'];
                     $bsp_name = $mapsArray[$i]['bsp_name'];
 
-                    //Insert game-specific function execution here
-		            $gameFunctionParserReturn = ParseGameData($game_name, "", "", "", "");
-                    $levelshotFolder = $gameFunctionParserReturn[1];
+                    //Check to see if we're parsing the same game as before. This should reduce calls to the game parser
+					if($game_name != $previousGame_name)
+					{
+						//Insert game-specific function execution here
+						$gameFunctionParserReturn = ParseGameData($game_name, "", "", "", "");
+						$levelshotFolder = $gameFunctionParserReturn[1];
+					}
+					//Now that we're past game detection, set this value
+                    $previousGame_name = $gameName;
 
                     $shotNumber = levelshotfinder("", $bsp_name, $levelshotFolder, $game_name, 1);
 
@@ -3518,7 +3554,7 @@ function cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $clean
 function mapreq_get_maps()
 {
   global $pgCon;
-  return pg_fetch_all(pg_query($pgCon, 'SELECT game_name, bsp_name FROM mapreq'));
+  return pg_fetch_all(pg_query($pgCon, 'SELECT game_name, bsp_name FROM mapreq ORDER BY game_name ASC'));
 }
 
 function mapreq_delete_map($game_name, $bsp_name)
@@ -3562,6 +3598,35 @@ function padOutputAndImplode($input, $glue)
 		$Lpad = $options[0];
 		$Rpad = $options[1];
 		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . str_repeat($pad, $RPadMax - $Rpad);
+	}
+
+	return implode($glue, $input);
+}
+
+function padOutputAddHyperlinksAndImplode($input, $glue)
+{
+	//This function adds spaces to lines at the beginning and end, to align them for the best readability
+
+	$pad = '&nbsp;';
+
+	$LPadMax = 0;
+	$RPadMax = 0;
+	$count = count($input);
+	for($i = 0; $i < $count; $i++)
+	{
+		$options = getOptionLength($input[$i]);
+		$check = $options[0];
+		$offset = $options[1];
+		if($check > $LPadMax) $LPadMax = $check;
+		if($offset > $RPadMax) $RPadMax = $offset;
+	}
+
+	for($i = 0; $i < $count; $i++)
+	{
+		$options = getOptionLength($input[$i]);
+		$Lpad = $options[0];
+		$Rpad = $options[1];
+		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . '<span class="noSelect">&nbsp;&nbsp;&nbsp;<a href="https://' . getWebServerName() . '/ParaTrackerDynamic.php?ip=' . explode(":", $input[$i])[0] . '&port=' . explode(":", $input[$i])[1] . '" target="_blank" class="adminTrackLink">Track</a>' . str_repeat($pad, $RPadMax - $Rpad) . "</span>";
 	}
 
 	return implode($glue, $input);

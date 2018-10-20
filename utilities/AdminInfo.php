@@ -194,7 +194,7 @@ function displayServerList($output)
 			{
 				//This is not our first execution
 				$count2 = count($outputArray);
-				$output .= '<strong>' . $count2 . checkPlural('</strong> server', $count2) . '<br><div id="' . makeFunctionSafeName($databaseInfo[$i-1]['name']) . '">' . padOutputAndImplode($outputArray, '<br>') . '<br></div><br>';
+				$output .= '<strong>' . $count2 . checkPlural('</strong> server', $count2) . '<br><div id="' . makeFunctionSafeName($databaseInfo[$i-1]['name']) . '">' . padOutputAddHyperlinksAndImplode($outputArray, '<br>') . '<br></div><br>';
 				$outputArray = array();
 			}
 			$output .= '<div class="cursorPointer" title="Click to expand/collapse" onclick="expandContractDiv(' . "'" . makeFunctionSafeName($databaseInfo[$i]['name']) . "'" . ')"><div class="serverListHeading ' . makeFunctionSafeName($databaseInfo[$i]['name']) . '">' . $databaseInfo[$i]['name'] . '</div></div>';
@@ -204,7 +204,7 @@ function displayServerList($output)
 	}
 	$count2 = count($outputArray);
 
-	$output .= '<strong>' . $count2 . checkPlural('</strong> server', $count2) . '<br><div id="' . makeFunctionSafeName($databaseInfo[$i-1]['name']) . '">' . padOutputAndImplode($outputArray, '<br>') . '<br></div><br>';
+	$output .= '<strong>' . $count2 . checkPlural('</strong> server', $count2) . '<br><div id="' . makeFunctionSafeName($databaseInfo[$i-1]['name']) . '">' . padOutputAddHyperlinksAndImplode($outputArray, '<br>') . '<br></div><br>';
 
 	//Now we need to add the untracked games to the list
 	$gameList = detectGameName('')[1];

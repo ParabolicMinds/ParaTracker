@@ -1172,7 +1172,7 @@ function parsePlayerProperties()
         team3count = 0
         team4count = 0
         check = 0
-
+    
         for(i = 0; i < count; i++)
         {
             if(data.players[i].team > check)
@@ -1201,6 +1201,19 @@ function parsePlayerProperties()
                 team4count++
             }
         }
+
+        if(data.serverInfo.team1score != '') team1score = data.serverInfo.team1score
+        if(data.serverInfo.team2score != '') team2score = data.serverInfo.team2score
+        if(data.serverInfo.team3score != '') team3score = data.serverInfo.team3score
+        if(data.serverInfo.team4score != '') team4score = data.serverInfo.team4score
+
+        if(teamCount == 0)
+            {
+                if(data.serverInfo.team1score != '') teamCount++
+                if(data.serverInfo.team2score != '') teamCount++
+                if(data.serverInfo.team3score != '') teamCount++
+                if(data.serverInfo.team4score != '') teamCount++
+            }
 
         //Assign the team scores for team sorting
         for(i = 0; i < count; i++)

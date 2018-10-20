@@ -92,7 +92,7 @@ font-size: 12pt;
 /* This class is for the log viewer's path table */
 .logViewerPathTable:hover
 {
-background-color: #872;
+background-color: #504911;
 }
 
 /* This class is for the log viewer's line numbers */
@@ -119,7 +119,7 @@ font-size: 10pt;
 /* This class is for the hover effect on the log viewer's text */
 .logViewerText:hover
 {
-background-color: #872;
+background-color: #504911;
 }
 
 /* This class is used for the title at the top of the log viewer */
@@ -1978,6 +1978,25 @@ font-size: 22pt;
 font-weight: bold;
 padding-right: 350px;
 }
+
+/* This class is used for the "Track" link on the admin server list */
+.adminTrackLink:hover
+{
+color: #7CF;
+}
+
+/* This class is used for the "Track" link on the admin server list */
+.adminTrackLink
+{
+color: #29F;
+}
+
+/* This class is used to prevent the "Track" text from being selectable */
+.noSelect
+{
+user-select: none;
+}
+
 
 @keyframes redBlinker
 {

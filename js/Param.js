@@ -23,9 +23,9 @@ function renderParamPage()
 function sort_elements(input)
 {
     input.sort((a, b)=>{
-    let a = decolorize(a.toLowerCase())
-    let b = decolorize(b.toLowerCase())
-    if (decolorize(a.toLowerCase()) > decolorize(b.toLowerCase())) return 1
+    let ad = decolorize(a.toLowerCase())
+    let bd = decolorize(b.toLowerCase())
+    if (decolorize(ad.toLowerCase()) > decolorize(bd.toLowerCase())) return 1
     return -1
     })
 }
