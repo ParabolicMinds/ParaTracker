@@ -216,7 +216,7 @@ function callofduty($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -302,7 +302,7 @@ function callofduty2($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -388,7 +388,7 @@ function callofduty4modernwarfare($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -474,7 +474,7 @@ function callofdutyworldatwar($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -582,7 +582,7 @@ function jediacademy($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array("dmflags", "g_weaponDisable", "g_duelWeaponDisable", "g_forcePowerDisable", "g_allowVote", "jp_councilAllowedCMD", "jp_knightAllowedCMD", "jp_instructorAllowedCMD", "jp_votesDisable", "jp_teamLock", "jp_emotDisallow", "jp_wordFilter");
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_duelWeaponDisable, $g_forcePowerDisable, $g_allowVote, $jp_councilAllowedCMD, $jp_knightAllowedCMD, $jp_instructorAllowedCMD, $jp_votesDisable, $jp_teamLock, $jp_emotDisallow, $jp_wordFilter);
 }
 
@@ -696,7 +696,7 @@ function jedioutcast($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array("dmflags", "g_weaponDisable", "g_forcePowerDisable");
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_forcePowerDisable);
 }
 
@@ -778,7 +778,7 @@ function quake($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -873,7 +873,7 @@ function quakeiiiarena($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array("dmflags", "item_disable", "server_availmodes", "server_customclient", "server_record", "powerup_disable", "weapon_start");
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $dmflags, $item_disable, $server_availmodes, $server_customclient, $server_record, $powerup_disable, $weapon_start);
 }
 
@@ -963,7 +963,7 @@ if(isset($cvars_hash["g_gametype"]))
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -1060,7 +1060,7 @@ function openarena($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array("dmflags", "videoflags");
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $dmflags, $videoflags);
 }
 
@@ -1149,7 +1149,7 @@ function returntocastlewolfenstein($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array("dmflags", "g_voteFlags");
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $dmflags, $g_voteFlags);
 }
 
@@ -1229,7 +1229,7 @@ function tremulous($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -1319,7 +1319,7 @@ function urbanterror($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -1409,7 +1409,7 @@ function warsow($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -1502,7 +1502,7 @@ function wolfensteinenemyterritory($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array("g_mapVoteFlags", "g_misc", "omnibot_flags");
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $g_mapVoteFlags, $g_misc, $omnibot_flags);
 }
 
@@ -1595,7 +1595,7 @@ function xonotic($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
@@ -1685,7 +1685,7 @@ function unrecognizedgame($cvars_hash, $cvars_hash_decolorized)
     $BitFlagsIndex = array();
 
     //Lastly, all data above MUST be returned in a specific order:
-    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $BitFlagsIndex, and all BitFlag arrays.
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
