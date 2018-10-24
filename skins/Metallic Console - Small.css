@@ -912,7 +912,7 @@ font-family: "verdana", sans-serif;
 /* This class sets the size of the form where the user enters the RCon command and password */
 .RConPasswordCommandSize
 {
-width: 740px;
+width: 750px;
 height: 50px;
 text-align: left;
 }

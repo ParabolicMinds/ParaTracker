@@ -19,7 +19,9 @@ else
     exit();
 }
 
-//ParaFunc.php checks for the existence of the logs folder and for RConLog.php, otherwise we would check for it here.
+//Make sure the rcon log file exists
+if(!checkFileExistence("RConLog.php", logPath . makeDynamicAddressPath($serverIPAddress, $serverPort))) return 'Could not create RCon log file!';
+
 if (trim(file_get_contents(logPath . $dynamicIPAddressPath . "RConLog.php")) == "")
 {
     file_put_contents(logPath . $dynamicIPAddressPath . "RConLog.php", logHeader("RConLog.php") . logFooter());
