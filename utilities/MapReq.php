@@ -65,20 +65,20 @@ $output .= '<body class="mapReqPageStyle">
                     {
                         include_once utilitiesPath . "SendEmails.php";
                         $message = '<table style="width: 100%; font-family: monospace; font-size: 11pt;"><tr><td style="text-align: center;">';
-                        $message .= '<h3>A levelshot request has been received for <strong>' . stringValidator($mapreq_bsp_game, "", "") . '</strong>.</h3>';
+                        $message .= '<p><span style="font-size: 12pt;">A levelshot request has been received for <strong>' . stringValidator($mapreq_bsp_game, "", "") . '</strong>.</span></p>';
                         $message .= '<p>BSP name: <strong>' . stringValidator($mapreq_bsp_name, "", "") . '</strong></p>';
                         if(!empty($mapreq_bsp_link))
                         {
 							if(strtolower(trim($mapreq_bsp_link)) == "base game") $message .= '<p style=""><strong>Base Game</strong></a></p>';
 							else if(strtolower(trim($mapreq_bsp_link)) == "none") $message .= '<p>No link provided</p>';
-							else $message .= '<p>Link: <a href="' . stringValidator($mapreq_bsp_link, "", "") . '"><strong>' . stringValidator($mapreq_bsp_link, "", "") . '</strong></a></p>';
+							else $message .= '<p>Link: <span style="font-size: 9pt; font-weight: bold;"><a href="' . stringValidator($mapreq_bsp_link, "", "") . '"><strong>' . stringValidator($mapreq_bsp_link, "", "") . '</strong></a></span></p>';
                         }
                         else
                         {
-                            $message .= '<p>No link provided</p>';
+                            $message .= '<p><b>No link provided</b></p>';
                         }
-                        $message .= '<p>Client IP Address: ' . $_SERVER['REMOTE_ADDR'] . '</p>';
-                        $message .= '<p>Time: ' . date('Y-m-d H:i', time()) . '</p>';
+                        $message .= '<p>Client IP Address: <b>' . $_SERVER['REMOTE_ADDR'] . '</b></p>';
+                        $message .= '<p>Time: <b>' . date('Y-m-d H:i', time()) . '</b></p>';
                         $message .= '</td></tr></table>';
                         sendEmail($emailAdministrators, 'ParaTracker - New Levelshot Request Received!', $message);
                     }

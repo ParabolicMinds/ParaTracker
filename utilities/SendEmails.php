@@ -65,7 +65,7 @@ else
 
 //This variable sets how many displayError calls are considered acceptable per day before warnings start
 //The value given here will turn the warning yellow, and 1.5 times that value will turn it red
-define("callsPerDay", 25);
+define("callsPerDay", 10);
 
 $emailPath = rtrim(trim($emailPath), '/') . '/';
 $emailAdminReports = booleanValidator($emailAdminReports, 0);
@@ -204,6 +204,7 @@ function prepareAndsendAdminReport($emailAdministrators)
 		$displayErrorCount = numericValidator(countDatabaseReturn(getDisplayErrorCalls()), 0, "", 622);
         $message .= '<h3 style="text-align: center;">DisplayError:</h3>';
 
+			//86400 is the number of seconds in a day
         $problemThreshold = ((currentTime - lastRefreshTime) / 86400) * callsPerDay;
 
         $unit = checkPlural("time", $displayErrorCount);
@@ -228,7 +229,7 @@ function prepareAndsendAdminReport($emailAdministrators)
 		$stuff[1] = 'Lowest Execution Time: ' . colorizeDangerousValuesHigher($minExecutionTime, 'seconds', 60, 120, '');
 		$stuff[2] = 'Average Execution Time: ' . colorizeDangerousValuesHigher($averageExecutionTime, 'seconds', 60, 120, '');
 		
-		$message .= '<p style="font-family: monospace; text-align: center;">' . padOutputAndImplode($stuff, '<br>') . '</p>';
+		$message .= '<p style="font-family: monospace; text-align: center;"><span style="font-size: 9pt;">' . padOutputAndImplode($stuff, '<br>') . '</span></p>';
 
         $cpuLoadArray = getCPULoadArray();
         $temp = getValuesFromArray($cpuLoadArray, 'load');
@@ -280,7 +281,7 @@ function prepareAndsendAdminReport($emailAdministrators)
 	$stuff = array();
 	$stuff[0] = 'Free space in info folder: ' . getFreeSpace(infoPath);
 	$stuff[1] = 'Free space in logs folder: ' . getFreeSpace(logPath);
-	$message .= '<p style="font-family: monospace; text-align: center;">' . padOutputAndImplode($stuff, '<br>') . '</p>';
+	$message .= '<p style="font-family: monospace; text-align: center;"><span style="font-size: 8pt;">' . padOutputAndImplode($stuff, '<br>') . '</span></p>';
 
 	$parseTimer = number_format(((microtime(true) - $parseTimer) * 1000), 3);
 	$message .= '<p style="font-family: monospace; text-align: center;">Email prepared in ' . $parseTimer . ' milliseconds.</p>';
