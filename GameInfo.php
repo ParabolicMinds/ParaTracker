@@ -54,8 +54,8 @@ Function detectGameName($input)
             "jedi" => "Jedi Academy",
             "jka" => "Jedi Academy",
             "jko" => "Jedi Outcast",
-            "openJK" => "Jedi Academy"
-            "ET" => "Wolfenstein: Enemy Territory",
+            "openJK" => "Jedi Academy",
+            "ET" => "Wolfenstein: Enemy Territory"
 
             );
 
