@@ -50,12 +50,12 @@ Function detectGameName($input)
             "warsow" => "Warsow",
             "Xonotic" => "Xonotic",
             "wolfmp" => "Return To Castle Wolfenstein",
-            "ET" => "Wolfenstein: Enemy Territory",
             "dogijk" => "DogiJK",
             "jedi" => "Jedi Academy",
             "jka" => "Jedi Academy",
             "jko" => "Jedi Outcast",
             "openJK" => "Jedi Academy"
+            "ET" => "Wolfenstein: Enemy Territory",
 
             );
 
