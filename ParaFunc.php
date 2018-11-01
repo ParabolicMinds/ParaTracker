@@ -3626,7 +3626,9 @@ function padOutputAddHyperlinksAndImplode($input, $glue)
 		$options = getOptionLength($input[$i]);
 		$Lpad = $options[0];
 		$Rpad = $options[1];
-		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . '<span class="noSelect">&nbsp;&nbsp;&nbsp;<a href="https://' . getWebServerName() . '/ParaTrackerDynamic.php?ip=' . explode(":", $input[$i])[0] . '&port=' . explode(":", $input[$i])[1] . '" target="_blank" class="adminTrackLink">Track</a>' . str_repeat($pad, $RPadMax - $Rpad) . "</span>";
+		$ipaddress = explode(":", $input[$i])[0]);
+		$port = explode(":", $input[$i])[1]);
+		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . '<span class="noSelect">' . str_repeat('&nbsp;', 8 - $port) . '<a href="https://' . getWebServerName() . '/ParaTrackerDynamic.php?ip=' . $ipaddress . '&port=' . $port . '" target="_blank" class="adminTrackLink">Track</a>' . str_repeat($pad, $RPadMax - $Rpad) . "</span>";
 	}
 
 	return implode($glue, $input);
