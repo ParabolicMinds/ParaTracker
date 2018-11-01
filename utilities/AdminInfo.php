@@ -230,7 +230,7 @@ function displayServerList($output)
 	}
 
 	$output .= '<div class="cursorPointer" title="Click to expand/collapse" onclick="expandContractDiv(\'untrackedGames\')">
-				<div class="serverListHeading">Untracked Games</div>
+				<br><div class="serverListHeading">Untracked Games</div>
 				</div>
 				<div id="untrackedGames">';
 				$count = count($untrackedGamesArray);
