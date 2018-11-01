@@ -238,7 +238,7 @@ function displayServerList($output)
 				{
 					$untrackedGamesArray[$i] = '<strong class="' . makeFunctionSafeName($untrackedGamesArray[$i]) . '">' . $untrackedGamesArray[$i] . '</strong>';
 				}
-				if($count > 0) $output .= padOutputAndImplode($untrackedGamesArray, '<br>') . '</div>';
+				if($count > 0) $output .= '<br>' . implode('<br>', $untrackedGamesArray) . '</div>';
 				else $output .= 'None<br>';
 
 	$output .= '<br>' . adminInfoGoBackLink() . '<br></body></html>';
