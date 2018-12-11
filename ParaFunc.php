@@ -3527,7 +3527,7 @@ function cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $clean
 						$levelshotFolder = $gameFunctionParserReturn[1];
 					}
 					//Now that we're past game detection, set this value
-                    $previousGame_name = $gameName;
+                    $previousGame_name = $game_name;
 
                     $shotNumber = levelshotfinder("", $bsp_name, $levelshotFolder, $game_name, 1);
 
@@ -3626,9 +3626,9 @@ function padOutputAddHyperlinksAndImplode($input, $glue)
 		$options = getOptionLength($input[$i]);
 		$Lpad = $options[0];
 		$Rpad = $options[1];
-		$ipaddress = explode(":", $input[$i])[0]);
-		$port = explode(":", $input[$i])[1]);
-		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . '<span class="noSelect">' . str_repeat($pad, 8 - $port) . '<a href="https://' . getWebServerName() . '/ParaTrackerDynamic.php?ip=' . $ipaddress . '&port=' . $port . '" target="_blank" class="adminTrackLink">Track</a>' . str_repeat($pad, $RPadMax - $Rpad) . "</span>";
+		$ipaddress = explode(":", $input[$i])[0];
+		$port = explode(":", $input[$i])[1];
+		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . '<span class="noSelect">' . str_repeat($pad, 8 - count($port)) . '<a href="https://' . getWebServerName() . '/ParaTrackerDynamic.php?ip=' . $ipaddress . '&port=' . $port . '" target="_blank" class="adminTrackLink">Track</a>' . str_repeat($pad, $RPadMax - $Rpad) . "</span>";
 	}
 
 	return implode($glue, $input);

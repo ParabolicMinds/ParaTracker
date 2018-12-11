@@ -133,10 +133,6 @@ function putInfoIntoDatabase($serv)
 	 * [6] => Player Count
 	 */
 
-	 echo '
-' . $serv_str . '
-';
-
 	// STATUS 
 	$status = $data[0];
 	$frame_id = pg_fetch_row(pg_query_params($pgCon, 'INSERT INTO analytics.frame (server_id) VALUES ($1) RETURNING id', array($server_id)))[0];
