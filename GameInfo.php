@@ -132,12 +132,48 @@ Function detectGameName($input)
             return false;
 }
 
+function parseGametype($inputGametype, $gametypeArray)
+{
+	if(empty($gametypeArray))
+	{
+		$gametypeArray = array();
+	}
+	
+	if(is_numeric($inputGametype))
+	{
+		//The value is numeric - so it must be an array index
+		$inputGametype = intval($inputGametype);
+		if($inputGametype <= count($gametypeArray))
+		{
+			$gametype = $gametypeArray[$inputGametype];
+		}
+		else
+		{
+			//Out of bounds. Skip the rest
+			return "Unknown";
+		}
+	}
+	else
+	{
+		//We've been given a string. Just stick it in the variable and format the words with capital letters
+		$gametype = ucwords($inputGametype);
+	}
+
+	//Since sometimes the gametype array has empty strings, we have to check this here AFTER the checks above
+	if(is_null($gametype) || $gametype == "" || $gametype == false)
+	{
+		$gametype = "Unknown";
+	}
+	return $gametype;
+}
+
 
 
 function callofduty($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -156,7 +192,7 @@ function callofduty($cvars_hash, $cvars_hash_decolorized)
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     if(isset($cvars_hash["g_gametype"]))
     {
-        $gametype = ucwords($cvars_hash["g_gametype"]);
+		$gametype = parseGametype($cvars_hash["g_gametype"], $gametypeArray);
     }
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
@@ -223,7 +259,8 @@ function callofduty($cvars_hash, $cvars_hash_decolorized)
 function callofduty2($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -242,7 +279,7 @@ function callofduty2($cvars_hash, $cvars_hash_decolorized)
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     if(isset($cvars_hash["g_gametype"]))
     {
-        $gametype = ucwords($cvars_hash["g_gametype"]);
+		$gametype = parseGametype($cvars_hash["g_gametype"], $gametypeArray);
     }
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
@@ -309,7 +346,8 @@ function callofduty2($cvars_hash, $cvars_hash_decolorized)
 function callofduty4modernwarfare($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -328,7 +366,7 @@ function callofduty4modernwarfare($cvars_hash, $cvars_hash_decolorized)
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     if(isset($cvars_hash["g_gametype"]))
     {
-        $gametype = ucwords($cvars_hash["g_gametype"]);
+		$gametype = parseGametype($cvars_hash["g_gametype"], $gametypeArray);
     }
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
@@ -395,8 +433,9 @@ function callofduty4modernwarfare($cvars_hash, $cvars_hash_decolorized)
 function callofdutyworldatwar($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
-    $levelshotFolder = "";
+	$gametype = "Unknown";
+    $gametypeArray = array();
+	$levelshotFolder = "";
     $mapname = "";
     $modName = "";
     $sv_hostname = "";
@@ -414,7 +453,7 @@ function callofdutyworldatwar($cvars_hash, $cvars_hash_decolorized)
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     if(isset($cvars_hash["g_gametype"]))
     {
-        $gametype = ucwords($cvars_hash["g_gametype"]);
+		$gametype = parseGametype($cvars_hash["g_gametype"], $gametypeArray);
     }
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
@@ -488,7 +527,8 @@ function dogijk($cvars_hash, $cvars_hash_decolorized)
 function jediacademy($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -506,10 +546,10 @@ function jediacademy($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("FFA", "", "", "Duel", "Power Duel", "", "Team FFA", "Siege", "CTF");
-    if(isset($cvars_hash_decolorized["g_gametype"]))
-    {
-        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
-    }
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "jedi academy";
@@ -592,17 +632,12 @@ function jediknightgalaxies($cvars_hash, $cvars_hash_decolorized)
     $JAInfo = jediacademy($cvars_hash, $cvars_hash_decolorized);
 
     //Now add the JK Galaxies specific stuff
-    $gametypeArray = array("FFA", "Duel", "Power Duel", "Single Player", "RPG City", "RPG Wilderness", "Team FFA", "CTF", "Warzone", "Ninelives", "Ticketed", "Roundbased");
-
     //JKG has it's own gametypes
-    if(isset($cvars_hash_decolorized["g_gametype"]))
-    {
-        $JAInfo[0] = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
-    }
-    else
-    {
-        $JAInfo[0] = "";
-    }
+    $gametypeArray = array("FFA", "Duel", "Power Duel", "Single Player", "RPG City", "RPG Wilderness", "Team FFA", "CTF", "Warzone", "Ninelives", "Ticketed", "Roundbased");
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$JAInfo[0] = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
 
     return $JAInfo;
 }
@@ -610,7 +645,8 @@ function jediknightgalaxies($cvars_hash, $cvars_hash_decolorized)
 function jedioutcast($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -628,10 +664,10 @@ function jedioutcast($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("FFA", "", "", "Duel", "Power Duel", "Team FFA", "Siege", "CTF");
-    if(isset($cvars_hash["g_gametype"]))
-    {
-        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
-    }
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "jedi outcast";
@@ -703,7 +739,8 @@ function jedioutcast($cvars_hash, $cvars_hash_decolorized)
 function quake($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -785,7 +822,8 @@ function quake($cvars_hash, $cvars_hash_decolorized)
 function quakeiiiarena($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -803,10 +841,10 @@ function quakeiiiarena($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("FFA", "1 on 1 Tournament", "Single Player", "Team Deathmatch", "CTF", "One Flag CTF", "Overload", "Harvester");
-    if(isset($cvars_hash_decolorized["g_gametype"]))
-    {
-        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
-    }
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "quake 3 arena";
@@ -880,7 +918,8 @@ function quakeiiiarena($cvars_hash, $cvars_hash_decolorized)
 function soldieroffortuneiidoublehelix($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -897,9 +936,9 @@ function soldieroffortuneiidoublehelix($cvars_hash, $cvars_hash_decolorized)
     //If you are adding a custom game, the stuff below is what to change.
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
-if(isset($cvars_hash["g_gametype"]))
+	if(isset($cvars_hash["g_gametype"]))
     {
-        $gametype = ucwords($cvars_hash_decolorized["g_gametype"]);
+		$gametype = parseGametype($cvars_hash["g_gametype"], $gametypeArray);
     }
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
@@ -978,7 +1017,8 @@ function nexuizclassic($cvars_hash, $cvars_hash_decolorized)
 function openarena($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -996,10 +1036,10 @@ function openarena($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("FFA", "1 on 1 Tournament", "Single Player", "Team Deathmatch", "CTF", "One Flag CTF", "Overload", "Harvester", "Elimination", "CTF Elimination", "Last Man Standing", "Double Domination", "Domination");
-    if(isset($cvars_hash_decolorized["g_gametype"]))
-    {
-        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
-    }
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "open arena";
@@ -1067,7 +1107,8 @@ function openarena($cvars_hash, $cvars_hash_decolorized)
 function returntocastlewolfenstein($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -1085,10 +1126,10 @@ function returntocastlewolfenstein($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("", "", "", "", "", "Multiplayer", "Stopwatch", "Checkpoint");
-    if(isset($cvars_hash_decolorized["g_gametype"]))
-    {
-        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
-    }
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "return to castle wolfenstein";
@@ -1156,7 +1197,8 @@ function returntocastlewolfenstein($cvars_hash, $cvars_hash_decolorized)
 function tremulous($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -1236,7 +1278,8 @@ function tremulous($cvars_hash, $cvars_hash_decolorized)
 function urbanterror($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -1254,10 +1297,11 @@ function urbanterror($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("FFA", "Last Man Standing", "", "Team Deathmatch", "Team Survivor", "Follow The Leader", "Capture and Hold", "CTF", "Bombmode", "Jump", "Freeze Tag", "Gun Game");
-    if(isset($cvars_hash_decolorized["g_gametype"]))
-    {
-        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
-    }
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
+
     if(isset($cvars_hash_decolorized["g_instagib"]) && $cvars_hash_decolorized["g_instagib"] != "" && $cvars_hash_decolorized["g_instagib"] != "0")
     {
         $gametype = 'Instagib ' . $gametype;
@@ -1330,7 +1374,8 @@ function warsow($cvars_hash, $cvars_hash_decolorized)
     //  " ALPHA: 5 BETA: 4"
     //Declaring variables to be used here. DO NOT change this part.
 
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -1349,7 +1394,7 @@ function warsow($cvars_hash, $cvars_hash_decolorized)
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     if(isset($cvars_hash_decolorized["gametype"]))
     {
-        $gametype = ucwords($cvars_hash_decolorized["gametype"]);
+		$gametype = parseGametype($cvars_hash["gametype"], $gametypeArray);
     }
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
@@ -1416,7 +1461,8 @@ function warsow($cvars_hash, $cvars_hash_decolorized)
 function wolfensteinenemyterritory($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -1434,10 +1480,10 @@ function wolfensteinenemyterritory($cvars_hash, $cvars_hash_decolorized)
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
     $gametypeArray = array("", "", "Objective", "Stopwatch", "Campaign", "LMS");
-    if(isset($cvars_hash_decolorized["g_gametype"]))
-    {
-        $gametype = $gametypeArray[$cvars_hash_decolorized["g_gametype"]];
-    }
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "wolfenstein enemy territory";
@@ -1509,7 +1555,8 @@ function wolfensteinenemyterritory($cvars_hash, $cvars_hash_decolorized)
 function xonotic($cvars_hash, $cvars_hash_decolorized)
 {
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -1530,8 +1577,8 @@ function xonotic($cvars_hash, $cvars_hash_decolorized)
     if(isset($cvars_hash_decolorized["qcstatus"]))
     {
         $qcstatusArray = explode(":", $cvars_hash_decolorized["qcstatus"]);
-        $gametype = ucwords($qcstatusArray[0]);
-    }
+		$gametype = parseGametype($qcstatusArray[0], $gametypeArray);
+	}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "xonotic";
@@ -1605,7 +1652,8 @@ function unrecognizedgame($cvars_hash, $cvars_hash_decolorized)
 {
     //Unknown game
     //Declaring variables to be used here. DO NOT change this part.
-    $gametype = "";
+    $gametype = "Unknown";
+    $gametypeArray = array();
     $levelshotFolder = "";
     $mapname = "";
     $modName = "";
@@ -1622,10 +1670,11 @@ function unrecognizedgame($cvars_hash, $cvars_hash_decolorized)
     //If you are adding a custom game, the stuff below is what to change.
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
-    if(isset($cvars_hash_decolorized["g_gametype"]))
-    {
-        $gametype = $cvars_hash_decolorized["g_gametype"];
-    }
+    $gametypeArray = array("", "", "", "");
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
 
     //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
     $levelshotFolder = "unknown";

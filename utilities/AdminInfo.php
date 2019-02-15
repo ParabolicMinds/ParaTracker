@@ -44,7 +44,7 @@ if(isset($_GET['forceAnalyticsBackground']))
 {
 	if(numericValidator($_GET['forceAnalyticsBackground'], 0, 2, 0) == 1)
 	{
-		$output .= '<h3>Forcing analyticsBackground to run could cause a high load on the server.<br>This should only be done if absolutely necessary.<br>Do you wish to continue?<br><br><strong><a class="testMessage" href="AdminInfo.php?forceAnalyticsBackground=2">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
+		$output .= '<h3>Forcing analyticsBackground to run could cause a high load on the server.<br>This should only be done if absolutely necessary.<br>Do you wish to continue?<br><br><strong class="hiddenStuff" id="working">Working...</strong><strong id="yesNoDialog"><a class="testMessage" href="AdminInfo.php?forceAnalyticsBackground=2" onclick="document.getElementById(\'yesNoDialog\').className = \'hiddenStuff\';document.getElementById(\'working\').className = \'\';">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
 		echo '-->' . $output;
 		exit();
 	}

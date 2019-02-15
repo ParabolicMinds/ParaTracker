@@ -38,6 +38,16 @@ if(!isset($analyticsBackground))
 }
 define("analyticsBackground", $analyticsBackground);
 
+//If we are running from within analytics, the client address will not exist. Let's give the log something useful
+if(analyticsBackground)
+{
+	define("clientAddress", "Analytics");
+}
+else
+{
+	define("clientAddress", $_SERVER['REMOTE_ADDR']);
+}
+
 //This block is here to suppress error messages
 $dynamicIPAddressPath = "";
 $serverIPAddress = "";
@@ -715,16 +725,6 @@ define("scrollThumbColor", $scrollThumbColor);
 
 define("customFont", $customFont);
 define("customSkin", $customSkin);
-
-//If we are running from within analytics, the client address will not exist. Let's give the log something useful
-if(analyticsBackground)
-{
-	define("clientAddress", "Analytics");
-}
-else
-{
-	define("clientAddress", $_SERVER['REMOTE_ADDR']);
-}
 
 //Make sure these directories exist before we do anything
 checkDirectoryExistence(infoPath);
