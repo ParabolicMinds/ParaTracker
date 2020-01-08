@@ -20,6 +20,15 @@
 
 
 /*==================================================================================================*/
+// TRACKER NAME
+// TRACKER NAME
+
+//This value appears in the title bar of the browser. It will show up in Google search results - choose wisely!
+//Default value is "ParaTracker - The Ultimate Quake III Server Tracker"
+$trackerName = "ParaTracker - The Ultimate Quake III Server Tracker";
+
+
+/*==================================================================================================*/
 // NETWORK SETTINGS
 // NETWORK SETTINGS
 
@@ -124,8 +133,25 @@ $customFont = "";
 // For instance, to have three animated levelshots for mp/ffa5, the files would have to be
 // named ffa5_1.jpg, ffa5_2.jpg, and ffa5_3.jpg
 
-// ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be searched for first, JPGs second,
-// and GIFs third. If no images are found, a placeholder image will be displayed instead.
+// The following array is a list of levelshot file extensions supported by the tracker.
+// You can add as many extensions as you like. Add each file extension on a new line, between the double
+// quotes, and make sure there is a comma at the end of each line, with the exception of the last line.
+// Do not inclue the "." - just the letters of the extension. "jpg", "png", etc. When the levelshot finder
+// searches for images, it will search in the order of this array and stop when it finds a match.
+// Prioritize the extensions carefully!
+// Example:
+// $fileExtList = array(
+// "webp",
+// "png",
+// "jpg",
+// "gif"
+// );
+$fileExtList = array(
+"webp",
+"png",
+"jpg",
+"gif"
+);
 
 // The following value will enable or disable levelshot transitions. A value of 1 or "Yes" will allow them,
 // and any other value will disable them. If this is disabled, only the first levelshot will show.
@@ -340,6 +366,11 @@ $analyticsFrontEndEnabled = "1";
 // Default is 0
 $mapreqEnabled = "0";
 
+// If mapreq is enabled and the server being tracked does not have levelshots, ParaTracker will display this message to
+//encourage users to submit their own levelshots.
+//Default is "Click here to add levelshots"
+$mapreqTextMessage = "Click here to add levelshots";
+
 
 /*==================================================================================================*/
 // EMAIL SETTINGS
@@ -431,6 +462,17 @@ $deleteInterval = "7";
 // Minimum is 50, maximum is 100
 // Default is 90
 $loadLimit = "90";
+
+// This variable is boolean. When this variable is set to Yes or 1, ParaTracker will remove old entries
+// from the analytics database as part of the cleanup process.
+// Default is 1.
+$cullDatabase = "1";
+
+// This variable determines how many days entries will be left in the analytics database before removal.
+// This will have no effect if $cullDatabase (Above) is disabled.
+// Minimum is 90 days, maximum is 2000 days.
+// Default is 370 days.
+$databaseCullTime = 370;
 
 
 /*==================================================================================================*/
