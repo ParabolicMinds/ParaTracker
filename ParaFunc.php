@@ -14,8 +14,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 function versionNumber()
 {
     //Return a string of the version number
-    //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users
-    return("ParaTracker 1.4.4");
+    //If you modify this project, PLEASE change this value to something of your own, as a courtesy to your users and ours
+    return("ParaTracker 1.4.5");
+    //Also - if you rename the tracker, don't forget to change
 }
 
 //Define the default skin, to be used throughout this file.
@@ -38,7 +39,7 @@ if(!isset($analyticsBackground))
 }
 define("analyticsBackground", $analyticsBackground);
 
-//If we are running from within analytics, the client address will not exist. Let's give the log something useful
+//If we are running from within analytics, the client address will not exist. Let's give the error log something useful
 if(analyticsBackground)
 {
 	define("clientAddress", "Analytics");
@@ -49,6 +50,8 @@ else
 }
 
 //This block is here to suppress error messages
+$trackerName = "";
+$fileExtList = array();
 $dynamicIPAddressPath = "";
 $serverIPAddress = "";
 $serverPort = "";
@@ -88,6 +91,9 @@ $errorLogSize = "";
 $mapreqEnabled = "";
 $analyticsEnabled = "";
 $analyticsFrontEndEnabled = "";
+$mapreqTextMessage = "";
+$cullDatabase = 0;
+$databaseCullTime = 0;
 
 //For safety, these MUST be forced to an initial value!
 $logPath = "logs";
@@ -462,6 +468,8 @@ if($dynamicTrackerCalledFromCorrectFile == "1" || $calledFromParam == "1" || $ca
 
 $connectionTimeout = numericValidator($connectionTimeout, 1, 15, 2);
 
+$trackerName = stringValidator($trackerName, "", "");
+
 //Have to validate this one twice to make sure it isn't lower than connectionTimeout
 $floodProtectTimeout = numericValidator($floodProtectTimeout, 5, 1200, 15);
 $floodProtectTimeout = numericValidator($floodProtectTimeout, $connectionTimeout, 1200, $floodProtectTimeout);
@@ -512,14 +520,24 @@ $cleanupInterval = numericValidator($cleanupInterval, 10, 3600, 60);
 $deleteInterval = numericValidator($deleteInterval, 1, 30, 7);
 
 //Need to make sure deleteInterval is greater than cleanupInterval.
-//cleanupInterval is given in minutes, and deleteInterval is given in days, so divide by 60.
-//Multiply by 2 for the final value.
-$deleteInterval = numericValidator($deleteInterval, $cleanupInterval / 60 * 2, 30, 7);
+//cleanupInterval is given in minutes, and deleteInterval is given in days, so divide by 1440.
+$deleteInterval = numericValidator($deleteInterval, $cleanupInterval / 1440, 30, 7);
 
 $loadLimit = numericValidator($loadLimit, 50, 100, 90);
 $cleanupLogSize = numericValidator($cleanupLogSize, 100, 100000, 10000);
 
 $mapreqEnabled = booleanValidator($mapreqEnabled, 0);
+
+
+$cullDatabase = booleanValidator($cullDatabase, 0);
+//If analytics is disabled, cullDatabase must also be disabled
+if($analyticsEnabled != 1)
+{
+	$cullDatabase = 0;
+}
+$databaseCullTime = numericValidator($databaseCullTime, 90, 2000, 370);
+
+
 if(enablePGSQL == 0 || !file_exists(utilitiesPath . 'MapReq.php') || $dynamicTrackerEnabled == '0')
 {
     $mapreqEnabled = "0";
@@ -712,6 +730,9 @@ define("RConLogSize", $RConLogSize);
 define("enableGeoIP", $enableGeoIP);
 define("geoIPPath", $geoIPPath);
 
+define("cullDatabase", $cullDatabase);
+define("databaseCullTime", $databaseCullTime);
+
 define("backgroundColor", $backgroundColor);
 define("backgroundOpacity", $backgroundOpacity);
 define("textColor", $textColor);
@@ -723,8 +744,20 @@ define("scrollShaftColor", $scrollShaftColor);
 define("scrollThumbColor", $scrollThumbColor);
 //define("scrollShaftOpacity", $scrollShaftOpacity);
 
+define("levelshotPlaceholder", 'images/missing.gif');
+define("mapreqTextMessage", $mapreqTextMessage);
+
 define("customFont", $customFont);
 define("customSkin", $customSkin);
+
+define("trackerName", $trackerName);
+
+//Convert all file extensions to lowercase before defining, and remove the "." if there is one
+for($i = 0; $i < count($fileExtList); $i++)
+{
+	$fileExtList[$i] = strtolower(ltrim($fileExtList[$i], '.'));
+}
+define("fileExtList", $fileExtList);
 
 //Make sure these directories exist before we do anything
 checkDirectoryExistence(infoPath);
@@ -742,7 +775,7 @@ checkFileExistence("emailTimer.txt", infoPath);
 //Only run this if analytics is disabled. Otherwise, it will be handled by AnalyticsBackground.php
 if(!analyticsEnabled)
 {
-    cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $cleanupLogSize);
+    cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $cleanupLogSize, 0);
 }
 
 function adminCheck()
@@ -846,17 +879,6 @@ function checkDirectoryExistence($dirname)
 function checkLevelshotDirectories($levelshotFolder)
 {
     $levelshotFolder = strtolower($levelshotFolder);
-
-/*
-    There is no point to this check now. If the folder does not exist it is
-    because someone screwed up GameInfo.php.
-
-    //We need to convert any matching directory name to lowercase
-    if(!file_exists("images/levelshots/" . $levelshotFolder))
-    {
-        $exit = "0";
-    }
-*/
     $levelshotFolder = "images/levelshots/" . $levelshotFolder . "/";
     return $levelshotFolder;
 }
@@ -947,8 +969,9 @@ function doUpdate($lastRefreshTime, $dynamicIPAddressPath)
     //Set this value to measure the server's ping
     $serverPing = microtime(true);
 
+	$message = str_repeat(chr(255),4) . chr(02) . "getstatus\n";
     //Connect to the server, but remove all invalid characters to prevent issues later
-    $s = connectToServerAndGetResponse($serverIPAddress, $serverPort, str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
+    $s = connectToServerAndGetResponse($serverIPAddress, $serverPort, $message, $lastRefreshTime);
 
     //Parse the server's ping.
     $serverPing = number_format(((microtime(true) - $serverPing) * 1000), 0);
@@ -959,7 +982,7 @@ function doUpdate($lastRefreshTime, $dynamicIPAddressPath)
         $serverPing = microtime(true);
 
         //If the connection failed, let's try one more time, just in case the message was lost somewhere
-        $s = connectToServerAndGetResponse($serverIPAddress, $serverPort, str_repeat(chr(255),4) . "getstatus\n", $lastRefreshTime);
+        $s = connectToServerAndGetResponse($serverIPAddress, $serverPort, $message, $lastRefreshTime);
 
         //Parse the server's ping.
         $serverPing = number_format(((microtime(true) - $serverPing) * 1000), 0);
@@ -1044,7 +1067,7 @@ function doUpdate($lastRefreshTime, $dynamicIPAddressPath)
 	}
 
 	//This has to be last, because the timer will output on this page
-	parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $flag, $countryName, $cvar_array_single, $parseTimer, $serverPing, $BitFlags, $player_array, $playerParseCount, $sv_maxclients, $team1score, $team2score, $team3score, $team4score);
+	parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $modName, $flag, $countryName, $cvar_array_single, $parseTimer, $serverPing, $BitFlags, $player_array, $playerParseCount, $sv_maxclients, $team1score, $team2score, $team3score, $team4score);
 
 	return 1;
 }
@@ -1123,6 +1146,7 @@ function quake3dataParser($s)
                         $cvars_hash[$cvars_array[$i]] = $cvars_array[$i+1];
                         $cvars_hash_decolorized[removeColorization($cvars_array[$i])] = $cvars_array[$i+1];
                 }
+
                 //Now, let's alphabetize the CVars so the list is easier to read
                 $cvar_array_single = array_sort($cvar_array_single, "name", false);
 
@@ -1290,7 +1314,7 @@ function ParseGameData($gameName, $cvars_hash, $cvars_hash_decolorized, $lastRef
         return $GameInfoData;
 }
 
-function parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $flag, $countryName, $cvar_array_single, $parseTimer, $serverPing, $BitFlags, $player_array, $playerParseCount, $sv_maxclients, $team1score, $team2score, $team3score, $team4score)
+function parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $modName, $flag, $countryName, $cvar_array_single, $parseTimer, $serverPing, $BitFlags, $player_array, $playerParseCount, $sv_maxclients, $team1score, $team2score, $team3score, $team4score)
 {
         $returnArray = array();
         $BitFlagsIndex = array();
@@ -1327,6 +1351,7 @@ function parseToJSON($dynamicIPAddressPath, $gameName, $gametype, $mapname, $fla
                 //Preload these things into the serverInfo array
                 array_push($serverInfoArray, JSONString("maxPlayers", $sv_maxclients));
                 array_push($serverInfoArray, JSONString("gamename", $gameName));
+                array_push($serverInfoArray, JSONString("modName", $modName));
                 array_push($serverInfoArray, JSONString("mapname", $mapname));
                 array_push($serverInfoArray, JSONString("gametype", $gametype));
                 array_push($serverInfoArray, JSONString("geoIPcountryCode", $flag));
@@ -1415,95 +1440,59 @@ function levelshotFinder($dynamicIPAddressPath, $mapName, $levelshotFolder, $gam
             $levelshotIndex = 1;
             $foundLevelshot = 0;
 
-            if(strtolower($levelshotFolder) == 'unknown')
-            {
-                $levelshotBuffer .= "images/missing.gif";
-            }
-            else
-            {
+			if(strtolower($levelshotFolder) != 'unknown')
+			{
 
-                //Let's make sure the levelshotfolder we were given is correct first.
-                $levelshotFolder = checkLevelshotDirectories($levelshotFolder);
+				//Let's make sure the levelshotfolder we were given is correct first.
+				$levelshotFolder = checkLevelshotDirectories($levelshotFolder);
 
-                $levelshotCheckName = strtolower($mapName);
-                do
-                {
+				$levelshotCheckName = strtolower($mapName);
+				do
+				{
 
-                    //Reset this value every iteration so we can check to see if levelshots are being found
-                    $foundLevelshot = 0;
+					//Reset this value every iteration so we can check to see if levelshots are being found
+					$foundLevelshot = 0;
 
-                    //Check for a PNG first
-                    if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png'))
-                    {
-                        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png';
-                        $foundLevelshot = 1;
-                    }
-                    else
-                    {
-                    //Failed to find a PNG, so let's check for a JPG
-                        if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg'))
-                        {
-                            $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg';
-                            $foundLevelshot = 1;
-                        }
-                        else
-                        {
-                            //Also failed to find a JPG, so let's check for a GIF
-                            if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif'))
-                            {
-                                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif';
-                                $foundLevelshot = 1;
-                            }
-                            else
-                            {
-                            //Could not find any images. One last check - is this the first iteration of the loop?
-                            //If so, we need to try and find a levelshot no matter what. Let's see if the user was
-                            //silly and forgot to add an underscore and number to the file name, and if so, we'll
-                            //just use that one. If not, we'll have to default to a placeholder for missing images.
-                                if ($levelshotCount == 0)
-                                {
-                                //Checking for a PNG again:
-                                        if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.png'))
-                                        {
-                                        $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.png';
-                                            }
-                                            else
-                                            {
-                                                //And checking for a JPG again:
-                                            if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.jpg'))
-                                            {
-                                                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.jpg';
-                                            }
-                                            else
-                                            {
-                                                //Lastly...checking for a GIF.
-                                                if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.gif'))
-                                                {
-                                                $levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '.gif';
-                                                }
-                                                else
-                                                {
-                                                    //Could not find a levelshot! Use the default 'missing picture' image and close out
-                                                    $levelshotBuffer .= "images/missing.gif";
+					for($i = 0; $i < count(fileExtList) && $foundLevelshot == 0; $i++)
+					{
+						if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . "." . fileExtList[$i]))
+						{
+							$levelshotBuffer .= $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . "." .fileExtList[$i];
+							$foundLevelshot = 1;
+						}
+					}
 
-                                                    //Check to see if Postgres is active. If it is, let's automatically
-                                                    //insert the map into the missing levelshots database.
-                                                    if(enablePGSQL && strtolower($levelshotFolder) != "unknown")
-                                                    {
-                                                        global $pgCon;
-                                                        pg_query_params($pgCon, '
-                                                        INSERT INTO mapreq (game_name, bsp_name)
-                                                        VALUES ($1, $2)
-                                                        ON CONFLICT (game_name, bsp_name) DO NOTHING', array($gameName, $levelshotCheckName))
-                                                        or echoStuff(" Could not auto-insert data into map table! ");
-                                                    }
-                                                }
-                                            }
-                                        }
-                                }
-                            }
-                        }
-                    }
+					if($levelshotCount == 0 && $foundLevelshot == 0)
+					{
+						//Could not find any images on the first pass. We need to try and find a levelshot no matter what.
+						//Let's see if maybe the user was silly and forgot to add an underscore and number to the file name, and
+						//if so, we'll just use that one. If not, we'll have to default to a placeholder for missing images.
+
+						for($i = 0; $i < count(fileExtList) && $foundLevelshot == 0; $i++)
+						{
+							if(file_exists($levelshotFolder . $levelshotCheckName . "." .fileExtList[$i]))
+							{
+								$levelshotBuffer .= $levelshotFolder . $levelshotCheckName . "." .fileExtList[$i];
+								$foundLevelshot = 1;
+							}
+						}
+
+						if($foundLevelshot == 0)
+						{
+							//Could not find a levelshot! Terminate. Javascript will use the "Missing image" instead.
+							//Check to see if Postgres is active. If it is, let's automatically
+							//insert the map into the missing levelshots database.
+							if(enablePGSQL && strtolower($levelshotFolder) != "unknown")
+							{
+								global $pgCon;
+								pg_query_params($pgCon, '
+								INSERT INTO mapreq (game_name, bsp_name)
+								VALUES ($1, $2)
+								ON CONFLICT (game_name, bsp_name) DO NOTHING', array($gameName, $levelshotCheckName))
+								or echoStuff(" Could not auto-insert data into map table! ");
+							}
+						}
+					}
                     if ($foundLevelshot == 1)
                     {
                         $levelshotBuffer .= "\n";
@@ -1528,6 +1517,26 @@ if ($levelshotCount == 0 && $stopAfterOneShot == 0)
 if($dynamicIPAddressPath != "")
 {
     file_put_contents(infoPath . $dynamicIPAddressPath . 'levelshots.txt', trim($levelshotBuffer));
+}
+else
+{
+	if($dynamicIPAddressPath == "cleanup")
+	{
+		//We are in a levelshot cleanup. Just return the number, 0 or otherwise.
+		return $levelshotCount;
+	}
+	else
+	{
+		//We must be here to get a levelshot for analytics. Just spit out the link to the levelshot image
+		if($levelshotCount == 0)
+		{
+			return levelshotPlaceholder;
+		}
+		else
+		{
+			return trim($levelshotBuffer);
+		}
+	}
 }
 
 return $levelshotCount;
@@ -1627,31 +1636,31 @@ function array_sort($a, $subkey, $direction)
 
 function booleanValidator($input, $defaultValue)
 {
-    //To use this function, use the following:
-    //$variableName = booleanValidator($variableName, defaultValue);
+	//To use this function, use the following:
+	//$variableName = booleanValidator($variableName, defaultValue);
 
-    //First, let's trim any possible white space that may have been left accidentally
-    $input = strtolower(trim($input));
+	//First, let's trim any possible white space that may have been left accidentally
+	$input = strtolower(trim($input));
 
-    //The config file allows for a value of 1 or the string "yes" to be used for booleans.
-    //Everything else must evaluate to false.
+	//The config file allows for a value of 1 or the string "yes" to be used for booleans.
+	//Everything else must evaluate to false.
 
-    if ($input == "1" || $input == "yes" || $input == "true" || $input == "t")
-        {
-            $input = 1;
-        }
-        else
-        {
-            if($input == "" && $defaultValue == "1")
-            {
-                $input = 1;
-            }
-            else
-            {
-                $input = 0;
-            }
-        }
-    return $input;
+	if ($input == "1" || $input == "yes" || $input == "true" || $input == "t")
+	{
+		$input = 1;
+	}
+	else
+	{
+		if($input == "" && $defaultValue == "1")
+		{
+			$input = 1;
+		}
+		else
+		{
+			$input = 0;
+		}
+	}
+	return $input;
 }
 
 function convertToRGBA($input)
@@ -1662,45 +1671,45 @@ function convertToRGBA($input)
 
 function colorValidator($input)
 {
-    //Get rid of all non-hex characters on the input.
-    $input = trim($input);
-    $input = preg_replace("/[^A-F0-9]/", "", strtoupper($input));
+	//Get rid of all non-hex characters on the input.
+	$input = trim($input);
+	$input = preg_replace("/[^A-F0-9]/", "", strtoupper($input));
 
-    if(strlen($input) > 6)
-    {
-        $input = substr($input, 0, 6);
-    }
+	if(strlen($input) > 6)
+	{
+		$input = substr($input, 0, 6);
+	}
 
-    //If the string we received is 6 characters, it is a 6 digit hex color
-    if(strlen($input) == "6")
-    {
-        return $input;
-    }
+	//If the string we received is 6 characters, it is a 6 digit hex color
+	if(strlen($input) == "6")
+	{
+		return $input;
+	}
 
-    //If the string we received is 3 characters, it is a 3 digit hex color
-    if(strlen($input) == "3")
-    {
-        return str_repeat(substr($input, 0, 1), 2) . str_repeat(substr($input, 1, 1), 2) . str_repeat(substr($input, 2, 1), 2);
-    }
+	//If the string we received is 3 characters, it is a 3 digit hex color
+	if(strlen($input) == "3")
+	{
+		return str_repeat(substr($input, 0, 1), 2) . str_repeat(substr($input, 1, 1), 2) . str_repeat(substr($input, 2, 1), 2);
+	}
 
-    //If the string we received is 2 characters, it is a 1 digit hex color, with two digits
-    if(strlen($input) == "2")
-    {
-        return str_repeat($input, 3);
-    }
+	//If the string we received is 2 characters, it is a 1 digit hex color, with two digits
+	if(strlen($input) == "2")
+	{
+		return str_repeat($input, 3);
+	}
 
-    //If the string we received is 1 character, it is a 1 digit hex color
-    if(strlen($input) == "1")
-    {
-        return str_repeat($input, 6);
-    }
+	//If the string we received is 1 character, it is a 1 digit hex color
+	if(strlen($input) == "1")
+	{
+		return str_repeat($input, 6);
+	}
 
-    return "";
+	return "";
 }
 
 function echoStuff($input)
 {
-    echo $input;
+	echo $input;
 }
 
 function numericValidator($input, $minValue, $maxValue, $defaultValue)
@@ -1709,82 +1718,80 @@ function numericValidator($input, $minValue, $maxValue, $defaultValue)
 //$variableName = numericValidator($variableName, min, max, default);
 //If you do not wish to pass a value, just pass a null string "" instead.
 
-    //First, let's trim any possible white space that may have been left accidentally
-    $input = trim($input);
+	//First, let's trim any possible white space that may have been left accidentally
+	$input = trim($input);
 
-    //Is the input numeric? If not, just give it the default value.
-    if (is_numeric($input))
-    {
-        //Did the user pass a minvalue? If not, move on.
-        if ($minValue != "" && $input < $minValue)
-        {
-            $input = $minValue;
-        }
-        //Did the user pass a maxvalue? If not, move on.
-        elseif ($maxValue != "" && $input > $maxValue)
-        {
-            $input = $maxValue;
-        }
-        //Value checks out! Leave it be and do nothing.
-        else
-        {
-        }
-    }
-    else
-    {
-        //Non-numeric value detected! Force the default.
-        $input = $defaultValue;
-    }
-    return $input;
+	if(empty($input))
+	{
+		//No input given! Assume default value.
+		return $defaultValue;
+	}
+
+	//Make sure we actually got a number
+	$input = floatval($input);
+    
+	//Did the user pass a minvalue? If not, move on.
+	if ($minValue != "" && $input < $minValue)
+	{
+		$input = $minValue;
+	}
+	//Did the user pass a maxvalue? If not, move on.
+	elseif ($maxValue != "" && $input > $maxValue)
+	{
+		$input = $maxValue;
+	}
+
+	return $input;
 }
 
 function basicValidator($input, $defaultValue)
 {
-    if(!isset($input) || $input == "")
-    {
-        return $defaultValue;
-    }
-    else
-    {
-        return $input;
-    }
+	if(!isset($input) || $input == "")
+	{
+		return $defaultValue;
+	}
+	else
+	{
+		return $input;
+	}
 }
 
 function pathValidator($input)
 {
-    str_replace("\\", "/", $input);
-    str_replace("//", "/", $input);
-    ltrim($input, "/");
-    $working = explode("/", $input);
-    $count = count($working);
-    $newFileList = array();
-    $depth = 0;
-    for($i = 0; $i < $count && $depth >= 0; $i++)
-    {
-        if($working[$i] == ".." || $working[$i] == ".")
-        {
-            //Value jumps back a folder.
-            $depth--;
-            if($depth < 0)
-            {
-                displayError("Access is forbidden to '" . $input . "'!<br>Cannot go outside the intended folder.<br>This event has been logged.", "", "");
-                return "";
-            }
-            array_pop($newFileList);
-        }
-        else if(!empty($working[$i]))
-        {
-            //Value is legitimate. Add it to the new array.
-            array_push($newFileList, $working[$i]);
-            $depth++;
-        }
-    }
+	str_replace("\\", "/", $input);
+	str_replace("//", "/", $input);
+	ltrim($input, "/");
+	$working = explode("/", $input);
+	$count = count($working);
+	$newFileList = array();
+	$depth = 0;
+	for($i = 0; $i < $count && $depth >= 0; $i++)
+	{
+		if($working[$i] == ".." || $working[$i] == ".")
+		{
+			//Value jumps back a folder.
+			$depth--;
+			if($depth < 0)
+			{
+				displayError("Access is forbidden to '" . $input . "'!<br>Cannot go outside the intended folder.<br>This event has been logged.", "", "");
+				return "";
+			}
+			array_pop($newFileList);
+		}
+		else if(!empty($working[$i]))
+		{
+			//Value is legitimate. Add it to the new array.
+			array_push($newFileList, $working[$i]);
+			$depth++;
+		}
+	}
 
-    return implode('/', $newFileList);
+	return implode('/', $newFileList);
 }
 
 function stringClean($input) {
-    $input = strval($input);
+	//This function removes white space from incoming strings.
+	$input = strval($input);
 	$return = "";
 	$count = strlen($input);
 	for ($i = 0; $i < $count; $i++) {
@@ -1797,194 +1804,194 @@ function stringClean($input) {
 
 function stringValidator($input, $maxLength, $defaultValue)
 {
-    //Is the string null? If not, continue.
-    if ($input != "")
-    {	
+	//Is the string null? If not, continue.
+	if ($input != "")
+	{
 		$input = stringClean($input);
-        //Check to see if a maxLength was given, and if the string exceeds the maximum length.
-        if ($maxLength != "" && $maxLength > 0 && strlen($input) > $maxLength)
-        {
-            //Trim down to the maximum length.
-            $input = substr($input, 0, $maxLength);
-        }
-        //Trim whitespace from the end of the string. There's no reason to leave it there.
-        //I will leave whitespace at the beginning, though, because people might use spaces
-        //or tabs to align things. So, we'll use rtrim() instead of trim().
-        $input = rtrim($input);
+		//Check to see if a maxLength was given, and if the string exceeds the maximum length.
+		if ($maxLength != "" && $maxLength > 0 && strlen($input) > $maxLength)
+		{
+			//Trim down to the maximum length.
+			$input = substr($input, 0, $maxLength);
+		}
+		//Trim whitespace from the end of the string. There's no reason to leave it there.
+		//I will leave whitespace at the beginning, though, because people might use spaces
+		//or tabs to align things. So, we'll use rtrim() instead of trim().
+		$input = rtrim($input);
 
-        //Check for and replace any invalid or dangerous characters.
-        //Players could connect with malicious names, but also if the tracker connects
-        //to the wrong IP address, code could be injected onto the clients when the web
-        //page loads.
-        //< and > are dangerous because they could add HTML to the tracker page.
-        //{ and } are dangerous because they could allow javascript to be added as well.
-        //Also removing equals signs for the same reason.
-        //Double quotes are being removed as well.
-        //Also removing colons to prevent http:// and stuff like that from getting through.
-        //I know this is a bit over-protective, but safety first.
-        $input = str_replace("<", "&lt;", $input);
-        $input = str_replace(">", "&gt;", $input);
-        $input = str_replace("{", "&#123;", $input);
-        $input = str_replace("}", "&#125;", $input);
-        $input = str_replace("=", "&#61;", $input);
-//        $input = str_replace("'", "&#39;", $input);  //Removing these will break the levelshot path for any game with an apostrophe in the name
-        $input = str_replace("\"", "&quot;", $input);
-//        $input = str_replace(".", "&#46;", $input);  //Commented this out, because it breaks the IP address validator, which results in blank trackers
-        $input = str_replace(":", "&#58;", $input);
-        $input = str_replace("?", "&#63;", $input);
-        //Also, do not allow the termination of a comment block
-        $input = str_replace("*/", "&#42;&#47;", $input);
-    }
-    else
-    {
-        //String is null! Force default value.
-        $input = $defaultValue;
-    }
-return $input;
+		//Check for and replace any invalid or dangerous characters.
+		//Players could connect with malicious names, but also if the tracker connects
+		//to the wrong IP address, code could be injected onto the clients when the web
+		//page loads.
+		//< and > are dangerous because they could add HTML to the tracker page.
+		//{ and } are dangerous because they could allow javascript to be added as well.
+		//Also removing equals signs for the same reason.
+		//Double quotes are being removed as well.
+		//Also removing colons to prevent http:// and stuff like that from getting through.
+		//I know this is a bit over-protective, but safety first.
+		$input = str_replace("<", "&lt;", $input);
+		$input = str_replace(">", "&gt;", $input);
+		$input = str_replace("{", "&#123;", $input);
+		$input = str_replace("}", "&#125;", $input);
+		$input = str_replace("=", "&#61;", $input);
+//		$input = str_replace("'", "&#39;", $input);  //Removing these will break the levelshot path for any game with an apostrophe in the name
+		$input = str_replace("\"", "&quot;", $input);
+//		$input = str_replace(".", "&#46;", $input);  //Commented this out, because it breaks the IP address validator, which results in blank trackers
+		$input = str_replace(":", "&#58;", $input);
+		$input = str_replace("?", "&#63;", $input);
+		//Also, do not allow the termination of a comment block
+		$input = str_replace("*/", "&#42;&#47;", $input);
+	}
+	else
+	{
+		//String is null! Force default value.
+		$input = $defaultValue;
+	}
+	return $input;
 }
 
 function protectPathValidator($input)
 {
-    $input = str_replace("..", "&#46;", $input);
+	$input = str_replace("..", "&#46;", $input);
 }
 
 function ipAndPortValidator($serverIPAddress, $serverPort, $dynamicTrackerEnabled)
 {
-    //By default, static mode will already have given us an IP address before all of this took place.
-    //So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
-    if($serverPort != "") $serverPort = numericValidator($serverPort, 1, 65535, 29070);
-    if($serverIPAddress != "") $serverIPAddress = ipAddressValidator($serverIPAddress, $dynamicTrackerEnabled);
+	//By default, static mode will already have given us an IP address before all of this took place.
+	//So, now that we have the IP address and port from our source of choice, MAKE SURE to validate them before we go ANY further!
+	if($serverPort != "") $serverPort = numericValidator($serverPort, 1, 65535, 29070);
+	if($serverIPAddress != "") $serverIPAddress = ipAddressValidator($serverIPAddress, $dynamicTrackerEnabled);
 
-    //Check for path exploits
-    if(strpos($serverPort, "..") !== false || strpos($serverIPAddress, "..") !== false)
-    {
-        displayError("Server address exploit detected! This event has been logged.", "", "");
-        return array("", "");
-    }
+	//Check for path exploits
+	if(strpos($serverPort, "..") !== false || strpos($serverIPAddress, "..") !== false)
+	{
+		displayError("Server address exploit detected! This event has been logged.", "", "");
+		return array("", "");
+	}
 
-    return array($serverIPAddress, $serverPort);
+	return array($serverIPAddress, $serverPort);
 }
 
 function ipAddressValidator($input, $dynamicTrackerEnabled)
 {
-    //Remove whitespace
-    $input = trim($input);
+	//Remove whitespace
+	$input = trim($input);
 
-    //Check to see if an address was supplied
-    if($input == "")
-    {
-        //No address. Are we running in dynamic mode?
-        if($dynamicTrackerEnabled == "0")
-        {
-            //We are in static mode, so ParaConfig.php is the problem
-            displayError("No server address specified in ParaConfig.php!", "", "");
-            return "";
-        }
-        else
-        {
-            //We are in Dynamic mode, so the user did not give an address
-            displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Please specify an IP Address.', "", "");
-            return "";
-        }
-    }
+	//Check to see if an address was supplied
+	if($input == "")
+	{
+		//No address. Are we running in dynamic mode?
+		if($dynamicTrackerEnabled == "0")
+		{
+			//We are in static mode, so ParaConfig.php is the problem
+			displayError("No server address specified in ParaConfig.php!", "", "");
+			return "";
+		}
+		else
+		{
+			//We are in Dynamic mode, so the user did not give an address
+			displayError('Invalid IP address! ' . stringValidator($input, "", "") . '<br />Please specify an IP Address.', "", "");
+			return "";
+		}
+	}
 
-    //Use a PHP function to check validity
-    if (!filter_var($input, FILTER_VALIDATE_IP) && $input != "localhost")
-    {
-        $test = gethostbyname($input);
+	//Use a PHP function to check validity
+	if (!filter_var($input, FILTER_VALIDATE_IP) && $input != "localhost")
+	{
+		$test = gethostbyname($input);
 
-        //gethostbyname returns the input string on failure. So, to test if this is a failure, we test it against itself
-        if($test == $input)
-        {
-            //DNS test failed.
+		//gethostbyname returns the input string on failure. So, to test if this is a failure, we test it against itself
+		if($test == $input)
+		{
+			//DNS test failed.
 			displayError('Invalid address! ' . stringValidator($input, "", "") . '<br />Check the address and try again.', "", "", false);
-            return "";
-        }
-        else
-        {
-            if(!filter_var($test, FILTER_VALIDATE_IP))
-            {
-                displayError('Invalid server address! ' . stringValidator($input, "", "") . '<br />Check the address and try again.</h3>', "", "");
-                return "";
-            }
-        }
-    }
+			return "";
+		}
+		else
+		{
+			if(!filter_var($test, FILTER_VALIDATE_IP))
+			{
+				displayError('Invalid server address! ' . stringValidator($input, "", "") . '<br />Check the address and try again.</h3>', "", "");
+				return "";
+			}
+		}
+	}
 
-    //Check for an ipv6 address, and add brackets if it is one
-    if(strpos($input, ':') !== false) return '[' . $input . ']';
+	//Check for an ipv6 address, and add brackets if it is one
+	if(strpos($input, ':') !== false) return '[' . $input . ']';
 
-    //Otherwise, return the address/domain as-is
-    return $input;
+	//Otherwise, return the address/domain as-is
+	return $input;
 }
 
 function skinValidator($paraTrackerSkin, $customSkin)
 {
-    $paraTrackerSkin = trim($paraTrackerSkin);
-    $customSkin = trim($customSkin);
+	$paraTrackerSkin = trim($paraTrackerSkin);
+	$customSkin = trim($customSkin);
 
-    if(strtolower($paraTrackerSkin) == "json")
-    {
-        return "json";
-    }
+	if(strtolower($paraTrackerSkin) == "json")
+	{
+		return "json";
+	}
 
-    //Are we refreshing the tracker? Give back a response of json
-    if(isset($_GET["JSONReload"]) && booleanValidator($_GET["JSONReload"], 0) == "1")
-    {
-        return "json";
-    }
+	//Are we refreshing the tracker? Give back a response of json
+	if(isset($_GET["JSONReload"]) && booleanValidator($_GET["JSONReload"], 0) == "1")
+	{
+		return "json";
+	}
 
-    //First and foremost, we'll check custom skins first, to avoid unnecessary error messages.
-    if(strtolower($paraTrackerSkin) == "custom" && $customSkin != "")
-    {
-        $customSkin = trim($customSkin);
-        //If an external skin file was specified, we need to check for double quotes to prevent exploits.
-        if(strtolower(substr($customSkin, -4)) == ".css")
-        {
-            $customSkin = substr($customSkin, 0, -4);
-        }
+	//First and foremost, we'll check custom skins first, to avoid unnecessary error messages.
+	if(strtolower($paraTrackerSkin) == "custom" && $customSkin != "")
+	{
+		$customSkin = trim($customSkin);
+		//If an external skin file was specified, we need to check for double quotes to prevent exploits.
+		if(strtolower(substr($customSkin, -4)) == ".css")
+		{
+			$customSkin = substr($customSkin, 0, -4);
+		}
 
-        if(strpos($customSkin, '"') !== 0)
-        {
-            return $customSkin;
-        }
-        else
-        {
-            echo " Double quotes can not be used in a custom skin path! Ignoring... ";
-            $customSkin == "";
-        }
-    }
+		if(strpos($customSkin, '"') !== 0)
+		{
+			return $customSkin;
+		}
+		else
+		{
+			echo " Double quotes can not be used in a custom skin path! Ignoring... ";
+			$customSkin == "";
+		}
+	}
 
-    //Prevent slashes, periods, and colons. This will stop people from adding a file extension, a URL, or a ../ into the file name
-    if(strpos($paraTrackerSkin, ".") !== false ||strpos($paraTrackerSkin, "/") !== false ||strpos($paraTrackerSkin, "\\") !== false ||strpos($paraTrackerSkin, ":") !== false)
-    {
-        echo " Invalid skin specified! Slashes, colons, and periods are forbidden in skin file names. Assuming default skin... ";
-        $paraTrackerSkin = defaultSkin;
-    }
+	//Prevent slashes, periods, and colons. This will stop people from adding a file extension, a URL, or a ../ into the file name
+	if(strpos($paraTrackerSkin, ".") !== false ||strpos($paraTrackerSkin, "/") !== false ||strpos($paraTrackerSkin, "\\") !== false ||strpos($paraTrackerSkin, ":") !== false)
+	{
+		echo " Invalid skin specified! Slashes, colons, and periods are forbidden in skin file names. Assuming default skin... ";
+		$paraTrackerSkin = defaultSkin;
+	}
 
-    if(strtolower($paraTrackerSkin) == "custom")
-    {
-        echo " '". $paraTrackerSkin . "' is a reserved value, and cannot be used as a skin name! Assuming default skin...  ";
-        $paraTrackerSkin = defaultSkin;
-    }
+	if(strtolower($paraTrackerSkin) == "custom")
+	{
+		echo " '". $paraTrackerSkin . "' is a reserved value, and cannot be used as a skin name! Assuming default skin...  ";
+		$paraTrackerSkin = defaultSkin;
+	}
 
-    $paraTrackerSkin = stringValidator($paraTrackerSkin, "", defaultSkin);
+	$paraTrackerSkin = stringValidator($paraTrackerSkin, "", defaultSkin);
 
-    if(!file_exists(skinsPath . $paraTrackerSkin . ".css"))
-    {
-        echo " Invalid skin specified! Skin names must have a lowercase file extension, cannot have slashes ( '\' or '/' ) and must refer to an actual CSS file. Assuming default skin... ";
-        $paraTrackerSkin = defaultSkin;
+	if(!file_exists(skinsPath . $paraTrackerSkin . ".css"))
+	{
+		echo " Invalid skin specified! Skin names must have a lowercase file extension, cannot have slashes ( '\' or '/' ) and must refer to an actual CSS file. Assuming default skin... ";
+		$paraTrackerSkin = defaultSkin;
 
-        if(!file_exists(skinsPath . $paraTrackerSkin . ".css"))
-        {
-            displayError(" Invalid skin specified!\nDefault skin could not be found! ", $lastRefreshTime, "");
-        }
-        else
-        {
-        //Non-fatal error; revert to default skin.
-        $paraTrackerSkin = defaultSkin;
-        }
-    }
-    return $paraTrackerSkin;
+		if(!file_exists(skinsPath . $paraTrackerSkin . ".css"))
+		{
+			displayError(" Invalid skin specified!\nDefault skin could not be found! ", $lastRefreshTime, "");
+		}
+		else
+		{
+		//Non-fatal error; revert to default skin.
+		$paraTrackerSkin = defaultSkin;
+		}
+	}
+	return $paraTrackerSkin;
 }
 
 function renderParamPage($serverIPAddress, $serverPort)
@@ -2027,23 +2034,23 @@ function getHumanReadableFilesize($file)
 
 function displayError($errorMessage, $lastRefreshTime, $dynamicIPAddressPath, $logError = true)
 {
-    $serverIPAddress = "";
-    $serverPort = "";
-    $serverAddressStuff = "";
+	$serverIPAddress = "";
+	$serverPort = "";
+	$serverAddressStuff = "";
 
-    if($dynamicIPAddressPath != "")
-    {
-        $brokenAddress = breakDynamicAddressPath($dynamicIPAddressPath);
-        $serverIPAddress = protectPathValidator($brokenAddress[0]);
-        $serverPort = protectPathValidator($brokenAddress[1]);
-    }
+	if($dynamicIPAddressPath != "")
+	{
+		$brokenAddress = breakDynamicAddressPath($dynamicIPAddressPath);
+		$serverIPAddress = protectPathValidator($brokenAddress[0]);
+		$serverPort = protectPathValidator($brokenAddress[1]);
+	}
 
-    if(trim($errorMessage) == "")
-    {
-        $errorMessage = "An unknown error has occurred! ParaTracker must terminate.";
-    }
+	if(trim($errorMessage) == "")
+	{
+		$errorMessage = "An unknown error has occurred! ParaTracker must terminate.";
+	}
 
-    if(!empty($dynamicIPAddressPath)) $serverAddressStuff = "Server being tracked: '" . $serverIPAddress . ":" . $serverPort . "'";
+	if(!empty($dynamicIPAddressPath)) $serverAddressStuff = "Server being tracked: '" . $serverIPAddress . ":" . $serverPort . "'";
 
 	if($logError)
 	{
@@ -2062,27 +2069,27 @@ function displayError($errorMessage, $lastRefreshTime, $dynamicIPAddressPath, $l
 			}
 		}
 	}
-    echo "<!--";
+	echo "<!--";
 
-    $errorMessage = '<!-- --><h3 class="errorMessage">' . $errorMessage . '</h3>';
+	$errorMessage = '<!-- --><h3 class="errorMessage">' . $errorMessage . '</h3>';
 
-    //Error detected and ParaTracker is terminating. Check to see if we have a file path and refresh time data.
-    if($lastRefreshTime != "" && $dynamicIPAddressPath != "")
-    {
-        //We have a file path! Write the error message to a file, update both of the refresh timers, and terminate!
-        file_put_contents(infoPath . $dynamicIPAddressPath . "errorMessage.txt", $errorMessage);
-        file_put_contents(infoPath . $dynamicIPAddressPath . "time.txt", time());
-        file_put_contents(infoPath . $dynamicIPAddressPath . "RConTime.txt", time());
-    }
-    echo $errorMessage;
+	//Error detected and ParaTracker is terminating. Check to see if we have a file path and refresh time data.
+	if($lastRefreshTime != "" && $dynamicIPAddressPath != "")
+	{
+		//We have a file path! Write the error message to a file, update both of the refresh timers, and terminate!
+		file_put_contents(infoPath . $dynamicIPAddressPath . "errorMessage.txt", $errorMessage);
+		file_put_contents(infoPath . $dynamicIPAddressPath . "time.txt", time());
+		file_put_contents(infoPath . $dynamicIPAddressPath . "RConTime.txt", time());
+	}
 
-    if(defined('analyticsBackground') && !analyticsBackground)
-    {
-        //We are not running the analytics background process, so terminate here.
-        //If no file path was given, flood protection will not be necessary, as ParaTracker never had a chance to contact the server.
-        //so it is safe to terminate regardless of whether there was a file path or not.
-        exit();
-    }
+	if(!defined('analyticsBackground') || !analyticsBackground)
+	{
+		//We are not running the analytics background process, so echo the message and terminate here.
+		//If no file path was given, flood protection will not be necessary, as ParaTracker never had a chance to contact the server.
+		//so it is safe to terminate regardless of whether there was a file path or not.
+		echo $errorMessage;
+		exit();
+	}
 }
 
 function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
@@ -2112,7 +2119,7 @@ function bitvalueCalculator($cvarName, $cvarValue, $arrayList)
 
 function htmlDeclarations($pageTitle, $filePath)
 {
-    $pageTitle = stringValidator($pageTitle, "", "ParaTracker - The Ultimate Quake III Server Tracker");
+    $pageTitle = stringValidator($pageTitle, "", "");
     $output = '<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -2202,7 +2209,7 @@ function dynamicInstructionsPage($personalDynamicTrackerMessage)
 
     $output = htmlDeclarations("", "");
 
-    $output .= '<script src="js/ParaScript.js"></script><meta name="keywords" content="Free PHP server tracker, server, tracker, ID Tech 3, JediTracker, Jedi Tracker, ' . $gameOutput .'Game Tracker, Custom Colors, JSON, Bit Value Calculator, Bit Flag Calculator, Bit Mask Calculator">
+    $output .= '<script src="js/ParaScript.js"></script><meta name="keywords" content="Free PHP server tracker, server, tracker, ID Tech 3, JediTracker, Jedi Tracker, ' . $gameOutput .'Game Tracker, Custom Colors, JSON, Bitfield calculator, Bit Value Calculator, Bit Flag Calculator, bitflag calculator, Bit Mask Calculator, Bitmask Calculator">
   <meta name="description" content="Free Server Tracker for ' . $gameOutput . 'Written in PHP, with custom colors, JSON compatible, Bit Value Calculator">
   <meta name="author" content="Parabolic Minds">
 
@@ -2282,8 +2289,21 @@ $output .= '</p><br><br></div><div class="utilitiesDiv utilitiesBottomRow">';
 //Levelshot requests form
 if (mapreqEnabled == "1")
 {
-    $output .= '<div id="mapreqDiv" class="mapreqDiv collapsedFrame"><span class="reqforminfo">&gt;&gt;&gt; Is ParaTracker missing levelshots? Fill out the below form to request levelshots for a specific map. &lt;&lt;&lt;</span><br>';
-    $output .= '<iframe src="' . utilitiesPath . 'MapReq.php" class="mapReqFrame" allowtransparency="true"></iframe></div>';
+	$output .= '<div id="mapreqDiv" class="mapreqDiv collapsedFrame"><span class="reqforminfo">&gt;&gt;&gt; Is ParaTracker missing levelshots? Fill out the form below to add or request levelshots for a specific map. &lt;&lt;&lt;</span><br>';
+	$output .= '<span class="reqforminfo">If you are submitting your own levelshots, do not resize them. Submit them at full resolution.</span><br>';
+
+	//Find out if we were given a game and/or BSP argument, and pass that on to mapreq
+	$mapReqDataArray = array();
+	if (isset($_GET["gameReq"]))
+	{
+		array_push($mapReqDataArray, 'gameReq=' . stringValidator($_GET["gameReq"], "", ""));
+	}
+	if (isset($_GET["bspReq"]))
+	{
+		array_push($mapReqDataArray, 'bspReq=' . stringValidator($_GET["bspReq"], "", ""));
+	}
+	$mapReqDataArray = implode('&', $mapReqDataArray);
+	$output .= '<iframe src="' . utilitiesPath . 'MapReq.php?' . $mapReqDataArray . '" class="mapReqFrame" allowtransparency="true"></iframe></div>';
 }
 
 
@@ -2776,6 +2796,9 @@ if ($RConPassword != "" && $RConCommand != "")
         {
                 $output .= '';
 
+//				It seems the chr(02) part breaks RCon. Medal of Honor requires the chr(02) in getstatus requests....I do not know if RCon will work without it, and I cannot test it. However, it seems
+//				that other games are broken by the chr(02) and thus it must not be sent.
+//              $s = connectToServerAndGetResponse($serverIPAddress, $serverPort, str_repeat(chr(255),4) . chr(02) . 'RCon ' . $RConPassword . ' ' . $RConCommand, $lastRefreshTime);
                 $s = connectToServerAndGetResponse($serverIPAddress, $serverPort, str_repeat(chr(255),4) . 'RCon ' . $RConPassword . ' ' . $RConCommand, $lastRefreshTime);
 
                 if($s)
@@ -2822,7 +2845,7 @@ function getWebServerName()
 function renderNormalHTMLPage($dynamicIPAddressPath)
 {
 
-$output = htmlDeclarations("ParaTracker - The Ultimate Quake III Server Tracker", "");
+$output = htmlDeclarations(trackerName, "");
 
 $webServerName = getWebServerName();
 
@@ -2952,10 +2975,10 @@ $output .= '<div id="paramButton" onclick="param_window();"><div id="paramButton
 $output .= '<div id="reconnectButton" onclick="pageReload();"><div id="reconnectButtonText" class="reconnectButton textColor"></div></div>';
 
 //This adds the levelshots to the page.
-$output .= '<div id="levelshotPreload2" class="levelshotFrame levelshotSize textColor" onclick="levelshotClick()">
+$output .= '<div id="levelshotPreload2" class="levelshotFrame levelshotSize textColor">
 <div id="levelshotPreload1" class="levelshotSize"></div>
 <div id="bottomLayerFade" class="levelshotSize"></div>
-<div id="topLayerFade" class="levelshotSize"></div>
+<div id="topLayerFade" class="levelshotSize mapreqTextPlacement"></div>
 <div id="loading" class="levelshotSize loadingLevelshot textColor collapsedFrame"></div>
 </div>';
 
@@ -2986,7 +3009,10 @@ function renderJSONOutput($dynamicIPAddressPath)
     array_push($outputArray, JSONString("version", versionNumber()));
 
     //Add the relevant config data and the server ping to the output
-    array_push($outputArray, JSONBoolean("filterOffendingServerNameSymbols", filterOffendingServerNameSymbols));
+    array_push($outputArray, JSONBoolean("mapreqEnabled", mapreqEnabled));
+    array_push($outputArray, JSONString("mapreqTextMessage", mapreqTextMessage));
+
+array_push($outputArray, JSONBoolean("filterOffendingServerNameSymbols", filterOffendingServerNameSymbols));
     array_push($outputArray, JSONNumber("levelshotTransitionTime", levelshotTransitionTime)); //This value takes the transition time value given in ParaConfig and passes it to the Javascript.
     array_push($outputArray, JSONNumber("levelshotDisplayTime", levelshotDisplayTime)); //This value takes the display time given in ParaConfig and passes it to the Javascript.
     array_push($outputArray, JSONNumber("allowTransitions", levelshotTransitionsEnabled));  //Used to test whether fading levelshots is disabled.
@@ -2998,10 +3024,10 @@ function renderJSONOutput($dynamicIPAddressPath)
     array_push($outputArray, JSONString("serverPort", $serverPort));
     array_push($outputArray, JSONString("serverNumericAddress", gethostbyname($serverIPAddress)));
     array_push($outputArray, JSONString("paraTrackerSkin", paraTrackerSkin));
+    array_push($outputArray, JSONString("levelshotPlaceholder", levelshotPlaceholder));
     array_push($outputArray, JSONBoolean("levelshotTransitionsEnabled", levelshotTransitionsEnabled));
     array_push($outputArray, JSONNumber("levelshotTransitionAnimation", levelshotTransitionAnimation));
     array_push($outputArray, JSONString("noPlayersOnlineMessage", noPlayersOnlineMessage));
-    array_push($outputArray, JSONBoolean("enableAutoRefresh", enableAutoRefresh));
     array_push($outputArray, JSONNumber("autoRefreshTimer", autoRefreshTimer));
     array_push($outputArray, JSONBoolean("RConEnable", RConEnable));
     array_push($outputArray, JSONNumber("RConFloodProtect", RConFloodProtect));
@@ -3010,9 +3036,17 @@ function renderJSONOutput($dynamicIPAddressPath)
 
     array_push($outputArray, JSONString("connectionErrorMessage", file_get_contents(infoPath . $dynamicIPAddressPath . "connectionErrorMessage.txt")));
 
-    //Time for levelshot stuff. Get the array from the file, explode it and validate it as an array of strings
-    array_push($outputArray, JSONArray("levelshotsArray", explode(":#:", file_get_contents(infoPath . $dynamicIPAddressPath . "levelshots.txt")), 3));
-
+	//Time for levelshot stuff. Get the array from the file, explode it and validate it as an array of strings
+	$levelshotsInput = file_get_contents(infoPath . $dynamicIPAddressPath . "levelshots.txt");
+	if(empty($levelshotsInput))
+	{
+		//If there's nothing here, pass on a null
+		array_push($outputArray, JSONArray("levelshotsArray", "", 3));
+	}
+	else
+	{
+		array_push($outputArray, JSONArray("levelshotsArray", explode(":#:", $levelshotsInput), 3));
+	}
 
     array_push($outputArray, JSONNumber("reconnectTimeout", floodProtectTimeout));
 
@@ -3168,6 +3202,11 @@ function JSONArray($variableName, $input, $mode)
     {
         $input = JSONValidateArray($mode, $input);
     }
+	//Check to see if the array is empty - if so, pass that on
+    if(empty($input))
+	{
+		return $variableName . '[]';
+	}
     //Return a string of the variable name, and the array delimited with commas
     if(is_array($input))
     {
@@ -3341,185 +3380,226 @@ function checkDatabaseForServerTime($dynamicIPAddressPath)
 
 function disableServerInDatabase($input)
 {
-    if($input == "") return 0;
-    $broken = breakDynamicAddressPath($input);
+	if($input == "") return 0;
+	$broken = breakDynamicAddressPath($input);
 
-    $serverAddress = $broken[0];
-    $serverPort = $broken[1];
+	$serverAddress = $broken[0];
+	$serverPort = $broken[1];
 
-    global $pgCon;
-    if(!pg_query_params($pgCon, 'UPDATE tracker.server SET active = FALSE WHERE location = $1 AND port = $2', array($serverAddress, $serverPort))) return 0;
-    return 1;
+	global $pgCon;
+	if(!pg_query_params($pgCon, 'UPDATE tracker.server SET active = FALSE WHERE location = $1 AND port = $2', array($serverAddress, $serverPort))) return 0;
+	return 1;
 }
 
 function getSystemLoadAverage()
 {
-    //This feature only works on Linux.
-    //If we are on any other OS, the function needs to return
-    //a 0, falsely indicating 0 load so as to not break anything.
-    $loadAverage = "0";
-    if(function_exists("sys_getloadavg"))
-    {
-        $loadArray = sys_getloadavg();
-        $cpuCores = shell_exec("cat /proc/cpuinfo | grep processor | wc -l");
+	//This feature only works on Linux.
+	//If we are on any other OS, the function needs to return
+	//a 0, falsely indicating 0 load so as to not break anything.
+	$loadAverage = "0";
+	if(function_exists("sys_getloadavg"))
+	{
+		$loadArray = sys_getloadavg();
+		$cpuCores = shell_exec("cat /proc/cpuinfo | grep processor | wc -l");
 
-        $loadAverage = $loadArray[2] / intval(trim($cpuCores));
-    }
-    return round($loadAverage * 100, 2);
+		$loadAverage = $loadArray[2] / intval(trim($cpuCores));
+	}
+	return round($loadAverage * 100, 2);
 }
 
 function getDirectoryList($input)
 {
-    $directoryList = scandir($input);
+	$directoryList = scandir($input);
 
-    $output = array();
+	$output = array();
 
-    $count = count($directoryList);
-    for($i = 0; $i < $count; $i++)
-    {
-        if($directoryList[$i] != "." && $directoryList[$i] != "..")
-        {
-            array_push($output, $directoryList[$i]);
-        }
-    }
-return $output;
+	$count = count($directoryList);
+	for($i = 0; $i < $count; $i++)
+	{
+		if($directoryList[$i] != "." && $directoryList[$i] != "..")
+		{
+			array_push($output, $directoryList[$i]);
+		}
+	}
+	return $output;
 }
 
-function cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $cleanupLogSize)
+function cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $cleanupLogSize, $forced)
 {
-    $cleanupTimer = microtime(true);
-    $loadAverage = getSystemLoadAverage();
+	$loadAverage = getSystemLoadAverage();
 
-    //Let's make these useful
-    $deleteInterval = $deleteInterval * 86400;
-    $deleteInterval = time() - $deleteInterval;
-    $cleanupInterval = $cleanupInterval * 60;
+	$forced = booleanValidator($forced, false);
 
-    //Get the info folder's timeout file and validate it
-    $currentTimer = numericValidator(file_get_contents(infoPath . "cleanupTimer.txt"), "", "", "0");
+	//Let's make these useful
+	//Anything LESS than $deleteInterval will be deleted
+	$deleteInterval = $deleteInterval * 86400;
+	$deleteInterval = time() - $deleteInterval;
+	$cleanupInterval = $cleanupInterval * 60;
 
-    //If the delete interval is larger than the current timer, ParaTracker was likely offline or not working, so no data should be cleaned up this time.
-    //Running cleanup wrongfully will mess up analytics.
-    if($currentTimer < $deleteInterval)
+	//Get the info folder's timeout file and validate it
+	$currentTimer = numericValidator(file_get_contents(infoPath . "cleanupTimer.txt"), "", "", "0");
+    
+	//If the delete interval is larger than the current timer, ParaTracker was likely offline or not working, so no data should be cleaned up this time.
+	//Running cleanup wrongfully will mess up analytics.
+	if($currentTimer < $deleteInterval)
+	{
+		$warningMessage = date(DATE_RFC2822) . ": Warning: massive gap in cleanup timer detected! ParaTracker assumed offline for an extended period of time. Foregoing cleanup and resetting timer to preserve data.";
+		writeToLogFile("cleanupLog.php", array($warningMessage, ""), $cleanupLogSize);
+		echo $warningMessage;
+		file_put_contents(infoPath . "cleanupTimer.txt", time());
+		return "";
+	}
+
+    if(($currentTimer + $cleanupInterval < time() && $currentTimer > 0) || $forced)
     {
-        $warningMessage = date(DATE_RFC2822) . ": Warning: massive gap in cleanup timer detected! ParaTracker assumed offline for an extended period of time. Foregoing cleanup and resetting timer to preserve data.";
-        writeToLogFile("cleanupLog.php", array($warningMessage, ""), $cleanupLogSize);
-        echo $warningMessage;
-        file_put_contents(infoPath . "cleanupTimer.txt", time());
-        return "";
-    }
+		$totalCleanupTimer = microtime(true);
+		$cleanupTimer = microtime(true);
 
-    if($currentTimer + $cleanupInterval < time() && $currentTimer > 0)
-    {
-        //Prevent users from aborting the page so the cleanup will always finish!
-        ignore_user_abort(true);
+		//Prevent users from aborting the page so the cleanup will always finish!
+		ignore_user_abort(true);
 
-        //First thing's first, we need to prevent a second cleanup from running.
-        file_put_contents(infoPath . "cleanupTimer.txt", time());
+		//Ignore the time limit so the cleanup always gets a chance to run completely
+		set_time_limit(0);
 
-        //Let's start a new cleanup log entry.
-        $cleanupLog = array("Running cleanup on " . date(DATE_RFC2822) . ":");
+		//First thing's first, we need to prevent a second cleanup from running.
+		file_put_contents(infoPath . "cleanupTimer.txt", time());
 
-        if($loadAverage > $loadLimit)
-        {
-            array_push($cleanupLog, "Server load is too high! Load is currently " . $loadAverage . "%, the limit is " . $loadLimit . "%. Cleanup cancelled.");
-        }
-        else
-        {
-            array_push($cleanupLog, "Server load OK! " . $loadAverage . "% load, threshold for cancellation is " . $loadLimit . "%. Starting cleanup...");
+		//Let's start a new cleanup log entry.
+		$cleanupLog = array("Running cleanup on " . date(DATE_RFC2822) . ":");
 
-            //Time to run cleanup!
-            echo " Running cleanup... ";
+		if($loadAverage > $loadLimit && !$forced)
+		{
+			array_push($cleanupLog, "Server load is too high! Load is currently " . $loadAverage . "%, the limit is " . $loadLimit . "%. Cleanup cancelled.");
+		}
+		else
+		{
+			if($forced)
+			{
+				array_push($cleanupLog, "Forced to run by admin. Server at " . $loadAverage . "% load, threshold for cancellation is " . $loadLimit . "%. Starting cleanup...");
+			}
+			else
+			{
+				array_push($cleanupLog, "Server load OK! " . $loadAverage . "% load, threshold for cancellation is " . $loadLimit . "%. Starting cleanup...");
+			}
 
-            $directoryList = getDirectoryList(infoPath);
-            $count = count($directoryList);
+			//Time to run cleanup!
+			echo " Running cleanup... ";
+            
+			$directoryList = getDirectoryList(infoPath);
+			$count = count($directoryList);
 
-            //Loop through the array of folders, and check the time values on everything. If the folder hasn't been refreshed in a while, delete it.
-            for($i = 0; $i < $count; $i++)
-            {
-                //Make sure we are only cleaning up directories, and not files!
-                if(is_dir(infoPath . $directoryList[$i]))
-                {
-                    if(file_exists(infoPath . $directoryList[$i] . "/time.txt"))
-                    {
-                        $currentInfoFolderTime = numericValidator(file_get_contents(infoPath . $directoryList[$i] . "/time.txt"), "", "", "wait");
-                    }
-                    else
-                    {
-                        $currentInfoFolderTime = 0;
-                    }
+			//Loop through the array of folders, and check the time values on everything. If the folder hasn't been refreshed in a while, delete it.
+			for($i = 0; $i < $count; $i++)
+			{
+				//Make sure we are only cleaning up directories, and not files!
+				if(is_dir(infoPath . $directoryList[$i]))
+				{
+					//If we're using analytics, the database value should provide the last refresh time
+					if(analyticsEnabled)
+					{
+						$testTime = checkDatabaseForServerTime($directoryList[$i]);
+						if($testTime < $deleteInterval)
+						{
+							array_push($cleanupLog, "Database requires deletion of:  " . infoPath . $directoryList[$i]);
+							$currentInfoFolderTime = $deleteInterval - 1;
+						}
+						else
+						{
+							$currentInfoFolderTime = microtime(true);
+						}
+					}
+					else
+					{
+						//We are not using analytics, so check time.txt for the last time the server was contacted
+						if(file_exists(infoPath . $directoryList[$i] . "/time.txt"))
+						{
+							//If we receive a non-numeric answer, that's because the file reads "wait" - the server is currently being contacted.
+							//So, non-numeric values must default to the current time to prevent deletion.
+							$currentInfoFolderTime = numericValidator(file_get_contents(infoPath . $directoryList[$i] . "/time.txt"), "", "", microtime(true));
+						}
+						else
+						{
+							$currentInfoFolderTime = 0;
+						}
+					}
 
-                    //If we're using analytics, the database value should override the last refresh time
-                    if(analyticsEnabled && checkDatabaseForServerTime($directoryList[$i]) < $deleteInterval)
-                    {
-                        array_push($cleanupLog, "Database requires deletion of:  " . infoPath . $directoryList[$i]);
-                        $currentInfoFolderTime = $deleteInterval - 1;
-                    }
+					if($currentInfoFolderTime < $deleteInterval)
+					{
+						array_push($cleanupLog, "Emptying:  " . infoPath . $directoryList[$i]);
+						//The timer is older than the threshold. Delete the entire folder.
+						//All files must be deleted before the directory can be removed.
+						$directoryList2 = getDirectoryList(infoPath . $directoryList[$i]);
+						$count2 = count($directoryList2);
+						for($j = 0; $j < $count2; $j++)
+						{
+							if(!unlink(infoPath . $directoryList[$i] . "/" . $directoryList2[$j]))
+							{
+								array_push($cleanupLog, "    Failed to delete:  " . infoPath . $directoryList[$i] . "/" . $directoryList2[$j]);
+							}
+						}
+						if(rmdir(infoPath . $directoryList[$i]))
+						{
+							//Success! Add it to the cleanup log.
+							$deletionMessage = 'Deleted:  ' . infoPath . $directoryList[$i];
+							if(disableServerInDatabase($directoryList[$i]))
+							{
+								$deletionMessage .= ' Successfully disabled server in database.';
+							}
+							else
+							{
+								$deletionMessage .= ' Failed to disable server in database.';
+							}
+							array_push($cleanupLog, $deletionMessage);
+						}
+							else
+						{
+							//Failed! Add it to the cleanup log.
+							$deletionMessage = 'Failed to delete:  ' . infoPath . $directoryList[$i];
+							if(analyticsEnabled && disableServerInDatabase($directoryList[$i]))
+							{
+								$deletionMessage .= ' Successfully disabled server in database.';
+							}
+							else
+							{
+								$deletionMessage .= ' Failed to disable server in database.';
+							}
+							array_push($cleanupLog, $deletionMessage);
+						}
+					}
+					else
+					{
+						//Commented out because it was generating too many junk messages
+						//array_push($cleanupLog, "Ignored:  " . infoPath . $directoryList[$i] . " Time is too soon. " . $currentInfoFolderTime . " < " . $deleteInterval);
+					}
+				}
+			}
+			array_push($cleanupLog, 'Done! Took ' . number_format(((microtime(true) - $cleanupTimer) * 1000), 0) . ' milliseconds.');
 
-                    if($currentInfoFolderTime < $deleteInterval && $currentInfoFolderTime != "wait")
-                    {
-                        array_push($cleanupLog, "Emptying:  " . infoPath . $directoryList[$i]);
-                        //The timer is older than the threshold. Delete the entire folder.
-                        //All files must be deleted before the directory can be removed.
-                        $directoryList2 = getDirectoryList(infoPath . $directoryList[$i]);
-                        $count2 = count($directoryList2);
-                        for($j = 0; $j < $count2; $j++)
-                        {
-                            if(!unlink(infoPath . $directoryList[$i] . "/" . $directoryList2[$j]))
-                            {
-                                array_push($cleanupLog, "    Failed to delete:  " . infoPath . $directoryList[$i] . "/" . $directoryList2[$j]);
-                            }
-                        }
-                        if(rmdir(infoPath . $directoryList[$i]))
-                        {
-                            //Success! Add it to the cleanup log.
-                            $deletionMessage = 'Deleted:  ' . infoPath . $directoryList[$i];
-                            if(disableServerInDatabase($directoryList[$i]))
-                            {
-                                $deletionMessage .= ' Successfully disabled server in database.';
-                            }
-                            else
-                            {
-                                $deletionMessage .= ' Failed to disable server in database.';
-                            }
-                            array_push($cleanupLog, $deletionMessage);
-                        }
-                         else
-                        {
-                            //Failed! Add it to the cleanup log.
-                            $deletionMessage = 'Failed to delete:  ' . infoPath . $directoryList[$i];
-                            if(analyticsEnabled && disableServerInDatabase($directoryList[$i]))
-                            {
-                                $deletionMessage .= ' Successfully disabled server in database.';
-                            }
-                            else
-                            {
-                                $deletionMessage .= ' Failed to disable server in database.';
-                            }
-                            array_push($cleanupLog, $deletionMessage);
-                        }
-                    }
-                    else
-                    {
-//                        array_push($cleanupLog, "Ignored:  " . infoPath . $directoryList[$i] . " Time is too soon. " . $currentInfoFolderTime . " < " . $deleteInterval);
-                    }
-                }
-            }
+			//Now let's clean up the map requests, if they are enabled.
+			if(mapreqEnabled)
+			{
+				array_push($cleanupLog, 'Starting cleanup of levelshot requests...');
+				$cleanupTimer = microtime(true);
+				$mapsArray = mapreq_get_maps();
+				$count2 = count($mapsArray);
 
-            //Now let's clean up the map requests, if they are enabled.
-            if(mapreqEnabled)
-            {
-                array_push($cleanupLog, "Done! Starting cleanup of levelshot requests...");
-                $mapsArray = mapreq_get_maps();
-                $count2 = count($mapsArray);
+				$supportedGameList = detectGameName("")[0];
 
-                $previousGame_name = "";
-                for($i = 0; $i < $count2; $i++)
-                {
-                    $game_name = $mapsArray[$i]['game_name'];
-                    $bsp_name = $mapsArray[$i]['bsp_name'];
+				$previousGame_name = "";
+				for($i = 0; $i < $count2; $i++)
+				{
+					$game_name = $mapsArray[$i]['game_name'];
+					$bsp_name = $mapsArray[$i]['bsp_name'];
 
-                    //Check to see if we're parsing the same game as before. This should reduce calls to the game parser
+					//Check to see if the game exists in the first place. If it does not, remove all entries for it.
+					if(!checkMatch($game_name, $supportedGameList))
+					{
+						array_push($cleanupLog, "Unsupported game: '" . $game_name . "' - removing entry '" . $bsp_name . "'!");
+						mapreq_delete_map($game_name, $bsp_name);
+						continue;
+					}
+
+					//Check to see if we're parsing the same game as before. This should reduce calls to the game parser
 					if($game_name != $previousGame_name)
 					{
 						//Insert game-specific function execution here
@@ -3527,27 +3607,69 @@ function cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $clean
 						$levelshotFolder = $gameFunctionParserReturn[1];
 					}
 					//Now that we're past game detection, set this value
-                    $previousGame_name = $game_name;
+					$previousGame_name = $game_name;
 
-                    $shotNumber = levelshotfinder("", $bsp_name, $levelshotFolder, $game_name, 1);
+					$shotNumber = levelshotfinder("cleanup", $bsp_name, $levelshotFolder, $game_name, 1);
 
-                    if($shotNumber > 0)
-                    {
-                        array_push($cleanupLog, "Levelshots found for " . $game_name . " - '" . $bsp_name . "', removing request!");
-                        mapreq_delete_map($game_name, $bsp_name);
-                    }
-                }
-                array_push($cleanupLog, 'Finished cleanup! Took ' . number_format(((microtime(true) - $cleanupTimer) * 1000), 0) . ' milliseconds');
-            }
+					if($shotNumber > 0)
+					{
+						array_push($cleanupLog, "Levelshots found for " . $game_name . " - '" . $bsp_name . "', removing request!");
+						mapreq_delete_map($game_name, $bsp_name);
+					}
+				}
+				array_push($cleanupLog, 'Done! Took ' . number_format(((microtime(true) - $cleanupTimer) * 1000), 0) . ' milliseconds.');
+			}
 
-        }
-    //Add a space at the end of the cleanup log, for readability
-    $cleanupLog = array_merge($cleanupLog, array(""));
-    writeToLogFile("cleanupLog.php", $cleanupLog, $cleanupLogSize);
+			if(cullDatabase)
+			{
+				//The database may need to have old data culled out. Check it!
+				array_push($cleanupLog, 'Culling database...');
+				$cleanupTimer = microtime(true);
 
-    //Allow users to abort the page again.
-    ignore_user_abort(false);
-    }
+				cullOldDatabaseEntries();
+				array_push($cleanupLog, 'Finished! Took ' . number_format(((microtime(true) - $cleanupTimer) * 1000), 0) . ' milliseconds.');
+			}
+
+			array_push($cleanupLog, 'Cleanup complete! Took ' . number_format(((microtime(true) - $totalCleanupTimer) * 1000), 0) . ' milliseconds.');
+
+		}
+		//Add a space at the end of the cleanup log, for readability
+		$cleanupLog = array_merge($cleanupLog, array(""));
+		writeToLogFile("cleanupLog.php", $cleanupLog, $cleanupLogSize);
+
+		//Allow users to abort the page again.
+		ignore_user_abort(false);
+
+		//Allow the time limit to run as normal again.
+		set_time_limit(30);
+	}
+}
+
+function cullOldDatabaseEntries()
+{
+	if(cullDatabase)
+	{
+		global $pgCon;
+		$cullTime = strtotime('-' . databaseCullTime . ' days');
+
+		pg_query($pgCon, 'BEGIN');
+		pg_query_params($pgCon, 'DELETE FROM analytics.record USING analytics.frame WHERE record_id = record.id AND entrydate < to_timestamp($1)', array($cullTime));
+		pg_query_params($pgCon, 'DELETE FROM analytics.frame WHERE entrydate < to_timestamp($1)', array($cullTime));
+		pg_query($pgCon, 'COMMIT');
+	}
+}
+
+function checkMatch($inputGame, $inputArray)
+{
+	$count = count($inputArray);
+	for($i = 0; $i < $count; $i++)
+	{
+		if($inputGame == $inputArray[$i])
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 // returns array of hashmap (with 'game_name' and 'bsp_name'), i.e. $data[2]['bsp_name']
@@ -3572,6 +3694,7 @@ function getOptionLength($input)
 {
 	$temp = strrpos($input, ':');
 	return array($temp, strlen($input) - $temp);
+echo "\n" . $temp . "\n";
 }
 
 function padOutputAndImplode($input, $glue)
@@ -3607,7 +3730,11 @@ function padOutputAddHyperlinksAndImplode($input, $glue)
 {
 	//This function adds spaces to lines at the beginning and end, to align them for the best readability
 
+	//This variable is what is used to pad the output
 	$pad = '&nbsp;';
+
+	//This variable is used to pad the port numbers by a specific number.
+	$linkSpacing = 3;
 
 	$LPadMax = 0;
 	$RPadMax = 0;
@@ -3628,7 +3755,8 @@ function padOutputAddHyperlinksAndImplode($input, $glue)
 		$Rpad = $options[1];
 		$ipaddress = explode(":", $input[$i])[0];
 		$port = explode(":", $input[$i])[1];
-		$input[$i] = str_repeat($pad, $LPadMax - $Lpad) . $input[$i] . '<span class="noSelect">' . str_repeat($pad, 8 - count($port)) . '<a href="https://' . getWebServerName() . '/ParaTrackerDynamic.php?ip=' . $ipaddress . '&port=' . $port . '" target="_blank" class="adminTrackLink">Track</a>' . str_repeat($pad, $RPadMax - $Rpad) . "</span>";
+
+		$input[$i] = '<span class="noSelect">' . str_repeat($pad, $LPadMax - $Lpad) . '</span>' . $input[$i] . '<span class="noSelect">' . str_repeat($pad, $linkSpacing + ($RPadMax - strlen($port))) . '<a href="https://' . getWebServerName() . '/ParaTrackerDynamic.php?ip=' . $ipaddress . '&port=' . $port . '" target="_blank" class="adminTrackLink">Track</a></span>';
 	}
 
 	return implode($glue, $input);
@@ -3763,6 +3891,15 @@ function writeNewConfigFile() {
 
 
 /*==================================================================================================*/
+// TRACKER NAME
+// TRACKER NAME
+
+//This value appears in the title bar of the browser. It will show up in Google search results - choose wisely!
+//Default value is "ParaTracker - The Ultimate Quake III Server Tracker"
+$trackerName = "ParaTracker - The Ultimate Quake III Server Tracker";
+
+
+/*==================================================================================================*/
 // NETWORK SETTINGS
 // NETWORK SETTINGS
 
@@ -3867,8 +4004,25 @@ $customFont = "";
 // For instance, to have three animated levelshots for mp/ffa5, the files would have to be
 // named ffa5_1.jpg, ffa5_2.jpg, and ffa5_3.jpg
 
-// ParaTracker will use any combination of PNG, JPG, and GIF images. PNGs will be searched for first, JPGs second,
-// and GIFs third. If no images are found, a placeholder image will be displayed instead.
+// The following array is a list of levelshot file extensions supported by the tracker.
+// You can add as many extensions as you like. Add each file extension on a new line, between the double
+// quotes, and make sure there is a comma at the end of each line, with the exception of the last line.
+// Do not inclue the "." - just the letters of the extension. "jpg", "png", etc. When the levelshot finder
+// searches for images, it will search in the order of this array and stop when it finds a match.
+// Prioritize the extensions carefully!
+// Example:
+// $fileExtList = array(
+// "webp",
+// "png",
+// "jpg",
+// "gif"
+// );
+$fileExtList = array(
+"webp",
+"png",
+"jpg",
+"gif"
+);
 
 // The following value will enable or disable levelshot transitions. A value of 1 or "Yes" will allow them,
 // and any other value will disable them. If this is disabled, only the first levelshot will show.
@@ -4083,6 +4237,11 @@ $analyticsFrontEndEnabled = "1";
 // Default is 0
 $mapreqEnabled = "0";
 
+// If mapreq is enabled and the server being tracked does not have levelshots, ParaTracker will display this message to
+//encourage users to submit their own levelshots.
+//Default is "Click here to add levelshots"
+$mapreqTextMessage = "Click here to add levelshots";
+
 
 /*==================================================================================================*/
 // EMAIL SETTINGS
@@ -4174,6 +4333,17 @@ $deleteInterval = "7";
 // Minimum is 50, maximum is 100
 // Default is 90
 $loadLimit = "90";
+
+// This variable is boolean. When this variable is set to Yes or 1, ParaTracker will remove old entries
+// from the analytics database as part of the cleanup process.
+// Default is 1.
+$cullDatabase = "1";
+
+// This variable determines how many days entries will be left in the analytics database before removal.
+// This will have no effect if $cullDatabase (Above) is disabled.
+// Minimum is 90 days, maximum is 2000 days.
+// Default is 370 days.
+$databaseCullTime = 370;
 
 
 /*==================================================================================================*/

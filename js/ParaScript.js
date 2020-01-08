@@ -1,5 +1,7 @@
 ﻿refreshCancelled = 0
 animationList = []
+levelshots = []
+mapreqText = ""
 teamCount = 0
 team1score = 0
 team2score = 0
@@ -9,11 +11,19 @@ team1count = 0
 team2count = 0
 team3count = 0
 team4count = 0
+timer = ""
 
 document.addEventListener("DOMContentLoaded", function(event)
 {
     changeSetupPageFunction()
 })
+
+function adminConfirmationClicked(elementToReplace)
+{
+	clear_element(document.getElementById(elementToReplace))
+	document.getElementById(elementToReplace).appendChild(document.createTextNode("Working..."))
+}
+
 
 //This function opens the param window
 function param_window()
@@ -33,7 +43,16 @@ function rcon_window()
 //This function opens the Analytics window
 function analytics_window()
 {
-		analyticsWindow = window.open(data.utilitiesPath + "Analytics.php?ip=" + data.serverIPAddress + "&port=" + data.serverPort, "analyticsWindow" ,"resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=1100,height=800");
+	if (data.mapreqEnabled === true)
+	{
+		analyticsWindow = window.open(data.utilitiesPath + "Analytics.php?ip=" + data.serverIPAddress + "&port=" + data.serverPort, "analyticsWindow" ,"resizable=no,titlebar=no,menubar=no,status=no,scrollbars=yes,width=1200,height=800");
+	}
+}
+
+//This function opens the utilities page, to the mapreq option
+function mapreq_window()
+{
+	mapreqWindow = window.open("ParaTrackerDynamic.php?gameReq=" + data.serverInfo.gamename + "&bspReq=" + data.serverInfo.mapname + "#mapreq", "mapreqWindow" ,"resizable=yes,titlebar=yes,menubar=yes,status=yes,scrollbars=yes,width=1200,height=800");
 }
 
 //This function opens the Analytics window
@@ -185,48 +204,88 @@ function firstExecution()
         blinker = document.getElementById("blinker")
     }
     
-    activeLevelshotTransitions = []
-    if (data.levelshotTransitionAnimation) {
+	activeLevelshotTransitions = []
+	if (data.levelshotTransitionAnimation) {
 		for (let i = 0; i < 15; i++)
 			if ((1 << i) & data.levelshotTransitionAnimation) activeLevelshotTransitions.push(i)
 	}
 
-    levelshots = data.levelshotsArray
-    maxLevelshots = levelshots.length
-    setUpLevelshots()
-    inputData()
+	setUpLevelshots()
+	inputData()
 }
 
 function setUpLevelshots()
 {
+    //Let's make sure any mapreq text is cleared before we start
+    clear_element(topLayerFade)
     shot = 1;   //Levelshot number.
     opac = 1;   //Opacity level for the top layer.
     mode = 1;   //0 means we are delaying between fades. 1 means a fade is in progress.
     count = 0;
 
-    if (maxLevelshots > 1 && typeof topLayerFade !== 'undefined');
-        {
-            detectLevelshotClasses();
-            document.getElementById("topLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
-            shot++;
-            document.getElementById("bottomLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+	if(data.levelshotsArray.length == 0)
+	{
+		//No levelshots were sent. Use the placeholder image.
+		levelshots = []
+		levelshots.push(data.levelshotPlaceholder)
+		//Disable clicking since there are no levelshots
+		topLayerFade.onclick = ""
+	}
+	else
+	{
+		levelshots = data.levelshotsArray
+		//Enable clicking since there are levelshots
+		topLayerFade.onclick = levelshotClick
+	}
+	maxLevelshots = levelshots.length
 
-            //let's set up a pre-loader in case there are more than 2 levelshots
-            shot++;
-            //In case there are only two levelshots, then we will just go back to shot 1
-            if(shot > maxLevelshots) shot = 1;
-            document.getElementById("levelshotPreload1").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+	detectLevelshotClasses();
+	if (maxLevelshots == 1 && typeof topLayerFade !== 'undefined')
+    {
+			document.getElementById("topLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+	}
 
-            shot++;
-            //In case there are only three levelshots, then we will just go back to shot 1
-            if(shot > maxLevelshots) shot = 1;
-            document.getElementById("levelshotPreload2").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+	if (maxLevelshots > 1 && typeof topLayerFade !== 'undefined')
+    {
+		document.getElementById("topLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+		shot++;
+		document.getElementById("bottomLayerFade").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
 
-            if(allowTransitions == 1)
-            {
-                timer = setTimeout("animateLevelshot()", 1000 * levelshotDisplayTime);
-            }
-        }
+		//let's set up a pre-loader in case there are more than 2 levelshots
+		shot++;
+		//In case there are only two levelshots, then we will just go back to shot 1
+		if(shot > maxLevelshots) shot = 1;
+		document.getElementById("levelshotPreload1").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+
+		shot++;
+		//In case there are only three levelshots, then we will just go back to shot 1
+		if(shot > maxLevelshots) shot = 1;
+		document.getElementById("levelshotPreload2").style.cssText = 'background: url("' + levelshots[shot - 1] + '"); background-size: 100% 100%; background-repeat: no-repeat;';
+
+		if(allowTransitions == 1)
+		{
+			timer = setTimeout("animateLevelshot()", 1000 * levelshotDisplayTime)
+		}
+	}
+
+	if(data.levelshotsArray.length == 0 && data.serverOnline)
+	{
+		if (data.mapreqEnabled === true && data.serverInfo.gamename.toLowerCase() != "unrecognized game" && data.serverInfo.gamename.toLowerCase() != "unknown game")
+		{
+			//If no levelshots are available, and mapreq is enabled, we should suggest to the user that they add some
+			if(data.levelshotsArray.length == 0)
+			{
+				//topLayerFade is the layer to add text to
+				mapreqText = document.createElement('div')
+				mapreqText.className = "levelshotSize mapreqMessage"
+				mapreqText.id = "mapreqText"
+				mapreqText.onclick = mapreq_window
+				mapreqText.appendChild(document.createTextNode(data.mapreqTextMessage))
+				clear_element(topLayerFade)
+				topLayerFade.appendChild(mapreqText)
+			}
+		}
+	}
 }
 
 function inputData()
@@ -236,7 +295,7 @@ function inputData()
 
      if(data.serverInfo)
      {
-        if(mapname != data.serverInfo.mapname || maxLevelshots != data.levelshotsArray.length)
+        if(mapname != data.serverInfo.mapname || (maxLevelshots != data.levelshotsArray.length && data.levelshotsArray.length > 0))
         {
             //Set mode to 0 to prevent further triggering
             mode = 0;
@@ -244,12 +303,9 @@ function inputData()
 
             //Either the map has changed, or the levelshots have changed.
             //Load new levelshots and restart the script.
-
             expandDiv('loading')
             document.getElementById('loading').style.cssText = "animation-duration: .5s; animation-fill-mode: forwards; animation-name: loadingLevelshotAnimationOn;"
             mapname = data.serverInfo.mapname
-            levelshots = data.levelshotsArray
-            maxLevelshots = levelshots.length
             setupTimer = setTimeout("setUpLevelshots()", 550)
             loadTimer = setTimeout("document.getElementById('loading').style.cssText = 'animation-duration: .5s; animation-fill-mode: forwards; animation-name: loadingLevelshotAnimationOff;'", 1550)
             loadTimer2 = setTimeout("contractDiv('loading')", 2100)
@@ -299,7 +355,7 @@ function inputData()
         }
 
         changeHTMLData(mapNameObject, data.info.mapname)
-        changeHTMLData(modNameObject, data.info.gamename)
+        changeHTMLData(modNameObject, data.serverInfo.modName)
         changeHTMLData(gametypeObject, data.serverInfo.gametype)
         changeHTMLData(serverPingObject, data.serverInfo.serverPing)
         changeHTMLData(IPAddressObject, data.serverIPAddress + ":" + data.serverPort)

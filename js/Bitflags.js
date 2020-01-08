@@ -38,7 +38,6 @@ function setup() {
 			// ================
 			let set_content_top = document.createElement('div')
 			set_content_top.className = 'bitflags_container_top'
-			set_content_top.id = 'bitflags_container_top'
 			let set_content_bottom = document.createElement('div')
 			set_content_bottom.className = 'bitflags_container_bottom'
 			set_content.appendChild(set_content_top)

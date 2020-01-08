@@ -28,6 +28,20 @@ if(mapreqEnabled == "0")
     displayError("Mapreq is disabled! Mapreq must be enabled in ParaConfig.php.", "", "");
 }
 
+//Set the default game to select from the list later on
+$gameReq = "jedi academy";
+$bspReq = "";
+
+//If another game is specified, then we'll use it instead of the one above
+if (isset($_GET["gameReq"]))
+{
+	$gameReq = stringValidator($_GET["gameReq"], "", "");
+}
+if (isset($_GET["bspReq"]))
+{
+	$bspReq = strtolower(stringValidator($_GET["bspReq"], "", ""));
+}
+
 $output = htmlDeclarations("", "../");
 
 $output .= '<link rel="stylesheet" href="../css/ParaSetup.css" type="text/css" />';
@@ -88,7 +102,7 @@ $output .= '<body class="mapReqPageStyle">
                 }
             }
 
-            $output .='<div class="reqformrow">
+				$output .='<div class="reqformrow">
                 <span class="reqformlabel">Game Name:</span>';
 
                 $gameListArray = detectGameName("");
@@ -101,7 +115,7 @@ $output .= '<body class="mapReqPageStyle">
                 for($i = 0; $i < $count; $i++)
                 {
 					$output .= '<option ';
-                    if(strtolower(trim($gameList[$i])) == "jedi academy")
+                    if(strtolower(trim($gameList[$i])) == strtolower(trim($gameReq)))
                     {
                         $output .= 'selected="selected" ';
                     }
@@ -111,11 +125,12 @@ $output .= '<body class="mapReqPageStyle">
                 }
                 
                 $output .= '</select>';
-
+echo '>> ' . $bspReq . ' <<
+';
             $output .= '</div>
             <div class="reqformrow">
                 <span class="reqformlabel">BSP Name:</span>
-                <input class="reqformtextentry" type="text" name="mapreq_bsp_name" placeholder="">
+                <input class="reqformtextentry" type="text" name="mapreq_bsp_name" value="' . $bspReq . '">
             </div>
             <div class="reqformrow">
                 <span class="reqformlabel">Map or Image(s) Link:</span>

@@ -18,7 +18,7 @@ if (!isset($safeToExecuteGameInfo))
 // CVar names must also be lowercase.
 // The function will be executed during data parsing.
 
-Function detectGameName($input)
+Function detectGameName($input = "")
 {
             // This function is used to auto-detect the name of the game being tracked.
             // If you add a game, add it to this array. Each line detects a different game.
@@ -39,10 +39,10 @@ Function detectGameName($input)
             "galaxies" => "Jedi Knight Galaxies",
             "JAmp" => "Jedi Academy",
             "JK2" => "Jedi Outcast",
-            "Nexuiz" => "Nexuiz Classic",
             "urt" => "Urban Terror",
             "q3ut" => "Urban Terror",
             "ioq3" => "Open Arena",
+            "quake3" => "Quake III Arena",
             "quake" => "Quake",
             "Q3" => "Quake III Arena",
             "sof2" => "Soldier of Fortune II: Double Helix",
@@ -55,7 +55,10 @@ Function detectGameName($input)
             "jka" => "Jedi Academy",
             "jko" => "Jedi Outcast",
             "openJK" => "Jedi Academy",
-            "ET" => "Wolfenstein: Enemy Territory"
+            "ET" => "Wolfenstein: Enemy Territory",
+            "Honor Allied" => "Medal Of Honor: Allied Assault",
+            "Honor Pacific" => "Medal Of Honor: Pacific Assault",
+            "worldofpadman" => "World of Padman"
 
             );
 
@@ -132,17 +135,39 @@ Function detectGameName($input)
             return false;
 }
 
+function getTeamScore($searchTerm, $cvars_hash_decolorized)
+{
+	if(isset($cvars_hash_decolorized[$searchTerm]) && is_numeric($cvars_hash_decolorized[$searchTerm]))
+	{
+		return $cvars_hash_decolorized[$searchTerm];
+	}
+	else
+	{
+		return "";
+	}
+}
+
 function parseGametype($inputGametype, $gametypeArray)
 {
 	if(empty($gametypeArray))
 	{
+		//Error suppression
 		$gametypeArray = array();
 	}
 	
 	if(is_numeric($inputGametype))
 	{
 		//The value is numeric - so it must be an array index
+
+		//If the gametype array is empty, then just display the numeric value. There is nothing more we can do.
+		if(count($gametypeArray) == 0)
+		{
+			return $inputGametype;
+		}
+		
+		//Cast as an integer
 		$inputGametype = intval($inputGametype);
+
 		if($inputGametype <= count($gametypeArray))
 		{
 			$gametype = $gametypeArray[$inputGametype];
@@ -223,27 +248,10 @@ function callofduty($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 
@@ -310,27 +318,10 @@ function callofduty2($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 
@@ -397,27 +388,10 @@ function callofduty4modernwarfare($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 
@@ -484,27 +458,10 @@ function callofdutyworldatwar($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 
@@ -579,27 +536,10 @@ function jediacademy($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
     $dmflags = array("", "", "", "No fall damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
@@ -697,27 +637,10 @@ function jedioutcast($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
     $dmflags = array("", "", "", "No fall damage", "Fixed cg_fov", "No footsteps", "No drown damage", "Fixed CL_Yawspeed", "No fixed anims", "No realistic hook");
@@ -735,6 +658,160 @@ function jedioutcast($cvars_hash, $cvars_hash_decolorized)
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $dmflags, $g_weaponDisable, $g_forcePowerDisable);
 }
+
+function medalofhonoralliedassault($cvars_hash, $cvars_hash_decolorized)
+{
+    //Unknown game
+    //Declaring variables to be used here. DO NOT change this part.
+    $gametype = "Unknown";
+    $gametypeArray = array();
+    $levelshotFolder = "";
+    $mapname = "";
+    $modName = "";
+    $sv_hostname = "";
+    $sv_maxclients = "?";
+    $BitFlagsIndex = array();
+
+    $team1score = '';
+    $team2score = '';
+    $team3score = '';
+    $team4score = '';
+
+
+    //If you are adding a custom game, the stuff below is what to change.
+
+    //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
+	if(isset($cvars_hash_decolorized["g_gametypestring"]))
+	{
+		//Because there is inconsistent info on what the gametypes really are, take the gametype name from the server's response
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametypestring"], array());
+	}
+	else
+	{
+		//If the server didn't tell us what gametype it is running, parse normally
+		$gametypeArray = array("", "Deathmatch", "Team Match", "Objective Match", "Roundbased");
+		if(isset($cvars_hash_decolorized["g_gametype"]))
+		{
+			$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+		}
+	}
+
+    //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
+    $levelshotFolder = "medal of honor allied assault";
+
+    //The name of the map being played.
+    if(isset($cvars_hash["mapname"]))
+    {
+        $mapname = $cvars_hash["mapname"];
+    }
+
+    //The name of the mod being run.
+    if(isset($cvars_hash["sv_info"]))
+    {
+        $modName = $cvars_hash["sv_info"];
+    }
+
+    //The name of the server. Some games use a different variable.
+    if(isset($cvars_hash["sv_hostname"]))
+    {
+        $sv_hostname = $cvars_hash["sv_hostname"];
+    }
+
+    //The maximum number of players the server can take.
+    if(isset($cvars_hash["sv_maxclients"]))
+    {
+        $sv_maxclients = $cvars_hash["sv_maxclients"];
+    }
+
+    //If team scores exist, get them
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
+
+	$dmflags = array("", "No Health", "No Powerups", "Weapons Stay", "No Fall Damage", "Instant Items", "Same Level", "", "", "", "", "", "No Armor", "", "", "Infinite Ammo", "", "", "No Footsteps", "Allow Lean", "Old Sniper Rifle", "German Shotgun");
+
+    //If there are any bitflags to return, they must be returned last.
+    //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
+    $BitFlagsIndex = array("dmflags");
+
+	//Lastly, all data above MUST be returned in a specific order:
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $dmflags);
+}
+
+function medalofhonorpacificassault($cvars_hash, $cvars_hash_decolorized)
+{
+    //Declaring variables to be used here. DO NOT change this part.
+    $gametype = "Unknown";
+    $gametypeArray = array();
+    $levelshotFolder = "";
+    $mapname = "";
+    $modName = "";
+    $sv_hostname = "";
+    $sv_maxclients = "?";
+    $BitFlagsIndex = array();
+
+    $team1score = '';
+    $team2score = '';
+    $team3score = '';
+    $team4score = '';
+
+
+    //If you are adding a custom game, the stuff below is what to change.
+
+    //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
+		//If the server didn't tell us what gametype it is running, parse normally
+		$gametypeArray = array("", "FFA", "Team Deathmatch", "", "Objective Match", "", "Invader");
+		if(isset($cvars_hash_decolorized["g_gametype"]))
+		{
+			$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+		}
+
+    //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
+    $levelshotFolder = "medal of honor pacific assault";
+
+    //The name of the map being played.
+    if(isset($cvars_hash["mapname"]))
+    {
+        $mapname = $cvars_hash["mapname"];
+    }
+
+    //The name of the mod being run.
+    if(isset($cvars_hash["gamename"]))
+    {
+        $modName = $cvars_hash["gamename"];
+    }
+
+    //The name of the server. Some games use a different variable.
+    if(isset($cvars_hash["sv_hostname"]))
+    {
+        $sv_hostname = $cvars_hash["sv_hostname"];
+    }
+
+    //The maximum number of players the server can take.
+    if(isset($cvars_hash["sv_maxclients"]))
+    {
+        $sv_maxclients = $cvars_hash["sv_maxclients"];
+    }
+
+    //If team scores exist, get them
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
+
+    //All BitFlag arrays must be declared here
+	$dmflags = array("", "No Health", "No Powerups", "Weapons Stay", "No Fall Damage", "Instant Items", "", "", "", "", "", "", "No Armor", "", "", "", "", "", "No Footsteps", "Allow Lean");
+
+    //If there are any bitflags to return, they must be returned last.
+    //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
+    $BitFlagsIndex = array("dmflags");
+
+    //Lastly, all data above MUST be returned in a specific order:
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $dmflags);
+ }
 
 function quake($cvars_hash, $cvars_hash_decolorized)
 {
@@ -787,27 +864,10 @@ function quake($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
     //If there are any bitflags to return, they must be returned last.
@@ -874,27 +934,10 @@ function quakeiiiarena($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
     $dmflags = array("", "", "", "No fall damage", "Fixed cg_fov", "No footsteps", "Winning team keeps their current armor/health/powerups (FT only)", "Winning teams frozen players are not thawed on a new round (FT only)");
@@ -973,27 +1016,10 @@ function soldieroffortuneiidoublehelix($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 
@@ -1006,6 +1032,12 @@ function soldieroffortuneiidoublehelix($cvars_hash, $cvars_hash_decolorized)
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
+/*
+ * Nexuiz classic support removed.		02/23/19
+ * At the time of this writing there are only 31 servers left.
+ * To support Medal Of Honor, chr(02) was added to the getstatus query to the server
+ * and Nexuiz classic refuses to respond to that. So unfortunately....this is the end.
+
 function nexuizclassic($cvars_hash, $cvars_hash_decolorized)
 {
     //Parse like Xonotic, but change the levelshot folder
@@ -1013,6 +1045,7 @@ function nexuizclassic($cvars_hash, $cvars_hash_decolorized)
     $temp[1] = "nexuiz classic";
     return $temp;
 }
+*/
 
 function openarena($cvars_hash, $cvars_hash_decolorized)
 {
@@ -1069,27 +1102,10 @@ function openarena($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
     $dmflags = array("", "", "", "No fall damage", "Fixed cg_fov", "No footsteps", "Instant weapon change", "Non-accelerated jumping", "Total invisibility", "Enable non-majority vote", "No self damage from weapons");
@@ -1159,27 +1175,10 @@ function returntocastlewolfenstein($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
     $dmflags = array("", "", "", "No fall damage", "Fixed cg_fov", "No footsteps");
@@ -1242,37 +1241,21 @@ function tremulous($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
+	$sv_allowDownload = array("Enabled", "Do not use HTTP/FTP downloads", "Do not use UDP downloads", "Do not ask the client to disconnect when using HTTP/FTP");
 
     //If there are any bitflags to return, they must be returned last.
     //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
-    $BitFlagsIndex = array();
+    $BitFlagsIndex = array("sv_allowDownload");
 
     //Lastly, all data above MUST be returned in a specific order:
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
-    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $sv_allowDownload);
 }
 
 function urbanterror($cvars_hash, $cvars_hash_decolorized)
@@ -1334,27 +1317,10 @@ function urbanterror($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 
@@ -1425,27 +1391,10 @@ function warsow($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 
@@ -1513,32 +1462,15 @@ function wolfensteinenemyterritory($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 
     //Not sure if this is used. Commenting it out
-//    $g_voteFlags = array("Restart Map", "Reset Match", "Start Match", "Next Map", "Swap Teams", "Game Type", "Kick Player", "Change Map");
+//	$g_voteFlags = array("Restart Map", "Reset Match", "Start Match", "Next Map", "Swap Teams", "Game Type", "Kick Player", "Change Map");
     $g_mapVoteFlags = array("Change the tie breaker so that the map not played the longest wins", "Intermission does not end until g_intermissionReadyPercent people have voted", "Multi-voting (Allows everybody to vote for 3 maps instead of one)", "Do not randomize the maps", "A passed nextmap vote will start the intermission and lets players vote which map should be played next", "Disable the ready button during intermission");
     $g_misc = array("Disable boosting when g_shove is enabled", "Medic syringe heal", "Combine Arty & Strike Timers", "Display owner of dynamite", "Display owner of landmine", "Players lose spawn shield when weapons are fired");
     $omnibot_flags = array("Disable XPSave for bots", "Bots cannot mount tanks", "Bots cannot mount emplaced guns", "Do not count bots as players");
@@ -1550,6 +1482,79 @@ function wolfensteinenemyterritory($cvars_hash, $cvars_hash_decolorized)
     //Lastly, all data above MUST be returned in a specific order:
     //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $g_mapVoteFlags, $g_misc, $omnibot_flags);
+}
+
+function worldofpadman($cvars_hash, $cvars_hash_decolorized)
+{
+    //Declaring variables to be used here. DO NOT change this part.
+    $gametype = "Unknown";
+    $gametypeArray = array();
+    $levelshotFolder = "";
+    $mapname = "";
+    $modName = "";
+    $sv_hostname = "";
+    $sv_maxclients = "?";
+    $BitFlagsIndex = array();
+
+    $team1score = '';
+    $team2score = '';
+    $team3score = '';
+    $team4score = '';
+
+
+    //If you are adding a custom game, the stuff below is what to change.
+
+    //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
+	$gametypeArray = array("FFA", "1v1", "Single Player", "SYC FFA", "Last Pad Standing", "Team FFA", "CTL", "SYC Team", "Big Balloon");
+	if(isset($cvars_hash_decolorized["g_gametype"]))
+	{
+		//There is also an InstaPad mutator, but I don't know how to detect it
+		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
+	}
+
+    //This is the folder that will store levelshots for this game. This will be converted to lowercase by the tracker.
+    $levelshotFolder = "world of padman";
+
+    //The name of the map being played.
+    if(isset($cvars_hash["mapname"]))
+    {
+        $mapname = $cvars_hash["mapname"];
+    }
+
+    //The name of the mod being run.
+    if(isset($cvars_hash["gamename"]))
+    {
+        $modName = $cvars_hash["gamename"];
+    }
+
+    //The name of the server. Some games use a different variable.
+    if(isset($cvars_hash["sv_hostname"]))
+    {
+        $sv_hostname = $cvars_hash["sv_hostname"];
+    }
+
+    //The maximum number of players the server can take.
+    if(isset($cvars_hash["sv_maxclients"]))
+    {
+        $sv_maxclients = $cvars_hash["sv_maxclients"];
+    }
+
+    //If team scores exist, get them
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
+
+    //All BitFlag arrays must be declared here
+	$sv_allowDownload = array("Enabled", "Do not use HTTP/FTP downloads", "Do not use UDP downloads", "Do not ask the client to disconnect when using HTTP/FTP");
+
+    //If there are any bitflags to return, they must be returned last.
+    //Before the BitFlag arrays are returned, we must return an index, which tells the variable name of each array so the tracker can identify them.
+    $BitFlagsIndex = array("sv_allowDownload");
+
+    //Lastly, all data above MUST be returned in a specific order:
+    //$gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, and all BitFlag arrays.
+    return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex, $sv_allowDownload);
 }
 
 function xonotic($cvars_hash, $cvars_hash_decolorized)
@@ -1646,8 +1651,6 @@ function xonotic($cvars_hash, $cvars_hash_decolorized)
     return array($gametype, $levelshotFolder, $mapname, $modName, $sv_hostname, $sv_maxclients, $team1score, $team2score, $team3score, $team4score, $BitFlagsIndex);
 }
 
-
-
 function unrecognizedgame($cvars_hash, $cvars_hash_decolorized)
 {
     //Unknown game
@@ -1670,7 +1673,7 @@ function unrecognizedgame($cvars_hash, $cvars_hash_decolorized)
     //If you are adding a custom game, the stuff below is what to change.
 
     //We need to find the name of the gametype. In most cases, this will require an array and to use the gametype value as the index location.
-    $gametypeArray = array("", "", "", "");
+    $gametypeArray = array();
 	if(isset($cvars_hash_decolorized["g_gametype"]))
 	{
 		$gametype = parseGametype($cvars_hash_decolorized["g_gametype"], $gametypeArray);
@@ -1704,27 +1707,10 @@ function unrecognizedgame($cvars_hash, $cvars_hash_decolorized)
     }
 
     //If team scores exist, get them
-    $scoreToGet = 'Score_Red';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team1score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Blue';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team2score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Yellow';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team3score = $cvars_hash_decolorized[$scoreToGet];
-    }
-    $scoreToGet = 'Score_Green';
-    if(isset($cvars_hash_decolorized[$scoreToGet]) && is_numeric($cvars_hash_decolorized[$scoreToGet]))
-    {
-        $team4score = $cvars_hash_decolorized[$scoreToGet];
-    }
-
+    $team1score = getTeamScore('Score_Red', $cvars_hash_decolorized);
+    $team2score = getTeamScore('Score_Blue', $cvars_hash_decolorized);
+    $team3score = getTeamScore('Score_Yellow', $cvars_hash_decolorized);
+    $team4score = getTeamScore('Score_Green', $cvars_hash_decolorized);
 
     //All BitFlag arrays must be declared here
 

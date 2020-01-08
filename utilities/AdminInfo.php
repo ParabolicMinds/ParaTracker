@@ -29,9 +29,12 @@ if(!admin)
     exit();
 }
 
-$output = htmlDeclarations("ParaTracker - Admin Info", "../") . '</head><body class="adminInfo">';
+$output = htmlDeclarations("ParaTracker - Admin Info", "../");
 
-$output .= '</head><body style="background-color: #000; color: #FFF; font-family: monospace; text-align: center;">';
+//Include ParaScript. We need it for the confirmation dialogs
+$output .= '<script src="../js/ParaScript.js"></script>';
+
+$output .= '</head><body class="adminInfo" style="background-color: #000; color: #FFF; font-family: monospace; text-align: center;">';
 
 if(isset($_GET['showServerList']) && booleanValidator($_GET['showServerList'], 0))
 {
@@ -40,11 +43,33 @@ if(isset($_GET['showServerList']) && booleanValidator($_GET['showServerList'], 0
 	exit();
 }
 
-if(isset($_GET['forceAnalyticsBackground']))
+if(isset($_GET['forceCleanup']))
+{
+	if(numericValidator($_GET['forceCleanup'], 0, 2, 0) == 1)
+	{
+		$output .= '<h3>Forcing info folder cleanup to run could cause a high load on the server.<br>This should only be done if absolutely necessary.<br>Do you wish to continue?<br><br><strong id="yesNoDialog"><a class="testMessage" href="AdminInfo.php?forceCleanup=2" onclick="adminConfirmationClicked(\'yesNoDialog\')">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
+		echo '-->' . $output;
+		exit();
+	}
+	if (numericValidator($_GET['forceCleanup'], 0, 2, 0) == 2)
+	{
+		$forceCleanup = 1;
+		cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $cleanupLogSize, 1);
+		$output .= '<h4 class="messageSuccess">Info folder and levelshot request cleanup complete!</h4>';
+		if(emailEnabled)
+		{
+			include_once utilitiesPath . 'SendEmails.php';
+			if(sendEmail($emailAdministrators, 'ParaTracker - info/levelshot cleanup forced', '<h3>This message was sent to notify you that ParaTracker was forced to run an info folder and levelshot request cleanup.</h4><br><br>' . 	date('Y-m-d H:i', time()))) $output .= '<h4 class="messageSuccess">Email alert sent!</h4>';
+			else $output .= '<h4 class="messageFailed">Email alert failed to send!</h4>';
+		}
+	}
+}
+
+if(analyticsEnabled && isset($_GET['forceAnalyticsBackground']))
 {
 	if(numericValidator($_GET['forceAnalyticsBackground'], 0, 2, 0) == 1)
 	{
-		$output .= '<h3>Forcing analyticsBackground to run could cause a high load on the server.<br>This should only be done if absolutely necessary.<br>Do you wish to continue?<br><br><strong class="hiddenStuff" id="working">Working...</strong><strong id="yesNoDialog"><a class="testMessage" href="AdminInfo.php?forceAnalyticsBackground=2" onclick="document.getElementById(\'yesNoDialog\').className = \'hiddenStuff\';document.getElementById(\'working\').className = \'\';">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
+		$output .= '<h3>Forcing analyticsBackground to run could cause a high load on the server.<br>This should only be done if absolutely necessary.<br>Do you wish to continue?<br><br><strong id="yesNoDialog"><a class="testMessage" href="AdminInfo.php?forceAnalyticsBackground=2" onclick="adminConfirmationClicked(\'yesNoDialog\')">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
 		echo '-->' . $output;
 		exit();
 	}
@@ -63,11 +88,11 @@ if(isset($_GET['forceAnalyticsBackground']))
 }
 
 
-if(emailEnabled && isset($_GET['forceAdminEmails']))
+if(emailEnabled && emailAdminReports && isset($_GET['forceAdminEmails']))
 {
 	if(numericValidator($_GET['forceAdminEmails'], 0, 2, 0) == 1)
 	{
-		$output .= '<h3>Forcing the admin status report to send will interfere with the weekly information sent.<br>Do you wish to continue?<br><br><strong><a class="testMessage" href="AdminInfo.php?forceAdminEmails=2">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
+		$output .= '<h3>Forcing the admin status report to send will interfere with the weekly information sent.<br>Do you wish to continue?<br><br><strong id="yesNoDialog"><a class="testMessage" href="AdminInfo.php?forceAdminEmails=2" onclick="adminConfirmationClicked(\'yesNoDialog\')">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="testMessage" href="AdminInfo.php">No</a></strong></h3></body></html>';
 		echo '-->' . $output;
 		exit();
 	}
@@ -98,14 +123,16 @@ if(emailEnabled)
         }
     }
 
-    $output .= "<h4>Email is enabled.</h4>";
+    $output .= '<p>Email is enabled.</p>';
     if(emailAdminReports)
     {
         $output .= '<p>Admin reports are enabled.</p>';
     }
-	if(analyticsEnabled) $output .= '<p>Analytics is enabled.<br><strong><a class="testMessage" href="AdminInfo.php?showServerList=1">Display active server and address list</a></strong><br><strong><a class="testMessage" href="AdminInfo.php?forceAnalyticsBackground=1">Force AnalyticsBackground to run now</a></strong></p>';
-	else $output .= 'Analytics is disabled.';
+	if(analyticsEnabled) $output .= '<p>Analytics is enabled.</p><strong id="showServerList"><a onclick="adminConfirmationClicked(\'showServerList\')" class="testMessage" href="AdminInfo.php?showServerList=1">Display active server and address list</a></strong><br><br><strong><a class="testMessage" href="AdminInfo.php?forceAnalyticsBackground=1">Force AnalyticsBackground to run now</a></strong>';
+	else $output .= '<p>Analytics is disabled.</p>';
 
+	$output .= '<p><strong><a class="testMessage" href="AdminInfo.php?forceCleanup=1">Force info folder and levelshot request cleanup to run now</a></strong></p>';
+	
 	if(useSMTP)
     {
         $output .= '<p>Using SMTP server at:<br><strong>' . smtpAddress . ':' . smtpPort . '</strong></p>';
@@ -121,9 +148,12 @@ if(emailEnabled)
 
     $output .= '<h3>' . implode($emailAdministrators, '<br>') . '</h3>';
 
-    $output .= '<strong><a class="testMessage" href="AdminInfo.php?sendTestEmail=1">Send test message to administrators</a></strong>';
+    $output .= '<strong id="sendTestEmail"><a onclick="adminConfirmationClicked(\'sendTestEmail\')" class="testMessage" href="AdminInfo.php?sendTestEmail=1">Send test message to administrators</a></strong>';
 
-	$output .= '<br><strong><a class="testMessage" href="AdminInfo.php?forceAdminEmails=1">Force Admin Status Report To Send Now</a></strong><br><br><strong>';
+	if(emailAdminReports)
+	{
+		$output .= '<br><strong><a class="testMessage" href="AdminInfo.php?forceAdminEmails=1">Force Admin Status Report To Send Now</a></strong><br><br>';
+	}
 
 }
 

@@ -63,77 +63,13 @@ if(function_exists($gameName) && is_callable($gameName))
     //Call the function
     $GameInfoData = $gameName(array(), array());
     $levelshotFolder = $GameInfoData[1];
-    echo '-->:#:' . levelshotFinderLite($mapName, $levelshotFolder) . ':#:';
-}
+	echo '-->:#:' . levelshotFinder("", $mapName, $levelshotFolder, $gameName, 1) . ':#:';
 
-function levelshotFinderLite($mapName, $levelshotFolder)
-{
     if(strtolower($levelshotFolder) == "unknown")
     {
         //Invalid game. Terminate.
-        return "images/missing.gif";
+        return levelshotPlaceholder;
     }
-
-                $levelshotFolder = "images/levelshots/" . strtolower($levelshotFolder) . "/";
-                $levelshotCheckName = strtolower($mapName);
-
-                $levelshotBuffer = '';
-
-                $levelshotCount = 0;
-                $levelshotIndex = 1;
-
-                    //Check for a PNG first
-                    if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png'))
-                    {
-                        $levelshotBuffer = $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.png';
-                    }
-                    else
-                    {
-                    //Failed to find a PNG, so let's check for a JPG
-                        if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg'))
-                        {
-                            $levelshotBuffer = $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.jpg';
-                        }
-                        else
-                        {
-                            //Also failed to find a JPG, so let's check for a GIF
-                            if(file_exists($levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif'))
-                            {
-                                $levelshotBuffer = $levelshotFolder . $levelshotCheckName . '_' . $levelshotIndex . '.gif';
-                            }
-                            else
-                            {
-                                //Checking for a PNG again:
-                                        if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.png'))
-                                        {
-                                        $levelshotBuffer = $levelshotFolder . $levelshotCheckName . '.png';
-                                            }
-                                            else
-                                            {
-                                                //And checking for a JPG again:
-                                            if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.jpg'))
-                                            {
-                                                $levelshotBuffer = $levelshotFolder . $levelshotCheckName . '.jpg';
-                                            }
-                                            else
-                                            {
-                                                //Lastly...checking for a GIF.
-                                                if(file_exists($levelshotFolder . $levelshotCheckName . $levelshotIndex . '.gif'))
-                                                {
-                                                $levelshotBuffer = $levelshotFolder . $levelshotCheckName . '.gif';
-                                                }
-                                                else
-                                                {
-                                                    //Could not find a levelshot! Use the default 'missing picture' image and close out
-                                                    $levelshotBuffer = "images/missing.gif";
-                                                }
-                                            }
-                                        }
-                            }
-                        }
-                    }
-
-    return $levelshotBuffer;
 }
 
 ?>

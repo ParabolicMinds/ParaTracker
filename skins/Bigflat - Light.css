@@ -651,6 +651,34 @@ overflow: hidden;
 text-align: center;
 }
 
+/* This is the hover class for the class below it */
+.mapreqMessage:hover
+{
+color: #FFF;
+opacity: 1;
+}
+
+/* This class is for the message that appears when there are no levelshots. It is intended
+   to encourage users to add their own levelshots or to request them. */
+.mapreqMessage
+{
+position: relative;
+	top: 130px;
+height: 20px;
+width: 100%;
+white-space: normal;
+opacity: .65;
+color: #FFF;
+background-color: rgba(200,200,200,.5);
+text-shadow: 1px 1px #000, 1px 1px #000;
+font-size: 8.5pt;
+text-align: center;
+font-weight: bold;
+font-family: monospace;
+overflow: hidden;
+pointer-events: auto;
+}
+
 /* This class adds the text to the "mod name" value */
 .modName::before
 {

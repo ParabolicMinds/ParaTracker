@@ -32,8 +32,7 @@ if(!analyticsEnabled)
 }
 else
 {
-    set_time_limit(300);
-    cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $cleanupLogSize);
+    cleanupInfoFolder($cleanupInterval, $deleteInterval, $loadLimit, $cleanupLogSize, FALSE);
 }
 
 define("analyticsStartTime", date('Y-m-d H:i', time()));

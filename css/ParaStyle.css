@@ -262,7 +262,7 @@ width: 95vw;
 .dynamicConfigPageStyle
 {
 text-align: center;
-font-size: 12pt;
+font-size: 11pt;
 font-family: monospace;
 color: #EEEEEE;
 }
@@ -274,6 +274,12 @@ font-size: 12pt;
 font-family: monospace;
 color: #FFE;
 background: linear-gradient(to right, #300, #211, #300, #211, #300, #211, #300, #211, #300, #211, #300, #211, #300);
+}
+
+/* This class sets up the toplayerfade element for the mapreq message in case of missing levelshots */
+.mapreqTextPlacement
+{
+text-align: center;
 }
 
 .mapReqFrame
@@ -690,7 +696,7 @@ BITVALUE CALCULATOR CLASSES
 
 
 #bitflags_top {
- 	width: 800px;
+ 	width: 940px;
 	height: 640px;
 	display: flex;
 	flex-direction: column;
@@ -700,10 +706,9 @@ BITVALUE CALCULATOR CLASSES
 
 #bitflags_tabdisplay {
 	flex: 0 0 auto;
-	height: 40px;
 	display: flex;
 	flex-direction: row;
-	padding: 0px 4px 0px 4px;
+	padding: 2px 4px 0px 4px;
 	font-size: 12px;
 	background: linear-gradient(#000, #000, #333);
 }
@@ -743,24 +748,23 @@ BITVALUE CALCULATOR CLASSES
 
 .game_tab {
 	flex: 0 1 auto;
-	margin: 4px 4px 0px 4px;
-	padding-left: 4px;
-	padding-right: 4px;
+	margin: 2px 2px 0px 2px;
+/*	overflow: hidden;	*/
+	padding-left: 1px;
+	padding-right: 1px;
 	padding-top: 4px;
 	padding-bottom: 4px;
-	overflow: hidden;
 	line-height: 11pt;
 	vertical-align: middle;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 	color: #FFF;
     font-weight: bold;
-	font-weight: bold;
 	text-shadow: -1px 1px #000000;
-	font-size: 10pt;
+	font-size: 8pt;
 	user-select: none;
 	cursor: pointer;
-	opacity: .6;
+	opacity: .75;
 }
 
 .game_tab:hover {
@@ -772,7 +776,7 @@ BITVALUE CALCULATOR CLASSES
 .game_tab_selected {
 	opacity: 1;
     color: #FFF;
-	font-size: 11pt;
+	font-size: 9pt;
 }
 
 .game_tab_selected:hover {
@@ -788,6 +792,7 @@ BITVALUE CALCULATOR CLASSES
 
 .bitflags_container_top {
 	flex: 1 1 auto;
+	height: 0px;
 	display: flex;
 	flex-direction: column;
 	flex-wrap: wrap;
@@ -883,6 +888,7 @@ BITVALUE CALCULATOR CLASSES
 {
     text-align: center;
     width: 100%;
+    user-select: none;
 }
 
 .bitflags_container_bitvalue_label:hover {
@@ -901,6 +907,20 @@ BITVALUE CALCULATOR CLASSES
 .game_jedioutcast
 {
 	background: linear-gradient(to right, #000666, #38C, #000666);
+	border: 1px solid #038;
+	border-bottom-width: 0px;
+}
+
+.game_medalofhonoralliedassault
+{
+	background: linear-gradient(to right, #696, #ACA, #696);
+	border: 1px solid #038;
+	border-bottom-width: 0px;
+}
+
+.game_medalofhonorpacificassault
+{
+	background: linear-gradient(to right, #669, #AAC, #669);
 	border: 1px solid #038;
 	border-bottom-width: 0px;
 }
@@ -933,6 +953,13 @@ BITVALUE CALCULATOR CLASSES
 	border-bottom-width: 0px;
 }
 
+.game_tremulous
+{
+	background: linear-gradient(to right, #060, #3F6, #060);
+	border: 1px solid #090;
+	border-bottom-width: 0px;
+}
+
 .game_urbanterror
 {
 	background: linear-gradient(to right, #090999, #4CD, #090999);
@@ -951,6 +978,13 @@ BITVALUE CALCULATOR CLASSES
 {
 	background: linear-gradient(to right, #422, #F62, #422);
 	border: 1px solid #888;
+	border-bottom-width: 0px;
+}
+
+.game_worldofpadman
+{
+	background: linear-gradient(to right, #44F, #3C3, #44F);
+	border: 1px solid #F66;
 	border-bottom-width: 0px;
 }
 
@@ -1034,9 +1068,15 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 */
 
 
+.fiftyPercentWidth:hover
+{
+	text-shadow: -1px 1px 1px #999;
+}
+
 .fiftyPercentWidth
 {
     width: 50%;
+	font-size: 10pt;
 }
 
 .callofduty
@@ -1072,6 +1112,18 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 .jedioutcast
 {
 	color: #58D;
+	font-weight: bold;
+}
+
+.medalofhonoralliedassault
+{
+	color: #ACA;
+	font-weight: bold;
+}
+
+.medalofhonorpacificassault
+{
+	color: #AAC;
 	font-weight: bold;
 }
 
@@ -1131,6 +1183,11 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 .wolfensteinenemyterritory
 {
 	color: #F73;
+}
+
+.worldofpadman
+{
+	color: #66F;
 }
 
 .xonotic
