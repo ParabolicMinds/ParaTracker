@@ -178,11 +178,11 @@ text-decoration: underline;
 ********************************************************
 </h2>
 
-<h3>Title: ParaTracker 1.4.5</h3>
+<h3>Title: ParaTracker 1.5</h3>
 
 <h3>Authors: Parabolic Mind - <span class="green">NA</span><span class="pink">B6</span><span class="blue">22</span>, <span class="blue">Phazmatis</span>, <span class="red">Cagelight</span></h3>
 
-<h3>TBA</h3>
+<h3 class="red">10/7/2022</h3>
 
 <p class="italic">Click on a category below to expand it</p>
 
@@ -283,7 +283,7 @@ ParaTracker will accept custom levelshots for any game it is able to track. It w
 So, if you were adding levelshots for <span class="blue">Jedi Academy</span>, you would put them in:<br />
 <span class="red">/images/levelshots/jedi academy</span></p>
 
-<p>Levelshots can be <span class="green">.webp</span>, <span class="green">.png</span>, <span class="green">.jpg</span> or <span class="green">.gif</span> (And yes, you can animate the .gifs). ParaTracker will look for <span class="green">WEBP</span> first, <span class="green">PNG</span> second, <span class="green">JPG</span> third, and <span class="green">GIF</span> last> Whichever file is found first is the one that will be used.</p>
+<p>Levelshots can be <span class="green">.webp</span>, <span class="green">.png</span>, <span class="green">.jpg</span> or <span class="green">.gif</span> (And yes, you can animate the .gifs). ParaTracker will look for <span class="green">WEBP</span> first, <span class="green">PNG</span> second, <span class="green">JPG</span> third, and <span class="green">GIF</span> last. Whichever file is found first is the one that will be used.</p>
 <p>If you only have one levelshot, you can just name it after the map name, and ParaTracker will find it.<br />
 If you have more than one levelshot, add a <span class="green">_1</span> to the end of the filename of the first one, <span class="green">_2</span> to the end of the second one, and so on.<br />
 So, if you have 3 PNG levelshots for <span class="green">mp</span><span class="red">/ffa3</span> in <span class="blue">Jedi Academy</span>, you would name them:<br />
@@ -324,6 +324,30 @@ If you find a bug, report it at:
 <h3>CHANGELOG:</h3>
 </div>
 <div id="changelog" class="hidden">
+
+<p>
+<span class="date">10/7/2022</span><br />Released ParaTracker 1.5
+</p>
+<p>
+&bull; Added "Playful" skin.<br />
+&bull; Finished adding server tools (Dynamic mode only).<br />
+&bull; Added DDOS protection for dynamic servers. Users can prove their ownership of their servers and add a key to the game server's firewall, which prevents ParaTracker's traffic from being spoofed.<br />
+&bull; Reduced the default wait times on the automatic refresh and flood protect. ParaTracker will now give much more timely results.<br />
+&bull; Added a server browser. Users can now browse through tracked servers for each game.<br />
+&bull; Updated "Metallic Console - Small" and "Metallic Console - Small (Reverse)" skins to display the player count on a server.<br />
+&bull; Renamed Analytics.php to Stats.php to play nice with ad blockers.<br />
+&bull; Added support for default "Missing Levelshot" images on a per-game basis. Each game can have its own default image.<br />
+&bull; Added default levelshots for all currently supported games.<br />
+&bull; Added support for custom "Default Levelshot" images. When a levelshot it not found, the user can specify their own, to be used before the default image.<br />
+&bull; Fixed numerous bugs with file I/O. Most I/O now goes through a function that forces displayError to trigger if there is a problem.<br />
+&bull; Added levelshots for World of Padman.<br />
+&bull; Fixed game parsing to use the decolorized cvar hash for things like gametype and maxclients.<br />
+&bull; Reformatted the cleanup log to be more legible.<br />
+&bull; Renamed RConLog.php to SecurityLog.php.<br />
+&bull; Fixed a bug in mapreq's levelshot request form that would sometimes cause it to not auto-select the correct game.<br />
+&bull; Fixed a bug that wrote customizable server settings to the cached server data, which could cause inconsistent trackers.<br />
+&bull; Various bug fixes.<br />
+</p>
 
 <p>
 <span class="date">1/7/2020</span><br />Released ParaTracker 1.4.5
@@ -536,8 +560,9 @@ Tracker images: <span class="green">NA</span><span class="pink">B6</span><span c
 </p>
 <p>
 Levelshots: <span class="green">NA</span><span class="pink">B6</span><span class="blue">22</span> and <span class="red">Cagelight</span><br />
-<span class="cyan">Urban Terror levelshots provided by DragonHeart</span>
-<br />
+<span class="cyan">Urban Terror levelshots provided by DragonHeart</span><br />
+<span class="cyan">World of Padman levelshots provided by PadWorld Entertainment</span><br />
+<span class="cyan">Quake III Arena levelshots provided by WASP.SK</span><br />
 </p>
 <p>
 Flag SVGs: Panayiotis Lipiridis (from <a href="https://github.com/lipis/flag-icon-css" target="_blank">https://github.com/lipis/flag-icon-css</a>)

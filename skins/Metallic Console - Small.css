@@ -262,7 +262,7 @@ padding-right: 5px;
 /* This class adds the text to the "Name" column in the player list */
 .playerNameHeader::before
 {
-content: "Name";
+content: "";
 }
 
 /* This is the style of the Name column header for the player list */
@@ -273,6 +273,7 @@ font-family: monospace;
 color: #FFFFBB;
 cursor: pointer;
 user-select: none;
+display: none;
 }
 
 /* This class adds the text to the "Score" column in the player list */
@@ -463,15 +464,16 @@ content: "Players: ";
 .playerCount
 {
 position: absolute;
-    left: 46px;
-    top: 259px;
+    left: 45px;
+    top: 46px;
+height: 15px;
 width: 130px;
-color: #EFEFEF;
-font-size: 13pt;
-font-family: sans-serif;
-vertical-align: middle;
-text-align: center;
-display: none;
+color: #FFFFBB;
+font-size: 8pt;
+font-family: monospace;
+vertical-align: top;
+text-align: left;
+display: block;
 }
 
 /* This class is used to style the message when there are no players online */
@@ -957,6 +959,7 @@ width: 740px;
 width: 740px;
 height: 215px;
 overflow-wrap: break-word;
+overflow-y: scroll;
 }
 
 

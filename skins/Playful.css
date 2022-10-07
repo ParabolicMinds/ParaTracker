@@ -1,0 +1,1277 @@
+/* Skin by NAB622 */
+
+/*
+If you are looking for the tracker configuration,
+you will find it in ParaConfig.php
+
+
+
+If there is a feature that you don't want to be visible in your skin, then apply the property "display: none;" to it.
+*/
+
+
+/*
+This part is here to forcefully remove the scroll bar from the player list. Javascript is unable to
+read CSS files in modern browsers, so the column headers can no longer be resized to match the list.
+*/
+.playerTable::-webkit-scrollbar {
+display: none;
+}
+
+
+/*
+This class controls the size of the tracker. It is also the parent element for the entire tracker.
+All properties applied here will be global.
+The width and height of the tracker MUST be specified in this class, because
+ParaTrackerDynamic will parse this file looking for them.
+*/
+.ParaTrackerSize
+{
+width: 675px;
+height: 300px;
+overflow: hidden;
+white-space: nowrap;
+}
+
+.BackgroundColorImage
+{
+
+/* This next line is the background color of the tracker.
+The numbers are given in RGBA, which is Red, Green, Blue, and Alpha.
+All values are 0 to 255, except alpha which is 0 to 1.
+0 is transparent, 1 is solid.
+Default is: background-color: rgba(0, 0, 0, 1);
+*/
+background-color: rgba(0, 0, 0, 0.35);
+
+/* If you want a background image on the tracker,
+this next line is the place to add it.
+Remember to add a ../ to the start of the path, as the
+path starts in the CSS folder. */
+background-image: url("");
+
+width: 100%;
+height: 100%;
+}
+
+/* This class controls the frame visual of the tracker.
+Do not add anything to this class, as it is rendered on top of everything else. */
+.TrackerFrame
+{
+position: absolute;
+    left: 0px;
+    top: 0px;
+width: 675px;
+height: 300px;
+pointer-events: none;
+overflow: hidden;
+user-select: none;
+}
+
+
+/*
+SCROLL BAR STYLES
+SCROLL BAR STYLES
+*/
+
+::-webkit-scrollbar
+{
+    width: 12px;
+	border-radius: 6px;
+}
+ 
+::-webkit-scrollbar-track
+{
+	background-color: #444;
+	border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+    border: 1px inset #888;
+}
+
+::-webkit-scrollbar-thumb
+{
+    border: 1px outset #888;
+    border-radius: 6px;
+	background-color: #555;
+}
+
+
+/*
+CUSTOM PAGE STYLES
+CUSTOM PAGE STYLES
+*/
+
+
+
+.CustomDiv1
+{
+position: absolute;
+	top: 50px;
+	left: 50px;
+width: 260px;
+height: 215px;
+border-radius: 5px;
+background-color: #158;
+}
+
+.CustomDiv2
+{
+position: absolute;
+	top: 38px;
+	left: 339px;
+width: 330px;
+height: 255px;
+border-radius: 2px;
+background-color: #CC3333;
+opacity: .3;
+transform: rotate(1.5deg);
+}
+
+.CustomDiv3
+{
+display: none;
+}
+
+.CustomDiv4
+{
+display: none;
+}
+
+.CustomDiv5
+{
+display: none;
+}
+
+.CustomDiv6
+{
+display: none;
+}
+
+
+
+/*
+NORMAL PAGE STYLES
+NORMAL PAGE STYLES
+*/
+
+
+
+/* This class affects the reload timer */
+.reloadTimer:hover
+{
+opacity: .5;
+}
+
+/* This class affects the reload timer */
+.reloadTimer
+{
+position: absolute;
+    left: 2px;
+    top: 225px;
+border: 1px solid #0FF;
+border-radius: 10px;
+background-color: #000;
+opacity: 0.25;
+cursor: pointer;
+width: 40px;
+height: 40px;
+line-height: 40px;
+text-align: center;
+overflow: hidden;
+color: #EFEFEF;
+font-size: 14pt;
+font-family: monospace;
+font-weight: bold;
+}
+
+/* This class is the ParaTracker logo */
+.ParaTrackerLogo:hover
+{
+opacity: 1;
+}
+
+/* This class is the ParaTracker logo */
+.ParaTrackerLogo
+{
+position: absolute;
+    left: 11px;
+    top: 60px;
+width: 20px;
+height: 102px;
+user-select: none;
+background-image: url("../images/tracker/ParaTrackerLogoSideways.png");
+cursor: pointer;
+opacity: .85;
+}
+
+/* This class is the ParaTracker text. It is meant to be used when a logo image is not used */
+.ParaTrackerText
+{
+position: absolute;
+    left: 15px;
+    top: 50px;
+width: 20px;
+height: 102px;
+text-align: center;
+overflow: hidden;
+color: #EFEFEF;
+font-size: 14pt;
+font-family: monospace;
+cursor: pointer;
+display: none;
+}
+
+/* This is the server name, shown at the top of the tracker */
+.serverName
+{
+position: absolute;
+    left: 10px;
+    top: 5px;
+width: 400px;
+height: 24px;
+font-size: 14pt;
+font-family: "Trebuchet MS", sans-serif;
+font-weight: bold;
+overflow: hidden;
+text-shadow: 1px 1px #000;
+}
+
+/* This is the title of the game, shown just below the server name */
+.gameTitle
+{
+position: absolute;
+    left: 10px;
+    top: 32px;
+width: 330px;
+height: 20px;
+color: #808080;
+font-size: 10pt;
+font-family: "Verdana", sans-serif;
+font-style: italic;
+overflow: hidden;
+}
+
+/* This class positions the column headers for name, score and ping.
+The width, padding-left and padding-right attributes, when added together, MUST match the width of .playerTable  */
+.nameScorePing
+{
+position: absolute;
+    left: 345px;
+    top: 35px;
+height: 15px;
+width: 311px;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+/* This class adds the text to the "Name" column in the player list */
+.playerNameHeader::before
+{
+content: "Name";
+}
+
+/* This is the style of the Name column header for the player list */
+.playerNameHeader
+{
+font-family: monospace;
+color: #FFFFBB;
+cursor: pointer;
+user-select: none;
+}
+
+/* This class adds the text to the "Score" column in the player list */
+.playerScoreHeader::before
+{
+content: "Score";
+}
+
+/* This is the style of the Ping column header for the player list */
+.playerScoreHeader
+{
+font-family: monospace;
+color: #FFFFBB;
+text-align: center;
+cursor: pointer;
+user-select: none;
+}
+
+/* This class adds the text to the "Ping" column in the player list */
+.playerPingHeader::before
+{
+content: "Ping";
+}
+
+/* This is the style of the Score column header for the player list */
+.playerPingHeader
+{
+font-family: monospace;
+color: #FFFFBB;
+text-align: center;
+cursor: pointer;
+user-select: none;
+}
+
+/* This class sets the size of the player list, and enables vertical scrolling only */
+.playerTable
+{
+position: absolute;
+    left: 345px;
+    top: 60px;
+width: 321px;
+height: 225px;
+vertical-align: middle;
+overflow-y: auto;
+overflow-x: hidden;
+border: 1px solid #000;
+}
+
+/* This class sets the attributes of the player name column. It also adjusts the column header. */
+.playerNameSize
+{
+width: 60%;
+display: inline-block;
+overflow: hidden;
+}
+
+/* This class sets the attributes of the player score column. It also adjusts the column header. */
+.playerScoreSize
+{
+width: 21%;
+display: inline-block;
+overflow: hidden;
+}
+
+/* This class sets the attributes of the player ping column. It also adjusts the column header.  */
+.playerPingSize
+{
+width: 19%;
+display: inline-block;
+overflow: hidden;
+}
+
+/* This class is used for the odd rows in the player list */
+.playerRow1
+{
+background-color: #19191988;
+font-family: monospace;
+color: #FFFFFF;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+/* This class is used for the even rows in the player list */
+.playerRow2
+{
+background-color: #2a2a2a88;
+font-family: monospace;
+color: #FFFFFF;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+/* This class sets the color of team 1 */
+.team1
+{
+color: #B00;
+}
+
+/* This class sets the background color of team 1's total score */
+.teamBackground1
+{
+background-color: #400;
+cursor: pointer;
+}
+
+/* This class sets the color of team 2 */
+.team2
+{
+color: #44F;
+}
+
+/* This class sets the background color of team 2's total score */
+.teamBackground2
+{
+background-color: #004;
+cursor: pointer;
+}
+
+/* This class sets the color of team 3 */
+.team3
+{
+color: #DD3;
+}
+
+/* This class sets the background color of team 3's total score */
+.teamBackground3
+{
+background-color: #441;
+cursor: pointer;
+}
+
+/* This class sets the color of team 4 */
+.team4
+{
+color: #0F0;
+}
+
+/* This class sets the background color of team 4's total score */
+.teamBackground4
+{
+background-color: #040;
+cursor: pointer;
+}
+
+/* This class is for the team colors */
+.playerTeam
+{
+font-weight: bold;
+cursor: pointer;
+user-select: none;
+}
+
+/* This class sets the size and font of player names */
+.playerName
+{
+font-size: 10pt;
+font-family: monospace;
+}
+
+/* This class sets the size and font of player scores */
+.playerScore
+{
+font-size: 10pt;
+font-family: monospace;
+text-align: center;
+}
+
+/* This class sets the size and font of players' pings */
+.playerPing
+{
+font-size: 10pt;
+font-family: monospace;
+text-align: center;
+}
+
+/* This class adds the text to the player count */
+.playerCount::before
+{
+content: "Players: ";
+}
+
+/* This class is used for the player count */
+.playerCount
+{
+position: absolute;
+    left: 500px;
+    top: 10px;
+width: 165px;
+height: 25px;
+line-height: 25px;
+color: #EFEFEF;
+font-size: 12pt;
+font-family: monospace;
+text-align: right;
+}
+
+/* This class is used to style the message when there are no players online */
+.noPlayersOnline
+{
+color: #FFFFFF;
+font-size: 10pt;
+font-family: monospace;
+text-align: left;
+padding-top: 4px;
+padding-bottom: 4px;
+padding-left: 5px;
+padding-right: 5px;
+}
+
+/* This class adds optional text to the analytics button */
+.analyticsButton::before
+{
+content: "";
+}
+
+/* This class affects the analytics button */
+.analyticsButton:hover
+{
+opacity: 1;
+}
+
+/* This class affects the analytics button */
+.analyticsButton
+{
+position: absolute;
+    left: 8px;
+    top: 175px;
+background-image: url("../images/tracker/AnalyticsBlack.svg");
+background-size: 100% 100%;
+width: 28px;
+height: 28px;
+cursor: pointer;
+line-height: 28px;
+text-align: center;
+overflow: hidden;
+color: #EFEFEF;
+font-size: 14pt;
+font-family: monospace;
+opacity: .8;
+}
+
+/* This class adds the text to the RCon button */
+.rconButton::before
+{
+content: "RCON";
+}
+
+/* This class is the RCon button */
+.rconButton
+{
+position: absolute;
+    left: 284px;
+    top: 190px;
+width: 85px;
+height: 30px;
+text-align: center;
+line-height: 30px;
+font-family: Tahoma, Sans-Serif;
+font-size: 14pt;
+color: #F00;
+letter-spacing: 2px;
+cursor: pointer;
+transform: rotate(90deg);
+}
+
+/* This class is the hover image for the RCon button */
+.rconButton:hover
+{
+text-shadow:0px 0px 20px #F00, 0px 0px 15px #F00;
+}
+
+/* This class adds the text to the param button */
+.paramButton::before
+{
+content: "PARAM";
+}
+
+/* This class is the Param button */
+.paramButton
+{
+position: absolute;
+    left: 284px;
+    top: 95px;
+width: 85px;
+height: 30px;
+text-align: center;
+line-height: 30px;
+font-family: Tahoma, Sans-Serif;
+font-size: 14pt;
+color: #0F0;
+letter-spacing: 1px;
+cursor: pointer;
+transform: rotate(90deg);
+}
+
+/* This class is the hover image for the Param button */
+.paramButton:hover
+{
+text-shadow:0px 0px 20px #0F0, 0px 0px 15px #0F0;
+}
+
+/* This is a container for the levelshots, and it also disables selecting them */
+.levelshotFrame
+{
+position: absolute;
+    left: 60px;
+    top: 60px;
+overflow: hidden;
+user-select: none;
+cursor: pointer;
+}
+
+/* This class sets the size of the levelshots. DO NOT put any position info into this class. */
+/* position: absolute MUST be left here, or the levelshots will not display correctly */
+.levelshotSize
+{
+position: absolute;
+width: 240px;
+height: 180px;
+}
+
+/* This class is used for the loading image between level changes */
+.loadingLevelshot
+{
+background: url('../images/loading.gif') 0% 0% / 100% 100% no-repeat;
+}
+
+/* This class is used to animate the loading image for levelshots. It is used when a level changes and the images are still loading. */
+@keyframes loadingLevelshotAnimationOn
+{
+0% {opacity: 0;}
+100% {opacity: 1;}
+}
+
+/* This class is used to animate the loading image for levelshots. It is used when a level changes and the images are still loading. */
+@keyframes loadingLevelshotAnimationOff
+{
+0% {opacity: 1;}
+100% {opacity: 0;}
+}
+
+/* This class is used for the "map name" value */
+.mapName
+{
+position: absolute;
+    left: 50px;
+    top: 240px;
+height: 25px;
+width: 260px;
+color: #EEEEEE;
+font-size: 10pt;
+font-family: monospace;
+overflow: hidden;
+text-align: center;
+line-height: 25px;
+font-weight: bold;
+text-shadow: 1px 1px #000;
+}
+
+/* This is the hover class for the class below it */
+.mapreqMessage:hover
+{
+color: #FFF;
+opacity: 1;
+}
+
+/* This class is for the message that appears when there are no levelshots. It is intended
+   to encourage users to add their own levelshots or to request them. */
+.mapreqMessage
+{
+position: relative;
+	top: 200px;
+height: 25px;
+width: 100%;
+white-space: normal;
+opacity: .65;
+color: #FFF;
+background-color: rgba(200,200,200,.5);
+text-shadow: 1px 1px #000, 1px 1px #000;
+font-size: 12pt;
+text-align: center;
+font-weight: bold;
+font-family: monospace;
+overflow: hidden;
+pointer-events: auto;
+}
+
+/* This class adds the text to the "mod name" value */
+.modName::before
+{
+content: "Mod name: ";
+}
+
+/* This class is used for the "mod name" value */
+.modName
+{
+    left: 180px;
+    top: 265px;
+height: 17px;
+width: 130px;
+position: absolute;
+color: #EFEFEF;
+font-size: 7pt;
+line-height: 17px;
+font-family: monospace;
+overflow: hidden;
+text-align: center;
+}
+
+/* This class adds the text to the "gametype" value */
+.gametype::before
+{
+content: "Gametype: ";
+}
+
+/* This class is used for the "gametype" value */
+.gametype
+{
+position: absolute;
+    left: 50px;
+    top: 265px;
+height: 17px;
+width: 130px;
+color: #EFEFEF;
+font-size: 7pt;
+line-height: 17px;
+font-family: monospace;
+overflow: hidden;
+text-align: center;
+}
+
+/* This class adds the text to the "IP address" value */
+.IPAddress::before
+{
+content: "Server IP: ";
+}
+
+/* This class is used for the "IP Address" value */
+.IPAddress
+{
+position: absolute;
+    left: 50px;
+    top: 283px;
+height: 17px;
+width: 260px;
+color: #EFEFEF;
+font-size: 8pt;
+font-family: monospace;
+overflow: hidden;
+text-align: center;
+	
+}
+
+/* This class is for the blinking cursor at the end of the IP address */
+.blinkingCursor
+{
+display: none;
+user-select: none;
+}
+
+/* This adds the optional country flag to the page. This feature only works when GeoIP is installed. */
+.countryFlag
+{
+position: absolute;
+    left: 430px;
+    top: 5px;
+height: 24px;
+width: 32px;
+user-select: none;
+overflow: hidden;
+}
+
+/* This class adds the text to the server ping */
+.ServerPing::before
+{
+content: "Ping: ";
+}
+
+/* This class is used for the game server's ping to the web server.
+It is not particularly useful; nonetheless, it is a feature and can be used. */
+.ServerPing
+{
+position: absolute;
+    left: 375px;
+    top: 265px;
+height: 17px;
+width: 255px;
+color: #EFEFEF;
+font-size: 8pt;
+font-family: monospace;
+overflow: hidden;
+padding-left: 7px;
+display: none;
+}
+
+
+
+/*
+NO CONNECTION PAGE STYLES
+NO CONNECTION PAGE STYLES
+*/
+
+
+/* This class adds the error message to the page when ParaTracker cannot connect to a server */
+.paraTrackerError::before
+{
+content: "Could not connect to server!";
+}
+
+/* Used for the text on the "Could Not Connect" page */
+.paraTrackerError
+{
+position: absolute;
+	top: 120px;
+	left: 50px;
+width: 260px;
+height: 120px;
+color :#EEEEEE;
+text-align: center;
+font-size: 11pt;
+font-family: monospace;
+}
+
+/* This class adds the error message to the page when ParaTracker cannot connect to a server */
+.paraTrackerErrorAddress::before
+{
+content: "Server Address:";
+}
+
+/* Used for the text on the "Could Not Connect" page */
+.paraTrackerErrorAddress
+{
+position: absolute;
+	top: 150px;
+	left: 345px;
+width: 321px;
+height: 120px;
+color :#EEEEEE;
+text-align: center;
+font-size: 11pt;
+font-family: monospace;
+word-wrap: break-word;
+}
+
+/* This class is for the version number, displayed when ParaTracker could not connect */
+.ParaTrackerTextNoConnection
+{
+position: absolute;
+    left: 375px;
+    top: 275px;
+height: 17px;
+width: 255px;
+color: #EFEFEF;
+font-size: 8pt;
+font-family: monospace;
+overflow: hidden;
+padding-left: 7px;
+}
+
+/* This class adds optional text to the reconnect button */
+.reconnectButton::before
+{
+content: "RECONNECT";
+}
+
+/* This class is the Reconnect button */
+.reconnectButton
+{
+position: absolute;
+    left: 50px;
+    top: 265px;
+height: 35px;
+width: 260px;
+text-align: center;
+line-height: 35px;
+font-family: Tahoma, Sans-Serif;
+font-size: 14pt;
+color: #0FF;
+letter-spacing: 2px;
+cursor: pointer;
+}
+
+/* This class is the hover image for the Reconnect button */
+.reconnectButton:hover
+{
+text-shadow:0px 0px 20px #0FF, 0px 0px 15px #0FF;
+}
+
+
+
+/*
+RCON PAGE CLASSES
+RCON PAGE CLASSES
+*/
+
+
+
+/* This class is the overall appearance of the RCon window */
+.RConPage
+{
+background-color: #000000;
+color: #EEEEEE;
+font-size: 11pt;
+font-family: monospace;
+text-align: left;
+}
+
+/* This class is for the Command and Password labels */
+.RConPasswordCommand
+{
+font-family: inherit;
+}
+
+/* This class is for the text boxes where the user enters RCon data */
+.RConInput
+{
+background-color: inherit;
+color: #FFFFFF;
+}
+
+/* This class is for the text boxes where the user enters the RCON data */
+input[type=text], input[type=password]
+{
+padding: 4px 10px;
+border: 1px;
+border-bottom-style: solid;
+border-top-style: none;
+border-right-style: none;
+border-left-style: none;
+font-family: inherit;
+}
+
+/* This class is for the Send button */
+input[type=submit]
+{
+padding: 10px 10px;
+border: 1px;
+background-color: #292929;
+cursor: pointer;
+color: #EEEEEE;
+font-family: inherit;
+}
+
+/* This class is for the server address and response text, just below the form */
+.RConServerAddressResponse
+{
+background-color: inherit;
+font-family: inherit;
+}
+
+/* This class is for the actual server response */
+.RConServerResponse
+{
+background-color: inherit;
+font-family: inherit;
+color: #EEEEEE;
+}
+
+/* This class is for the blinking cursor on the RCon page */
+.RConblinkingCursor
+{
+display: inline;
+width: 18px;
+background: url("../images/tracker/blinker2.gif") no-repeat;
+background-position: 2px 2px;
+user-select: none;
+}
+
+/* This class is used as a container for the countdown timer that appears if someone tries to send RCon commands too quickly */
+.RConTimeoutTimer
+{
+display: inline;
+}
+
+/* No idea if this is used any more */
+.text
+{
+color:#EFEFEF;
+font-size:8pt;
+font-family: "verdana", sans-serif;
+}
+
+/* This class sets the size of the form where the user enters the RCon command and password */
+.RConPasswordCommandSize
+{
+width: 750px;
+height: 50px;
+text-align: left;
+}
+
+/* This class sets the size of the container that displays the server's response. */
+.RConServerResponseFrame
+{
+width: 740px;
+}
+
+/* This class sets the size of the container that displays the server's response. */
+.RConServerResponseScroll
+{
+width: 740px;
+height: 215px;
+overflow-wrap: break-word;
+overflow-y: scroll;
+}
+
+
+
+/*
+PARAM PAGE CLASSES
+PARAM PAGE CLASSES
+*/
+
+
+
+/* This class is the fonts and colors for the Param page */
+.cvars_page
+{
+background-color:#111111;
+color:#EFEFEF;
+font-size:8pt;
+font-family: "Trebuchet MS", sans-serif;
+text-align:center;
+}
+
+/* This class centers the table and makes it fill most of the window */
+.FullSizeCenter
+{
+width: 540px;
+margin: 0 auto 0 auto;
+}
+
+/* This class is for the server name at the top of the page */
+.CVarHeading
+{
+color:#EFEFEF;
+font-size:22pt;
+font-weight:bold;
+text-align:center;
+}
+
+/* This class is for the game name at the top of the page */
+.CVarGameHeading
+{
+color:#EFEFEF;
+font-size:14pt;
+font-weight:bold;
+text-align:center;
+}
+
+/* This class is for the server IP and port at the top of the page */
+.CVarServerAddress
+{
+color:#EFEFEF;
+font-size:10pt;
+font-weight:bold;
+text-align:center;
+}
+
+/* This class is for the server IP and port at the top of the page */
+.CVarServerPing
+{
+color:#EFEFEF;
+font-size:8pt;
+font-weight:bold;
+text-align:center;
+}
+
+/* This class is for the title row at the top of the CVar table */
+.cvars_titleRow
+{
+background-color:#383833;
+font-weight:bold;
+font-size: 14pt;
+text-align: center;
+vertical-align: middle;
+}
+
+/* This class sets the width of the Name column */
+.nameColumnWidth
+{
+width: 250px;
+overflow-wrap: break-word;
+}
+
+/* This class sets the width of the Value column */
+.valueColumnWidth
+{
+padding-top: 6px;
+padding-bottom: 6px;
+width: 290px;
+display: block;
+overflow-wrap: break-word;
+}
+
+/* This class sets the padding and size of the CVar table */
+.CVarTable
+{
+border:1px solid white;
+width: 540px;
+padding-top: 0px;
+padding-bottom: 0px;
+padding-right: 0px;
+padding-left: 0px;
+}
+
+/* This class aligns the CVar table in the center of the page */
+.CVarTableWrapper
+{
+text-align: center;
+width: 540px;
+margin: auto;
+}
+
+/* This class defines the size of the title row. It should be slightly larger than the rest of the table */
+.cvars_titleRowSize
+{
+padding-bottom: 5px;
+height: 28px;
+width: 540px;
+}
+
+/* This class is used to set the height of each row in the CVar table  */
+.CVarRow
+{
+padding-bottom: 10px;
+height: 28px;
+}
+
+
+/* This class determines the color of each odd row of the CVar table */
+.cvars_row1
+{
+height: 28px;
+background-color:#333333;
+text-align: center;
+font-size: 10pt;
+}
+
+/* This class determines the color of each even row of the CVar table */
+.cvars_row2
+{
+height: 28px;
+background-color:#3F3F3F;
+text-align: center;
+font-size: 10pt;
+}
+
+/* This class is for the individual table cells in the CVar table */
+.CVarCell
+{
+width: 270px;
+text-align: center;
+font-size: 10pt;
+padding-bottom: 10px;
+vertical-align: middle;
+}
+
+/* This class is for the "(Click to expand/collapse)" text on the expanding list */
+.expandCollapse
+{
+font-size: 7pt;
+}
+
+/* This class displays the CVar lists for the collapsible items  */
+.expandedList
+{
+display: inline;
+}
+
+/* This class hides the CVar lists for the collapsible items  */
+.collapsedList
+{
+display: none;
+}
+
+/* This class makes the cursor display a pointer over the expand/collapse lists  */
+.CVarExpandList
+{
+cursor:pointer;
+}
+
+
+
+/*
+COLORIZER CLASSES
+COLORIZER CLASSES
+
+The following values are used for colorizing things like player names and the server name.
+*/
+
+
+
+.color0
+/* Black (Gray is used for readability)
+Default is #141414 */
+{
+color: #141414;
+text-shadow: -1px 1px #444;
+}
+
+.color1
+/* Red
+Default is #FF0000 */
+{
+color: #FF0000;
+}
+
+.color2
+/* Green
+Default is #00FF00 */
+{
+color: #00FF00;
+}
+
+.color3
+/* Yellow
+Default is #FFFF00 */
+{
+color: #FFFF00;
+}
+
+.color4
+/* Blue
+Default is #2222FF */
+{
+color: #2222FF;
+font-weight: bold;
+}
+
+.color5
+/* Cyan
+Default is #00FFFF */
+{
+color: #00FFFF;
+}
+
+.color6
+/* Pink/Purple
+Default is #FF00FF */
+{
+color: #FF00FF;
+}
+
+.color7
+/* White
+Default is #FFFFFF */
+{
+color: #FFFFFF;
+}
+
+.color8
+/* Orange
+Default is #FF6605 */
+{
+color: #FF6605;
+}
+
+.color9
+/* Gray
+Default is #5E5E5E */
+{
+color: #5E5E5E;
+}
+
+
+
+/*
+GENERAL FORMATTING
+GENERAL FORMATTING
+*/
+
+
+
+/* This class removes the margin and padding around the edge of the page, so ParaTracker will sit flush in the containing element.
+It is highly advised that you leave it alone. */
+.ParaTrackerPage
+{
+margin: 0px;
+padding: 0px;
+}
+
+/* Used for the blinking cursor on the tracker and on the RCon page. */
+@keyframes blink
+{
+    0% {opacity: 1;}
+    49% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 0;}
+}

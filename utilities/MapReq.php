@@ -1,4 +1,16 @@
 ﻿<?php
+/*
+
+ParaTracker is released under the MIT license, which reads thus:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
 
 echo "<!--";
 
@@ -35,14 +47,20 @@ $bspReq = "";
 //If another game is specified, then we'll use it instead of the one above
 if (isset($_GET["gameReq"]))
 {
-	$gameReq = stringValidator($_GET["gameReq"], "", "");
+	//This value CANNOT be validated - the colon in the game name might be removed, which breaks the selection.
+	//It is also not printed directly into the page anywhere, so it's harmless to allow it through without validation.
+	//It is only used to match against the existing array of supported games.
+	$gameReq = $_GET["gameReq"];
 }
 if (isset($_GET["bspReq"]))
 {
 	$bspReq = strtolower(stringValidator($_GET["bspReq"], "", ""));
 }
 
-$output = htmlDeclarations("", "../");
+//Make sure this is taken care of right away
+$gameReq = strtolower(trim($gameReq));
+
+$output = htmlDeclarations('', '../');
 
 $output .= '<link rel="stylesheet" href="../css/ParaSetup.css" type="text/css" />';
 
@@ -54,7 +72,7 @@ $mapreqs_user = pg_fetch_all(pg_query($pgCon, 'SELECT * FROM mapreq WHERE userad
 $mapreqs_auto = pg_fetch_all(pg_query($pgCon, 'SELECT * FROM mapreq WHERE useradded = false ORDER BY game_name ASC, bsp_name ASC'));
 
 $output .= '<body class="mapReqPageStyle">
-    <form method="POST">
+    <form method="POST" onsubmit="return confirm(\'Are you sure your submission is ready?\')">
         <div id="reqform">';
 
             // Process POST and print notifications
@@ -66,35 +84,47 @@ $output .= '<body class="mapReqPageStyle">
                     $mapreq_bsp_name = strtolower($_POST['mapreq_bsp_name']);
                     if(substr($mapreq_bsp_name, -4) == '.bsp') $mapreq_bsp_name = substr($mapreq_bsp_name, 0, strlen($mapreq_bsp_name) - 4);
                     $mapreq_bsp_link = trim($_POST['mapreq_bsp_link']);
+                    $mapreq_email = trim($_POST['mapreq_email']);
                     pg_query_params($pgCon, '
-                        INSERT INTO mapreq (game_name, bsp_name, dl_link, useradded)
-                        VALUES ($1, $2, $3, true)
+                        INSERT INTO mapreq (game_name, bsp_name, email, dl_link, useradded)
+                        VALUES ($1, $2, $3, $4, true)
                         ON CONFLICT (game_name, bsp_name) DO UPDATE
-                        SET dl_link = $3, entry_date = NOW(), useradded = true', array($mapreq_bsp_game, $mapreq_bsp_name, $mapreq_bsp_link))
+                        SET dl_link = $3, entry_date = NOW(), useradded = true', array($mapreq_bsp_game, $mapreq_bsp_name, $mapreq_email, $mapreq_bsp_link))
                         or displayError ('Could not insert data into map table', "", "");
                     $output .= pageNotificationSuccess("Submission received!");
 
                     //Submission added. Check to see if email is enabled and try the email file
                     if(emailEnabled)
                     {
+						$linkColor = 'color: #77F;';
+
                         include_once utilitiesPath . "SendEmails.php";
                         $message = '<table style="width: 100%; font-family: monospace; font-size: 11pt;"><tr><td style="text-align: center;">';
-                        $message .= '<p><span style="font-size: 12pt;">A levelshot request has been received for <strong>' . stringValidator($mapreq_bsp_game, "", "") . '</strong>.</span></p>';
-                        $message .= '<p>BSP name: <strong>' . stringValidator($mapreq_bsp_name, "", "") . '</strong></p>';
+                        $message .= '<p><span style="font-family: monospace; font-size: 12pt; color: #c41414;">A levelshot request has been received for <strong style="color: #D49414">' . stringValidator($mapreq_bsp_game, "", "") . '</strong>.</span></p>' . emailHr2;
+                        $message .= '<p style="font-family: monospace;">BSP name: <strong style="color: #7F7">' . stringValidator($mapreq_bsp_name, "", "") . '</strong></p>';
                         if(!empty($mapreq_bsp_link))
                         {
-							if(strtolower(trim($mapreq_bsp_link)) == "base game") $message .= '<p style=""><strong>Base Game</strong></a></p>';
-							else if(strtolower(trim($mapreq_bsp_link)) == "none") $message .= '<p>No link provided</p>';
-							else $message .= '<p>Link: <span style="font-size: 9pt; font-weight: bold;"><a href="' . stringValidator($mapreq_bsp_link, "", "") . '"><strong>' . stringValidator($mapreq_bsp_link, "", "") . '</strong></a></span></p>';
+							if(strtolower(trim($mapreq_bsp_link)) == "base game") $message .= '<p style="font-family: monospace; color: #9E9; "><strong>Base Game</strong></p>';
+							else if(strtolower(trim($mapreq_bsp_link)) == "none") $message .= '<p style="font-family: monospace; color: #E99; ">No link provided</p>';
+							else $message .= '<p style="font-family: monospace;">User-given link: <span style="font-family: monospace; font-size: 9pt; font-weight: bold;"><a href="' . stringValidator($mapreq_bsp_link, "", "") . '" style="' . $linkColor . '"><strong>' . fixHyperlinksForGmail(stringValidator($mapreq_bsp_link, "", "")) . '</strong></a></span></p>';
                         }
                         else
                         {
-                            $message .= '<p><b>No link provided</b></p>';
+                            $message .= '<p style="font-family: monospace;"><b>No link provided</b></p>';
                         }
-                        $message .= '<p>Client IP Address: <b>' . $_SERVER['REMOTE_ADDR'] . '</b></p>';
-                        $message .= '<p>Time: <b>' . date('Y-m-d H:i', time()) . '</b></p>';
+                        if(!empty($mapreq_email))
+                        {
+							$message .= '<p style="font-family: monospace;">Email address: <b style="color: #F92">' . fixHyperlinksForGmail(stringValidator($mapreq_email, "", "")) . '</b></p>';
+						}
+						else
+						{
+							$message .= '<p style="font-family: monospace;">Email address not given</p>';
+						}
+                        $message .= '<p style="font-family: monospace;">Client IP Address: <b style="color: #F37">' . $_SERVER['REMOTE_ADDR'] . '</b></p>';
+                        if(webServerName != '') $message .= '<p><a style="font-family: monospace; font-weight: bold; ' . $linkColor . '" href="https://' . webServerName . '/#mapreq">Click here to see this request in mapreq</a></p>';
+                        $message .= '<p style="font-family: monospace;">Time: <b style="color: #777;">' . date('Y-m-d H:i', time()) . '</b></p>';
                         $message .= '</td></tr></table>';
-                        sendEmail($emailAdministrators, 'ParaTracker - New Levelshot Request Received!', $message);
+                        sendEmail($emailAdministrators, trackerName() . ' - New Levelshot Request Received!', $message);
                     }
 
                 } else { // Required field not filled out
@@ -115,7 +145,7 @@ $output .= '<body class="mapReqPageStyle">
                 for($i = 0; $i < $count; $i++)
                 {
 					$output .= '<option ';
-                    if(strtolower(trim($gameList[$i])) == strtolower(trim($gameReq)))
+                    if(strtolower(trim($gameList[$i])) == $gameReq)
                     {
                         $output .= 'selected="selected" ';
                     }
@@ -132,8 +162,12 @@ echo '>> ' . $bspReq . ' <<
                 <span class="reqformlabel">BSP Name:</span>
                 <input class="reqformtextentry" type="text" name="mapreq_bsp_name" value="' . $bspReq . '">
             </div>
+			<div class="reqformrow">
+                <span class="reqformlabel">Your email address:</span>
+                <input class="reqformtextentry" type="text" name="mapreq_email" placeholder="This is optional, but helps a lot">
+            </div>
             <div class="reqformrow">
-                <span class="reqformlabel">Map or Image(s) Link:</span>
+                <span class="reqformlabel">Link to Map or Image(s):</span>
 			</div>
 			<div class="reqformrow">
                 <input class="reqformtextentry" type="text" name="mapreq_bsp_link" placeholder="Use \'\'Base Game\'\' for maps included with the game">
@@ -172,6 +206,7 @@ function addmapreqtable($title, $query, $with_dl) {
 				$output .= '<span class="entryfield entrygamefield entryheaderfield">Game</span>';
 				$output .= '<span class="entryfield entrybspfield entryheaderfield">BSP</span>';
 				$output .= '<span class="entryfield entrydatefield entryheaderfield">Date</span>';
+				if (admin) $output .= '<span class="entryfield entryemailfield entryheaderfield">Email</span>';
 				if ($with_dl && admin) $output .= '<span class="entryfield entrylinkfield entryheaderfield">Download</span>';
 				$output .= '</div><div class="entrybody">';
 
@@ -185,11 +220,12 @@ function addmapreqtable($title, $query, $with_dl) {
 					$output .= "<span class=\"entryfield entrygamefield\" title=\"$entry[game_name]\">" . htmlentities("$entry[game_name]") . "</span>";
 					$output .= "<span class=\"entryfield entrybspfield\" title=\"$entry[bsp_name]\">" . htmlentities("$entry[bsp_name]") . "</span>";
 					$output .= "<span class=\"entryfield entrydatefield\" title=\"$entry[bsp_name]\">" . date('Y-m-d', strtotime($entry['entry_date'])) . "</span>";
+					if (admin) $output .= "<span class=\"entryfield entryemailfield\" title=\"$entry[email]\">" . htmlentities("$entry[email]") . "</span>";
 					if ($with_dl && !empty($entry["dl_link"]))
 					{
 						if(strtolower(trim($entry["dl_link"])) == "base game") $output .= "<p class=\"entryfield entrylinkfield\">Base Game</p>";
 						else if(strtolower(trim($entry["dl_link"])) == "none") $output .= "<p class=\"entryfield entrylinkfield\">No link provided</p>";
-						else $output .= "<a class=\"entryfield entrylinkfield\" title=\"$entry[dl_link]\" href=\"$link\">Link</a>";
+						else $output .= "<a class=\"entryfield entrylinkfield entrylinkfieldHover\" title=\"$entry[dl_link]\" href=\"$link\" target=\"_blank\">Link</a>";
 					}
 					$curbg = !$curbg;
 					$output .= "</div>";

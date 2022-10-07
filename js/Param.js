@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function(event)
 
 function renderParamPage()
 {
-    if(data.serverOnline)
+    if(data.serverInfo.serverOnline)
     {
         clear_element(paramDataTable)
 //        sort_elements(data.info)
@@ -34,9 +34,9 @@ function renderElements(paramDataTable)
 {
 
     clear_element(CVarServerNumericAddress)
-    if(data.serverNumericAddress != data.serverIPAddress)
+    if(data.serverInfo.serverNumericAddress != data.serverInfo.serverIPAddress)
     {
-        CVarServerNumericAddress.appendChild(document.createTextNode('(' + data.serverNumericAddress + ')'))
+        CVarServerNumericAddress.appendChild(document.createTextNode('( ' + data.serverInfo.serverNumericAddress + ':' + data.serverInfo.serverPort + ' )'))
         CVarServerNumericAddress.appendChild(document.createElement('br'))
     }
 

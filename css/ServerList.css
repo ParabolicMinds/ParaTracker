@@ -1,0 +1,336 @@
+body {
+	background: linear-gradient(to right, #225, #114, #225, #114, #225, #114, #225, #114, #225, #114, #225, #114, #225);
+	text-align: center;
+	color: #FFFFFF;
+	text-shadow: -2px 2px #000000;
+	font-family: monospace;
+	padding: 0px, 10px, 10px, 10px;
+}
+
+#gameSelectDiv {
+	font-family: monospace;
+	margin: 0 auto;
+}
+
+#gameDropdown {
+	font-size: 11pt;
+	font-family: monospace;
+	text-align: center;
+	background-color: #444;
+	border: 1px solid #000;
+	border-radius: 8px;
+	color: #FFF;
+	overflow-y: none;
+	padding: 5px;
+}
+
+#filterDiv {
+}
+
+.filterLabel {
+	font-size:12pt;
+}
+
+#filterInput {
+	font-size: 11pt;
+	font-family: monospace;
+	background-color: #444;
+	border: 1px solid #000;
+	border-radius: 8px;
+	color: #FFF;
+	overflow-y: none;
+	padding: 5px;
+}
+
+#clearFilter:hover
+{
+	background-color: #700;
+	text-shadow: 2px 2px #000;
+}
+
+#clearFilter
+{
+	font-weight: bold;
+	font-size: 14pt;
+	color: #FFF;
+	background-color: #D22;
+	border-radius: 4px;
+	border: 1px #FFF outset;
+	margin: 5px;
+/*	transform: translate(-100%, 0%)	*/
+}
+
+label
+{
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#headerDiv {
+	width: 100%;
+}
+
+#footerDiv {
+	width: 100%;
+}
+
+.pageCountDropdownDiv {
+	font-size: 8pt;
+	display: inline-block;
+	width: 10%;
+	text-align: right;
+}
+
+#pageCountDropdown {
+	font-size: 11pt;
+	font-family: monospace;
+	text-align: center;
+	background-color: #444;
+	border: 1px solid #000;
+	border-radius: 8px;
+	color: #FFF;
+	overflow-y: none;
+	padding: 5px;
+}
+
+.serverListHover:hover {
+	color: #FF0;
+	text-shadow: 0px 0px 7px #AAA;
+	opacity: 1;
+}
+
+.serverListArrowsDiv {
+	width: 80%;
+	display: inline-block;
+}
+
+.serverListArrows {
+	display: inline-block;
+	padding: 5px 10px 5px 10px;
+	cursor: pointer;
+	font-size: 16pt;
+	font-weight: bold;
+	user-select: none;
+	color: #CCC;
+	opacity: 0.65;
+}
+
+.serverListNumbers:hover {
+	text-shadow: 0px 0px 7px #AAA;
+	opacity: 1;
+}
+
+.serverListNumbers {
+	display: inline-block;
+	padding: 5px 10px 5px 10px;
+	width: 20px;
+	cursor: pointer;
+	font-size: 12pt;
+	font-weight: bold;
+	user-select: none;
+	opacity: 0.65;
+}
+
+.serverListCurrentNumber {
+	color: #999;
+	cursor: default;
+}
+
+#serverDiv {
+	font-family: monospace;
+	color: #FFF;
+	background-color: #000A;
+	min-width: 700px;
+	margin: 0 auto;
+	font-size: 11pt;
+	border: 1px solid #000;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+}
+
+table {
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	border-spacing: 0px;
+}
+
+tr {
+	margin: 0px;
+	padding: 4px 0px 4px 0px;
+}
+
+td {
+	margin: 0px;
+	padding: 6px;
+}
+
+.serverListCount {
+	width: 5%;
+	word-break: break-word;
+}
+
+.serverListServerName {
+	width: 25%;
+	word-break: break-word;
+}
+
+.serverListGame {
+	width: 15%;
+	word-break: break-word;
+}
+
+.serverListAddress {
+	width: 20%;
+	word-break: break-word;
+}
+
+.serverListMap {
+	width: 20%;
+	word-break: break-word;
+}
+
+.serverListPlayers {
+	width: 10%;
+	word-break: break-word;
+}
+
+.serverListTrack {
+	width: 5%;
+	word-break: break-word;
+}
+
+.serverListHeader {
+	background-color: #0005;
+	padding: 0px 8px 0px 8px;
+}
+
+.serverListHeaderText:hover {
+	text-shadow: 0px 0px 7px #AAA;
+	color: #FF0;
+}
+
+.serverListHeaderText {
+	font-size: 12pt;
+	font-weight: bold;
+	user-select: none;
+	cursor: pointer;
+	word-break: keep-all;
+	white-space: nowrap;
+}
+
+.serverListSortArrows {
+	font-weight: bold;
+	font-size: 18pt;
+}
+
+.serverListLine:hover {
+	background-color: #9935
+}
+
+.serverListLineOdd {
+	background-color: #3339;
+}
+
+.serverListLineEven {
+	background-color: #3336;
+}
+
+/*
+.serverListServerName {
+	word-break: break-word;
+}
+
+.serverListGame {
+	word-break: keep-all;
+	white-space: nowrap;
+}
+
+.serverListAddress {
+	word-break: keep-all;
+	white-space: nowrap;
+}
+
+.serverListMap {
+	word-break: keep-all;
+	white-space: nowrap;
+}
+
+.serverListPlayers {
+	word-break: keep-all;
+	white-space: nowrap;
+}
+*/
+
+
+.color0
+/* Black (Gray is used for readability)
+Default is #242424 */
+{
+color: #242424;
+text-shadow: -1px 1px #555;
+}
+
+.color1
+/* Red
+Default is #FF0000 */
+{
+color: #FF0000;
+}
+
+.color2
+/* Green
+Default is #00FF00 */
+{
+color: #00FF00;
+}
+
+.color3
+/* Yellow
+Default is #FFFF00 */
+{
+color: #FFFF00;
+}
+
+.color4
+/* Blue
+Default is #2222FF */
+{
+color: #2222FF;
+font-weight: bold;
+}
+
+.color5
+/* Cyan
+Default is #00FFFF */
+{
+color: #00FFFF;
+}
+
+.color6
+/* Pink/Purple
+Default is #FF00FF */
+{
+color: #FF00FF;
+}
+
+.color7
+/* White
+Default is #FFFFFF */
+{
+color: #FFFFFF;
+}
+
+.color8
+/* Orange
+Default is #FF6605 */
+{
+color: #FF6605;
+}
+
+.color9
+/* Gray
+Default is #5E5E5E */
+{
+color: #5E5E5E;
+}

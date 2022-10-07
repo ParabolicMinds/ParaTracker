@@ -14,9 +14,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 if(!isset($dynamicTrackerCalledFromCorrectFile))
 {
-    //We are running in static mode. Set the output buffer here, for JSON compatibility.
-    //ParaTrackerDynamic.php already does this for itself, so we have to check if it was already done before doing another.
-    ob_start();
+	//We are running in static mode. Set the output buffer here, for JSON compatibility.
+	//ParaTrackerDynamic.php already does this for itself, so we have to check if it was already done before doing another.
+	ob_start();
 }
 
 echo "<!--";
@@ -30,21 +30,26 @@ $safeToExecuteParaFunc = "1";
 //has already been loaded.
 if(!isset($dynamicTrackerCalledFromCorrectFile))
 {
-    //We are not running in dynamic mode, so load ParaFunc.php
-    //ParaFunc.php MUST exist, or we must terminate!
-    if (file_exists("ParaFunc.php"))
-    {
-        include_once 'ParaFunc.php';
-    }
-    else
-    {
-        echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3>';
-        exit();
-    }
+	//We are not running in dynamic mode, so load ParaFunc.php
+	//ParaFunc.php MUST exist, or we must terminate!
+	if (file_exists("ParaFunc.php"))
+	{
+		include_once 'ParaFunc.php';
+	}
+	else
+	{
+		echo '--> <h3 class="errorMessage">ParaFunc.php not found - cannot continue!</h3>';
+		exit();
+	}
 }
 
 //Check to see if an update needs done, and do it
-checkForAndDoUpdateIfNecessary($dynamicIPAddressPath);
+if(checkForAndDoUpdateIfNecessary($dynamicIPAddressPath) === 0)
+{
+	// I'm not sure what I was doing, sometimes returning 0 and sometimes false...
+	// pretty sure 0 was for "Stop and do not continue" and false was for "Did not update but continue anyway"
+	exit();
+}
 
 //Just as good practice, let's declare this
 $output = "";
@@ -52,19 +57,22 @@ $output = "";
 //We no longer need to check to see if the connection was successful. Just output a page.
 if(strtolower(paraTrackerSkin) == "json")
 {
-    //Since we're giving a JSON response, we have to give the page a JSON header
-    header("Content-Type: application/json");
+	//Since we're giving a JSON response, we have to give the page a JSON header
+	header("Content-Type: application/json");
 
-    //We are running in JSON mode! Output the JSON response here.
-    $output = renderJSONOutput($dynamicIPAddressPath);
+	//We are running in JSON mode! Output the JSON response here.
+	$output = renderJSONOutput($dynamicIPAddressPath);
 
-    //Remove everything from the buffer so we can supply JSON info only
-    ob_clean();
+	//Remove everything from the buffer so we can supply JSON info only
+	ob_clean();
 }
 else
 {
-    //Add an HTML end comment, then render a normal tracker page
-    $output = "-->" . renderNormalHTMLPage($dynamicIPAddressPath);
+	//Add an HTML end comment, then render a normal tracker page
+	$output = "-->";
+	$output .= htmlDeclarations('', '');
+	$output .= renderNormalHTMLPage($dynamicIPAddressPath);
+
 }
 
 echo $output;

@@ -975,6 +975,7 @@ width: 740px;
 width: 740px;
 height: 215px;
 overflow-wrap: break-word;
+overflow-y: scroll;
 }
 
 

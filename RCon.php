@@ -1,4 +1,17 @@
 <?php
+/*
+
+ParaTracker is released under the MIT license, which reads thus:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
+
 echo "<!-- ";
 
 //This variable will allow ParaFunc to execute.
@@ -19,15 +32,17 @@ else
     exit();
 }
 
-//Make sure the rcon log file exists
-if(!checkFileExistence("RConLog.php", logPath . makeDynamicAddressPath($serverIPAddress, $serverPort))) return 'Could not create RCon log file!';
+if(serverToolsEnabled && emailEnabled) include_once utilitiesPath . 'SendEmails.php';	// We'll need this later on to send emails
 
-if (trim(file_get_contents(logPath . $dynamicIPAddressPath . "RConLog.php")) == "")
+//Make sure the rcon log file exists
+if(!checkFileExistence(serverSecurityLogFilename, logPath . makeDynamicAddressPath($serverIPAddress, $serverPort))) return 'Could not create RCon log file!';
+
+if (trim(readFileIn(logPath . $dynamicIPAddressPath . serverSecurityLogFilename)) == "")
 {
-    file_put_contents(logPath . $dynamicIPAddressPath . "RConLog.php", logHeader("RConLog.php") . logFooter());
+    writeFileOut(logPath . $dynamicIPAddressPath . serverSecurityLogFilename, logHeader(serverSecurityLogFilename) . logFooter());
 }
 
-$output = htmlDeclarations("Rcon - " . $serverIPAddress . " - ParaTracker", "");
+$output = htmlDeclarations('Rcon ' . $serverIPAddress, '');
 
 if(scrollShaftColor != "")
 {
@@ -82,7 +97,7 @@ else
     </div>
     </form>
     <script>commandTextField.focus()</script>
-    <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . $serverIPAddress . ":" . $serverPort . '<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse RConServerResponseScroll">';
+    <div class="RConServerResponseFrame"><div class="RConServerAddressResponse"><br />Server Address: ' . $serverIPAddress . ":" . $serverPort . ' ( ' . gethostbyname($serverIPAddress) . ' )<br /><br />Server Response:<br /><br /></div><div class="RConServerResponse RConServerResponseScroll">';
 
     if(strlen($RConCommand) > RConMaximumMessageSize)
     {
@@ -99,7 +114,12 @@ else
 
     if ($RConCommand != "" && $RConPassword != "")
     {
-        $lastRefreshTime = "0";
+        $lastRefreshTime = 0;
+		$temp = breakDynamicAddressPath($dynamicIPAddressPath);
+//		$temp[0] = gethostbyname("$temp[0]");	// Not sure why this is here..?
+		$serverIPAddress = "$temp[0]";
+		$dynamicIPAddressPath = makeDynamicAddressPath($temp[0], $temp[1]);
+
         if (file_exists(infoPath . $dynamicIPAddressPath . "RConTime.txt"))
         {
             $lastRefreshTime = numericValidator(file_get_contents(infoPath . $dynamicIPAddressPath . "RConTime.txt"), "", "", 0);
@@ -108,23 +128,18 @@ else
         if ($lastRefreshTime + RConFloodProtect < time())
         {
             file_put_contents(infoPath . $dynamicIPAddressPath . "RConTime.txt", time());
-            $output .= sendReceiveRConCommand($serverIPAddress, $serverPort, $lastRefreshTime, $RConPassword, $RConCommand);
+            $output .= sendReceiveRConCommand($serverIPAddress, $serverPort, $RConPassword, $RConCommand);
         }
         else
         {
-
-        $timeRemaining = intval(abs(time() - RConFloodProtect - $lastRefreshTime)) + 1;
-        if ($timeRemaining > RConFloodProtect)
-        {
-            $timeRemaining = intval(RConFloodProtect) + 1;
-        }
-        $javascriptTimeInterval = intval(RConFloodProtect);
-        $output .= '<script type="text/javascript">
-        var floodProtectTimer = ' . intval($javascriptTimeInterval) . ';
-        var initialFloodProtectTimer = ' . floor(RConFloodProtect) . ';
-        var timeRemaining = ' . intval($timeRemaining) .';
-        RConTimer = setTimeout("RConFloodProtectTimer()", 50);
-        </script>Please wait ' . RConFloodProtect . ' seconds between commands.<br /><div id="RConTimeoutTimer" class="RConTimeoutTimer"></div> <div id="RConTimeoutText" class="RConTimeoutTimer"></div>';
+			$timeRemaining = intval(abs(time() - RConFloodProtect - $lastRefreshTime)) + 1;
+			$javascriptTimeInterval = intval($timeRemaining);
+			$output .= '<script type="text/javascript">
+			var floodProtectTimer = ' . intval($javascriptTimeInterval) . ';
+			var initialFloodProtectTimer = ' . floor(RConFloodProtect) . ';
+			var timeRemaining = ' . intval($timeRemaining) .';
+			RConTimer = setTimeout("RConFloodProtectTimer()", 50);
+			</script>Please wait ' . RConFloodProtect . ' seconds between commands.<br /><div id="RConTimeoutTimer" class="RConTimeoutTimer"></div> <div id="RConTimeoutText" class="RConTimeoutTimer"></div>';
         }
     }
     else

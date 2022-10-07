@@ -1524,7 +1524,7 @@ function loadLevelshot(input, element)
     let gameNameAtTime = gameNameArray[input]
     let mapnameAtTime = mapnameArray[input]
 
-    let currentURL = window.location.href.split("Analytics.php")[0]
+    let currentURL = window.location.href.split("Stats.php")[0]
     
     let levelshotURL = encodeURI(currentURL + "LevelshotFinder.php?gameName=" + gameNameAtTime + "&mapName=" + mapnameAtTime)
 

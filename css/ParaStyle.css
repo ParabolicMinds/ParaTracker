@@ -9,11 +9,154 @@ you will find it in ParaConfig.php
 */
 
 
+/*
+TITLE COLORS
+TITLE COLORS
+*/
+.paraTrackerColor
+{
+color: #c41414;
+}
+
+.paraTrackerVersionColor
+{
+color: #767676;
+}
+
 
 /*
 PARATRACKER DYNAMIC SETUP PAGE CLASSES
 PARATRACKER DYNAMIC SETUP PAGE CLASSES
 */
+
+.serverToolsRoundedCorners
+{
+border-radius: 12px;
+padding: 15px;
+}
+
+/* This class configures the iframe for the server tools */
+.serverToolsFrame
+{
+width: 95vw;
+min-width: 1050px;
+min-height: 200px;
+border-radius: 10px;
+border: 1px solid #993;
+box-shadow: 0px 0px 20px #999, inset 0px 0px 10px #993;
+flex: 1 1 auto;
+flex-direction: column;
+}
+
+.serverToolsKeysAndValues
+{
+margin: 15px;
+display: flex;
+font-size: 12pt;
+user-select: none;
+align-items: center;
+}
+
+.serverToolsKey
+{
+flex: auto;
+text-align: left;
+color: #96F;
+font-weight: bold;
+}
+
+.serverToolsValue
+{
+flex: auto;
+text-align: right;
+color: #F12;
+user-select: all;
+}
+
+.serverToolsEmailReasons
+{
+margin-bottom: 0px;
+}
+
+.serverToolsCategoryHeading
+{
+text-align: center;
+margin: 10px;
+color: #88F;
+font-size: 14pt;
+}
+
+.serverToolsCategoryText
+{
+color: #AAA;
+font-size: 11pt;
+}
+
+.serverToolsDayCount
+{
+color: #FB2;
+}
+
+.serverToolsCategory:hover
+{
+border-color: #4CC;
+box-shadow: 0px 0px 20px #777, inset 0px 0px 10px #4CC;
+background-color: #333B;
+}
+
+.serverToolsCategory
+{
+width: 650px;
+background-color: #0004;
+margin: 0 auto;
+padding: 20px;
+margin-top: 12px;
+margin-bottom: 12px;
+border-radius: 10px;
+border: 1px solid #993;
+box-shadow: 0px 0px 20px #777, inset 0px 0px 10px #993;
+}
+
+.serverToolsTable
+{
+}
+
+.serverToolsTableData
+{
+text-align: left;
+}
+
+.serverToolsTableButton
+{
+	text-align: right;
+}
+
+.serverToolsTimeoutDiv
+{
+position: fixed;
+background-color: #233;
+border: 1px solid #399;
+padding: 5px 10px 5px 10px;
+border-radius: 12px;
+float: right;
+right: 10px;
+top: 10px;
+}
+
+.serverToolsSessionTimer
+{
+font-size: 12pt;
+font-weight: bold;
+}
+
+.serverToolsEmailPreview
+{
+border: 1px solid #AAA;
+background-color: #111;
+padding: 0px;
+margin: 0px;
+}
+
 
 /* This class configures the iframe for analytics */
 .analyticsFrame
@@ -29,6 +172,25 @@ flex: 1 1 auto;
 flex-direction: column;
 }
 
+/* These next two classes are used to make the log viewer scroll correctly */
+.logTable
+{
+overflow: scroll;
+width: 95%;
+min-height: 200px;
+margin: 0 auto;
+display: flex;
+flex: 1 1 auto;
+flex-direction: column;
+}
+
+.logPageFlex
+{
+height: 100vh;
+display: flex;
+flex-direction: column;
+}
+
 /* This class configures the iframe for the log viewer */
 .logViewerDiv
 {
@@ -36,6 +198,26 @@ width: 95vw;
 display: flex;
 flex: 1 1 auto;
 flex-direction: column;
+}
+
+.logViewerRow1:hover
+{
+background-color: #504911;
+}
+
+.logViewerRow1
+{
+background-color: #2A2A2A;
+}
+
+.logViewerRow2:hover
+{
+background-color: #504911;
+}
+
+.logViewerRow2
+{
+background-color: #333;
 }
 
 /* This class configures the iframe for admin info */
@@ -68,7 +250,7 @@ flex-direction: column;
 .logViewerPage
 {
 font-family: monospace;
-background-color: #222;
+background-color: #171717;
 color: #EEE;
 font-size: 10pt;
 }
@@ -78,6 +260,7 @@ font-size: 10pt;
 {
 width: 800px;
 margin: 0 auto;
+border-spacing: 0px 2px;
 }
 
 /* This class is for the first cell in the log viewer's path table */
@@ -87,12 +270,6 @@ width: 75%;
 padding: 5px;
 color: #EEE;
 font-size: 12pt;
-}
-
-/* This class is for the log viewer's path table */
-.logViewerPathTable:hover
-{
-background-color: #504911;
 }
 
 /* This class is for the log viewer's line numbers */
@@ -114,6 +291,14 @@ width: 100%;
 padding: 5px;
 color: #EEE;
 font-size: 10pt;
+text-align: left;
+}
+
+/* This class removes margins from the pre-formatted text */
+.logViewerPre
+{
+margin-top: 0;
+margin-bottom: 0;
 }
 
 /* This class is for the hover effect on the log viewer's text */
@@ -132,6 +317,7 @@ text-align: center;
 .logSize
 {
 text-align: center;
+font-size: 11pt;
 }
 
 /* The following classes are used for links in the log viewer */
@@ -147,16 +333,24 @@ color: #E44;
 }
 
 /* The following classes are used for file sizes */
-.bytes {
+.b {
 	color: #AFA;
 }
 
-.kilobytes {
+.kib {
 	color: #FD8;
 }
 
-.megabytes {
-	color: #FAA;
+.mib {
+	color: #A66;
+}
+
+.gib {
+	color: #FCA;
+}
+
+.tib {
+	color: #FAF;
 }
 
 /* This class is for the admin info page */
@@ -234,7 +428,10 @@ align-items: center;
 /* This class is used for the top row of the utilities page */
 .utilitiesTopRow
 {
-
+margin-top: 30px;
+/*
+padding: 0% 10% 0% 10%;
+*/
 }
 
 /* This class is used for the button row on the utilities page */
@@ -262,7 +459,7 @@ width: 95vw;
 .dynamicConfigPageStyle
 {
 text-align: center;
-font-size: 11pt;
+font-size: 12pt;
 font-family: monospace;
 color: #EEEEEE;
 }
@@ -320,9 +517,20 @@ flex-direction: column;
 }
 
 /* This class is for the buttons on ParaTrackerDynamic.php */
+.dynamicFormButtonsStyle:hover
+{
+color: #B31;
+background: linear-gradient(to bottom, #000B, #0006, #0000, #0006, #000B);
+background-color: #DD0;
+text-shadow: -1px 1px #000000;
+border: 1px solid #900;
+}
+
+/* This class is for the buttons on ParaTrackerDynamic.php */
 .dynamicFormButtonsStyle
 {
 margin: 10px;
+background: linear-gradient(to bottom, #0006, #0003, #0000, #0003, #0006);
 background-color: #292929;
 cursor: pointer;
 color: #EEEEEE;
@@ -331,15 +539,6 @@ font-size: 12pt;
 border: 1px solid #369;
 user-select: none;
 text-shadow: -1px 1px #000000;
-}
-
-/* This class is for the buttons on ParaTrackerDynamic.php */
-.dynamicFormButtonsStyle:hover
-{
-color: #F63;
-background: linear-gradient(to bottom, #990, #DD0, #990);
-text-shadow: -1px 1px #000000;
-border: 1px solid #900;
 }
 
 /* This class is for the buttons on ParaTrackerDynamic.php */
@@ -364,6 +563,79 @@ width: 80%;
 {
 padding: 10px 10px;
 cursor: pointer;
+white-space: nowrap;
+border-radius: 8px;
+}
+
+.greenButton:hover
+{
+background-color: #29EE29;
+color: #444;
+}
+
+.greenButton
+{
+background-color: #295529;
+}
+
+.yellowButton:hover
+{
+background-color: #EEEE22;
+color: #444;
+}
+
+.yellowButton
+{
+background-color: #888800;
+}
+
+.redButton:hover
+{
+background-color: #EE2222;
+color: #444;
+}
+
+.redButton
+{
+background-color: #771111;
+}
+
+.blueButton:hover
+{
+background-color: #4444EE;
+color: #EC3;
+}
+
+.blueButton
+{
+background-color: #222266;
+}
+
+.purpleButton:hover
+{
+background-color: #EE22EE;
+color: #444;
+}
+
+.purpleButton
+{
+background-color: #551155;
+}
+
+.disabledButton:hover
+{
+background: none;
+background-color: #555;
+color: #AAA;
+border: 1px solid #369;
+}
+
+.disabledButton
+{
+cursor: default;
+background: none;
+background-color: #555;
+color: #AAA;
 }
 
 /* This class is used for the subscripts underneath the Color input boxes on the dynamic setup page */
@@ -376,6 +648,19 @@ font-size: 8pt;
 input:focus, select:focus, textarea.focus
 {
 box-shadow: 0px 0px 20px #44F, inset 0px 0px 10px #44F;
+}
+
+.inputDarkColors
+{
+background-color: #333;
+color: #EEE;
+border: 1px solid #A00;
+}
+
+.serverToolsInput
+{
+padding: 5px;
+font-family: monospace;
 }
 
 /* This class is used to put a border around the color selections */
@@ -432,7 +717,7 @@ text-align: center;
 {
 background-size: 150%;
 background: linear-gradient(to right, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333, #FFFF33, #33FF33, #33FFFF, #3333FF, #FF33FF, #FF3333);
-animation: paraTrackerTestFrameGradientAnimation 5s linear infinite;
+animation: paraTrackerTestFrameGradientAnimation 10s linear infinite;
 }
 
 /* This class animates the background gradient */
@@ -454,11 +739,27 @@ animation: paraTrackerTestFrameGradientAnimation 5s linear infinite;
     100% {opacity: 0;}
 }
 
+/* This animation will blink an element red to get the user's attention */
+.flashRedBackground {
+	animation-name: flashRedKeyframes;
+	animation-duration: 1.2s;
+	animation-direction: normal;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes flashRedKeyframes {
+	0%		{box-shadow: 0px 0px 40px #44F, inset 0px 0px 20px #44F;}
+	15%		{box-shadow: 0px 0px 40px #F44, inset 0px 0px 80px #F44; color: #444;}
+	50%		{box-shadow: 0px 0px 40px #F00, inset 0px 0px 80px #F00; color: #FFF;}
+	85%		{box-shadow: 0px 0px 40px #F44, inset 0px 0px 80px #F44; color: #444;}
+	100%	{box-shadow: 0px 0px 40px #44F, inset 0px 0px 20px #44F;}
+}
+
 /* This class is used for the background gradient on the dynamic setup page */
 .paraTrackerTestFrameTexture
 {
 background-image: url("../images/tracker/backgroundTest.jpg");
-animation: paraTrackerTestFrameTextureAnimation 20s linear infinite;
+animation: paraTrackerTestFrameTextureAnimation 40s linear infinite;
 }
 
 .paraTrackerTestFrameTexturePreload
@@ -974,6 +1275,13 @@ BITVALUE CALCULATOR CLASSES
 	border-bottom-width: 0px;
 }
 
+.game_warfork
+{
+	background: linear-gradient(to right, #081621, #082631, #081621);
+	border: 1px solid #A0A;
+	border-bottom-width: 0px;
+}
+
 .game_wolfensteinenemyterritory
 {
 	background: linear-gradient(to right, #422, #F62, #422);
@@ -1076,7 +1384,32 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 .fiftyPercentWidth
 {
     width: 50%;
-	font-size: 10pt;
+}
+
+.gameListTableHover:hover
+{
+	background-color: #7771;
+	border-radius: 15px;
+}
+
+.gameListTableHover
+{
+	margin: 0 auto;
+}
+
+.gameListTable:hover
+{
+	font-size: 12pt;
+}
+
+.gameListTable
+{
+	font-size: 12pt;
+}
+
+.gameListTableEntries
+{
+	padding: 5px;
 }
 
 .callofduty
@@ -1177,6 +1510,12 @@ THE FOLLOWING CLASSES ARE FOR THE SUPPORTED GAMES LIST
 .warsow
 {
 	color: #FA0;
+	font-weight: bold;
+}
+
+.warfork
+{
+	color: #eb8c8a;
 	font-weight: bold;
 }
 
@@ -1361,8 +1700,16 @@ MAPREQ CLASSES
 	align-items: center;
 }
 
+.entrycont_dbg:hover {
+	background-color: #333;
+}
+
 .entrycont_dbg {
 	background-color: #222;
+}
+
+.entrycont_lbg:hover {
+	background-color: #383838;
 }
 
 .entrycont_lbg {
@@ -1396,29 +1743,44 @@ MAPREQ CLASSES
 	border: 1px solid #400;
 	outline: none;
 	border-radius: 5px;
+    cursor: pointer;
 }
 
 .entrydeletebutton:hover {
-	background-color: #F00;
+	background-color: #F60;
+	text-align: center;
 }
 
 .entrygamefield {
 	flex: 0 0 auto;
 	width: 250px;
+	text-align: center;
 }
 
 .entrybspfield {
 	flex: 0 0 auto;
-	min-width: 370px;
+	flex: 1 1 auto;
 }
 
 .entrydatefield {
 	flex: 0 0 auto;
 	width: 180px;
+	text-align: center;
+}
+
+.entryemailfield {
+	flex: 0 0 auto;
+	width: 180px;
+	text-align: center;
 }
 
 .entrylinkfield {
-	flex: 1 1 auto;
+	width: 100px;
+	text-align: center;
+}
+
+.entrylinkfieldHover:hover {
+	background-color: #971;
 }
 
 #adminlogin {
@@ -2054,6 +2416,12 @@ color: #29F;
 user-select: none;
 }
 
+/* This class is used to make text selectable for copy/paste */
+.yesSelect
+{
+user-select: all;
+}
+
 
 @keyframes redBlinker
 {
@@ -2105,6 +2473,138 @@ border-color: #33F;
 background-color: #33F;
 }
 
+/* This class is for the body on ServerTools.php */
+.serverToolsPage
+{
+background: linear-gradient(to right, #020, #061106, #020, #061106, #020, #061106, #020, #061106, #020, #061106, #020, #061106, #020);
+background-color: #000D;
+color: #BB0;
+text-align: center;
+font-family: monospace;
+margin: 0 auto;
+min-width: 725px;
+}
+
+/* This class is for the buttons on ServerTools.php */
+.serverToolsButtons
+{
+margin: 10px;
+background-color: #292929;
+cursor: pointer;
+color: #EEEEEE;
+font-family: inherit;
+font-size: 12pt;
+border: 1px solid #369;
+user-select: none;
+text-shadow: -1px 1px #000000;
+}
+
+.inlineBlock
+{
+	display: inline-block;
+}
+
+.serverToolsInfo
+{
+	font-size: 10pt;
+}
+
+.serverToolsmessageContainer
+{
+	width: 670px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.serverToolsMessages
+{
+	padding: 10px;
+	margin: 10px 0px 10px 0px;
+	border: 1px solid #AA5;
+	border-radius: 15px;
+	background-color: #262;
+	font-weight: bold;
+	color: #FFB;
+	width: 650px;
+	word-break: break-word;
+	align-items: center;
+	display: flex;
+}
+
+.serverToolsWarnings
+{
+	padding: 10px;
+	margin: 10px 0px 10px 0px;
+	border: 1px solid #A55;
+	border-radius: 15px;
+	background-color: #622;
+	font-weight: bold;
+	color: #FBB;
+	width: 650px;
+	word-break: break-word;
+	align-items: center;
+	display: flex;
+}
+
+.serverToolsWarningsText
+{
+	display: inline-block;
+	flex: 1;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.closeServerToolsMessageButton:hover
+{
+	background-color: #9999;
+	color: #FFFF;
+}
+
+.closeServerToolsMessageButton
+{
+	display: inline-block;
+	border-radius: 30px;
+	font-size: 14pt;
+	line-height: 16pt;
+	font-weight: bold;
+	padding: 5px;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	background-color: #9993;
+	color: #FFF9;
+	cursor: pointer;
+}
+
+.serverToolsDivBorder
+{
+	margin-top: 30px;
+	margin-bottom: 30px;
+	padding: 10px;
+	border: 1px solid #444;
+	box-shadow: 0px 0px 20px #999, inset 0px 0px 10px #993;
+}
+
+.noTopPadding
+{
+padding-top: 0px;
+}
+
+.noBottomPadding
+{
+padding-bottom: 0px;
+}
+
+.noTopMargin
+{
+margin-top: 0px;
+}
+
+.noBottomMargin
+{
+margin-bottom: 0px;
+}
 
 /*
 COLORIZER CLASSES

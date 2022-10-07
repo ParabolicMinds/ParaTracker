@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# This script accepts image names as arguments, and will convert them for paratracker.
+# It will also rename the source AND destination files to lowercase.
+# Wildcards ( * and ? ) are acceptable as arguments.
+
+
+
+# This part is the OLD script
+# Rename all files to lowercase BEFORE any conversions take place...
+#for img in "$@"
+#do
+#    mv "$img" `echo "$img" | tr 'A-Z' 'a-z'`
+#done
+#
+#
+## Now convert the files for ParaTracker
+#for img in "$@"
+#do
+#    mogrify -resize 300x225^ -gravity center -crop 300x225+0+0 -format png -path "../$outputFolder" "$img";
+#    echo "$img"
+#done
+
+clear
+
+outputFolder=output
+inputFolder=input
+
+# Check to make sure the input folder exists...
+if [[ ! -d "$inputFolder" ]]
+then
+    echo "$inputFolder does not exist! Cannot continue!"
+else
+
+    if [[ ! -d "$outputFolder" ]]
+    then
+        mkdir "$outputFolder"
+    fi
+        echo "Input folder: $inputFolder"
+        echo "Output folder: $outputFolder"
+
+        # Rename all files to lowercase BEFORE any conversions take place...
+        for img in $inputFolder/*
+        do
+            if [ ! $img == `echo "$img" | tr 'A-Z' 'a-z'` ]
+            then
+                echo "Renaming $img to `echo "$img" | tr 'A-Z' 'a-z'`"
+                mv "$img" `echo "$img" | tr 'A-Z' 'a-z'`
+            fi
+        done
+
+
+        # Now convert the files for ParaTracker
+        for img in $inputFolder/*
+        do
+            mogrify -resize 300x225^ -gravity center -crop 300x225+0+0 -path "$outputFolder" -format png "$img";
+            echo "$img"
+        done
+
+
+fi

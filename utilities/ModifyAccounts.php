@@ -1,4 +1,16 @@
 <?php
+/*
+
+ParaTracker is released under the MIT license, which reads thus:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
 
 $analyticsBackground = 1;
 $calledFromElsewhere = 1;
@@ -94,15 +106,15 @@ function renderInstructions()
     $output = '<html><body style="font-family: monospace; font-size: 12pt;"><h3>This file does nothing unless it is run from the command line.</h3>';
 
     $output .= "<h3>Instructions:</h3>";
-    $output .= "<p>To add an account, run this file with the following parameters:<br>";
+    $output .= "<p>To add an account, run this file from the command line with the following parameters:<br>";
     $output .= "<strong>add &lt;username&gt; &lt;password&gt;</strong><br>";
     $output .= "The password will be hashed and salted, and stored in the database.</p>";
 
-    $output .= "<p>To modify an account (Change the password), run this file with the following parameters:<br>";
+    $output .= "<p>To modify an account (Change the password), run this file from the command line with the following parameters:<br>";
     $output .= "<strong>modify &lt;username&gt; &lt;password&gt;</strong><br>";
     $output .= "The new password will be hashed and salted, and stored in the database.</p>";
 
-    $output .= "<p>To delete an account, run this file with the following parameters:<br>";
+    $output .= "<p>To delete an account, run this file from the command line with the following parameters:<br>";
     $output .= "<strong>delete &lt;username></strong><br>";
     $output .= "The user will be removed from the database.</p>";
 

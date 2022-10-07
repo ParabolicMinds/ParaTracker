@@ -20,12 +20,12 @@
 
 
 /*==================================================================================================*/
-// TRACKER NAME
-// TRACKER NAME
+// TRACKER TAGLINE
+// TRACKER TAGLINE
 
 //This value appears in the title bar of the browser. It will show up in Google search results - choose wisely!
-//Default value is "ParaTracker - The Ultimate Quake III Server Tracker"
-$trackerName = "ParaTracker - The Ultimate Quake III Server Tracker";
+//Default value is "The Ultimate Quake III Server Tracker"
+$trackerTagline = "The Ultimate Quake III Server Tracker";
 
 
 /*==================================================================================================*/
@@ -45,14 +45,19 @@ $serverPort = "";
 
 // This variable limits how many seconds are required between each snapshot of the server.
 // This prevents high traffic on the tracker from bogging down the game server it is tracking.
-// ParaTracker forces a minimum value of 5 seconds between snapshots. Maximum is 1200 seconds.
+// ParaTracker forces a minimum value of 2 seconds between snapshots. Maximum is 60 seconds.
 // This value cannot be lower than the value of $connectionTimeout (below).
-// Default is 15 seconds.
-$floodProtectTimeout = "15";
+// Default is 5 seconds.
+$floodProtectTimeout = "5";
+
+// This value is the number of times ParaTracker will attempt to connect to a game server before giving up.
+// Minimum value is 1, maximum value is 10.
+// Default is 2.
+$connectionAttempts = 2;
 
 // This value is the number of seconds ParaTracker will wait for a response from the game server
-// before timing out. If the first attempt fails, a second attempt will be made.
-// ParaTracker forces a minimum value of 1 second, and will not allow values over 15 seconds.
+// before timing out. ParaTracker forces a minimum value of 1 second, and will not allow values
+// over 15 seconds.
 // Not recommended to go above 5 seconds, as people will get impatient and leave.
 // This setting also affects RCon wait times.
 // Default is 2.5 seconds.
@@ -201,6 +206,13 @@ $levelshotTransitionAnimation = "3";
 // Default is 20 levelshots.
 $maximumLevelshots = "20";
 
+// This value is boolean. When this variable is set to Yes or 1, it allows the user to specify
+// custom levelshots in the tracker URL. If there are no levelshots found for a map, a custom
+// levelshot may be used in place of the default levelshot for that particular game.
+// This feature only works in dynamic mode.
+// Default is 1.
+$enableCustomDefaultLevelshots = "1";
+
 
 /*==================================================================================================*/
 // TRACKER SETTINGS
@@ -231,8 +243,8 @@ $enableAutoRefresh = "1";
 // Decimals are invalid and will be rounded.
 // Minimum is 10 seconds, maximum is 300 seconds.
 // Cannot be lower than the value of $floodProtectTimeout.
-// Default is 30 seconds.
-$autoRefreshTimer = "30";
+// Default is 15 seconds.
+$autoRefreshTimer = "15";
 
 // This variable will set the maximum number of characters ParaTracker will accept from the server.
 // This prevents pranksters from sending 50MB back, in the event that you connect to
@@ -251,6 +263,13 @@ $maximumServerInfoSize = "16384";
 // A value of Yes or 1 will enable it, and any other value will disable it.
 // Disabled by default.
 $dynamicTrackerEnabled = "0";
+
+// This next setting enables server tools, which enables things like DDOS filtering for server owners,
+// as well as viweing server security logs (RCon). This feature requires "Dynamic" ParaTracker (Above)
+// to be enabled, otherwise it will be forcefully disabled.
+// A value of Yes or 1 will enable it, and any other value will disable it.
+// Enabled by default.
+$serverToolsEnabled = "1";
 
 // The following setting is a personal message that will be displayed on ParaTrackerDynamic.php when a user is setting
 // up ParaTracker for their own use. By default, this is simply a link to our GitHub, where you can download the program
@@ -278,10 +297,10 @@ $RConMaximumMessageSize = "200";
 // RCon flood protection forces the user to wait a certain number of seconds before sending another command.
 // Note that this is not user-specific; if someone else is using RCon on your server, you will also have to wait
 // to send the command.
-// Minimum is 10 seconds, maximum is 3600.
+// Minimum is 5 seconds, maximum is 20.
 // Cannot be lower than the value of $connectionTimeout.
-// Default is 20 seconds.
-$RConFloodProtect = "20";
+// Default is 10 seconds.
+$RConFloodProtect = "10";
 
 
 /*==================================================================================================*/
@@ -380,6 +399,10 @@ $mapreqTextMessage = "Click here to add levelshots";
 // Emails are sent by SendEmails.php, which is found in the $utilitiesPath folder.
 // SendEmails.php must be activated by a cron job, that runs at the frequency you want to receive administrative reports.
 
+// This value is the domain of the server ParaTracker is running on, for instance 'paratracker.dogi.us'
+// It is used in emails to link back to the web page (Some tools are run from command line so there is no domain)
+$webServerDomain = "pt.dogi.us";
+
 // This setting enables or disables e-mail functionality. For this to work, an administrator e-mail address must exist,
 // and PHPMailer must be installed via composer.
 // Default is 0
@@ -397,25 +420,33 @@ $emailPath = "vendor/phpmailer/phpmailer/";
 // Default is 0
 $useSMTP = "0";
 
-    // If using SMTP, this variable is the address of the SMTP server we will use
-    // Default is ""
-    $smtpAddress = "";
+	// If using SMTP, this variable is the address of the SMTP server we will use
+	// Default is ""
+	$smtpAddress = "";
 
-    // If using SMTP, this variable is the port of the SMTP server we will use
-    // Default is ""
-    $smtpPort = "";
+	// If using SMTP, this variable is the port of the SMTP server we will use
+	// Default is ""
+	$smtpPort = "";
 
-    // If using SMTP, this variable is the username we will use for the SMTP server
-    // Default is ""
-    $smtpUsername = "";
+	// If using SMTP, this will control if the connection is secure. Valid values are true and false
+	// Default is true
+	$SMTPSecure = true;
 
-    // If using SMTP, this variable is the password we will use for the SMTP server
-    // Default is ""
-    $smtpPassword = "";
+	// If using SMTP, this variable is the username we will use for the SMTP server
+	// Default is ""
+	$smtpUsername = "";
+
+	// If using SMTP, this variable is the password we will use for the SMTP server
+	// Default is ""
+	$smtpPassword = "";
 
 // This is the address that will be used to send the email.
 // Default is ""
 $emailFromAddress = "";
+
+// Server tools has a feature to allow users to email the administrators once they have logged in.
+// Default is 0.
+$serverToolsAllowEmailAdministrators = 0;
 
 // This is an array of administrator e-mail addresses. You can add as many as you like. Add each e-mail address
 // on a new line, between the double quotes, and make sure there is a comma at the end of each line, with the
@@ -516,13 +547,13 @@ $errorLogSize = "10000";
 // Default is 10000 lines.
 $cleanupLogSize = "10000";
 
-// RCon events are logged in RConLog.php. Each server has it's own unique RCon log, which is found in the
+// RCon events are logged in SecurityLog.php. Each server has it's own unique RCon log, which is found in the
 // $logPath folder, inside a folder named for the server's IP address and port.
 // This setting will determine the maximum number of lines that will be stored in the log file
 // before the old entries are truncated.
 // Minimum is 100 lines. Maximum is 100000.
 // Default is 1000 lines.
-$RConLogSize = "1000";
+$SecurityLogSize = "1000";
 
 
 /*==================================================================================================*/

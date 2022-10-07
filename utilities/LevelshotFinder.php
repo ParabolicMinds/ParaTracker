@@ -1,4 +1,16 @@
 ﻿<?php
+/*
+
+ParaTracker is released under the MIT license, which reads thus:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+
 
 $calledFromElsewhere = 1;
 
@@ -63,13 +75,30 @@ if(function_exists($gameName) && is_callable($gameName))
     //Call the function
     $GameInfoData = $gameName(array(), array());
     $levelshotFolder = $GameInfoData[1];
-	echo '-->:#:' . levelshotFinder("", $mapName, $levelshotFolder, $gameName, 1) . ':#:';
+    $defaultLevelshot = $GameInfoData[2];
+    
+    //levelshotfinder returns an array, so we need to get index 0
+	$output = levelshotFinder("", $mapName, $levelshotFolder, $gameName, $defaultLevelshot, 1);
 
-    if(strtolower($levelshotFolder) == "unknown")
+	//Strip this down to just the first entry
+	if(is_array($output)) $output = $output[0];
+
+	if(strtolower($levelshotFolder) == "unknown" || $output == "")
     {
-        //Invalid game. Terminate.
-        return levelshotPlaceholder;
+		//Invalid game or no levelshots found - see if there's a default levelshot
+		if($defaultLevelshot != "")
+		{
+			$output = $defaultLevelshot;
+		}
+		else
+		{
+			//Nothing at all...we'll just have to use the placeholder
+			$output = levelshotPlaceholder;
+		}
     }
+
+	$output = '-->:#:' . $output . ':#:';
+	echo $output;
 }
 
 ?>
